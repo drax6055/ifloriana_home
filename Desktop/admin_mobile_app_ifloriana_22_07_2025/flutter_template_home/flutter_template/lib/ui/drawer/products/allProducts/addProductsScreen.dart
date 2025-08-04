@@ -1,0 +1,589 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_template/ui/drawer/products/allProducts/addProductsController.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import '../../../../wiget/custome_snackbar.dart';
+
+class AddProductScreen extends StatelessWidget {
+  const AddProductScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.put(AddProductController());
+    final textTheme = Theme.of(context).textTheme;
+    final isEditMode = controller.isEditMode.value;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(isEditMode ? 'Update Product' : 'Add Product'),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: controller.formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // _buildImagePicker(controller),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: controller.productNameController,
+                decoration: const InputDecoration(
+                    labelText: 'Product Name *', border: OutlineInputBorder()),
+                validator: (v) => v!.isEmpty ? 'Required' : null,
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: controller.descriptionController,
+                decoration: const InputDecoration(
+                    labelText: 'Description', border: OutlineInputBorder()),
+                maxLines: 3,
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(child: _buildBrandDropdown(controller)),
+                  const SizedBox(width: 8),
+                  Expanded(child: _buildCategoryDropdown(controller)),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(child: _buildTagDropdown(controller)),
+                  const SizedBox(width: 8),
+                  Expanded(child: _buildUnitDropdown(controller)),
+                ],
+              ),
+              const SizedBox(height: 24),
+              _buildSectionTitle(textTheme, 'Price, SKU & Stock'),
+              Obx(() => _buildPriceSection(controller)),
+              const SizedBox(height: 24),
+              // Removed _buildSectionTitle(textTheme, 'Product Discount'),
+              // Removed _buildDiscountSection(controller),
+              const SizedBox(height: 24),
+              _buildSectionTitle(textTheme, 'Status'),
+              _buildStatusSelector(controller),
+              const SizedBox(height: 24),
+              _buildSectionTitle(textTheme, 'Branch *'),
+              _buildBranchDropdown(controller),
+              const SizedBox(height: 32),
+              _buildActionButtons(controller, isEditMode),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImagePicker(AddProductController controller) {
+    return Center(
+      child: Column(
+        children: [
+          Obx(() => Container(
+                height: 120,
+                width: 120,
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.grey.shade200),
+                child: controller.imageFile.value != null
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.file(controller.imageFile.value!,
+                            fit: BoxFit.cover))
+                    : const Icon(Icons.image, size: 50, color: Colors.grey),
+              )),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                  onPressed: controller.pickImage, child: const Text('Upload')),
+              const SizedBox(width: 8),
+              TextButton(
+                onPressed: () => controller.imageFile.value = null,
+                child:
+                    const Text('Remove', style: TextStyle(color: Colors.red)),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- Dropdown Widgets ---
+  Widget _buildBrandDropdown(AddProductController controller) {
+    return Obx(() => DropdownButtonFormField<Brand>(
+          value: controller.selectedBrand.value,
+          decoration: const InputDecoration(
+              labelText: 'Brand *', border: OutlineInputBorder()),
+          items: controller.brandList
+              .map((item) =>
+                  DropdownMenuItem(value: item, child: Text(item.name ?? '')))
+              .toList(),
+          onChanged: (v) => controller.selectedBrand.value = v,
+          validator: (v) => v == null ? 'Required' : null,
+        ));
+  }
+
+  Widget _buildCategoryDropdown(AddProductController controller) {
+    return Obx(() => DropdownButtonFormField<Category>(
+          value: controller.selectedCategory.value,
+          decoration: const InputDecoration(
+              labelText: 'Category *', border: OutlineInputBorder()),
+          items: controller.categoryList
+              .map((item) =>
+                  DropdownMenuItem(value: item, child: Text(item.name ?? '')))
+              .toList(),
+          onChanged: (v) => controller.selectedCategory.value = v,
+          validator: (v) => v == null ? 'Required' : null,
+        ));
+  }
+
+  Widget _buildTagDropdown(AddProductController controller) {
+    return Obx(() => DropdownButtonFormField<Tag>(
+          value: controller.selectedTag.value,
+          decoration: const InputDecoration(
+              labelText: 'Tag *', border: OutlineInputBorder()),
+          items: controller.tagList
+              .map((item) =>
+                  DropdownMenuItem(value: item, child: Text(item.name ?? '')))
+              .toList(),
+          onChanged: (v) => controller.selectedTag.value = v,
+          validator: (v) => v == null ? 'Required' : null,
+        ));
+  }
+
+  Widget _buildUnitDropdown(AddProductController controller) {
+    return Obx(() => DropdownButtonFormField<Unit>(
+          value: controller.selectedUnit.value,
+          decoration: const InputDecoration(
+              labelText: 'Unit *', border: OutlineInputBorder()),
+          items: controller.unitList
+              .map((item) =>
+                  DropdownMenuItem(value: item, child: Text(item.name ?? '')))
+              .toList(),
+          onChanged: (v) => controller.selectedUnit.value = v,
+          validator: (v) => v == null ? 'Required' : null,
+        ));
+  }
+
+  Widget _buildBranchDropdown(AddProductController controller) {
+    return Obx(() => DropdownButtonFormField<Branch>(
+          value: controller.selectedBranch.value,
+          decoration: const InputDecoration(
+              labelText: 'Branch *', border: OutlineInputBorder()),
+          items: controller.branchList
+              .map((item) =>
+                  DropdownMenuItem(value: item, child: Text(item.name ?? '')))
+              .toList(),
+          onChanged: (v) => controller.selectedBranch.value = v,
+          validator: (v) => v == null ? 'Required' : null,
+        ));
+  }
+
+  Widget _buildSectionTitle(TextTheme theme, String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0, top: 12.0),
+      child: Text(title,
+          style: theme.titleLarge?.copyWith(fontWeight: FontWeight.w600)),
+    );
+  }
+
+  // --- Price and Variation Section ---
+  Widget _buildPriceSection(AddProductController controller) {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        side: BorderSide(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                const Text('Has variations?'),
+                Switch(
+                  value: controller.hasVariations.value,
+                  onChanged: (val) => controller.hasVariations.value = val,
+                ),
+              ],
+            ),
+            const Divider(),
+            if (!controller.hasVariations.value)
+              _buildSimplePriceFields(controller)
+            else
+              _buildVariationPriceFields(controller),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSimplePriceFields(AddProductController controller) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: Row(
+        children: [
+          Expanded(
+              child: TextFormField(
+                  controller: controller.priceController,
+                  decoration: const InputDecoration(
+                      labelText: 'Price *', border: OutlineInputBorder()),
+                  keyboardType: TextInputType.number,
+                  validator: (v) => v!.isEmpty ? 'Required' : null)),
+          const SizedBox(width: 8),
+          Expanded(
+              child: TextFormField(
+                  controller: controller.stockController,
+                  decoration: const InputDecoration(
+                      labelText: 'Stock *', border: OutlineInputBorder()),
+                  keyboardType: TextInputType.number,
+                  validator: (v) => v!.isEmpty ? 'Required' : null)),
+          const SizedBox(width: 8),
+          Expanded(
+              child: TextFormField(
+            controller: controller.skuController,
+            decoration: const InputDecoration(
+              labelText: 'SKU',
+              border: OutlineInputBorder(),
+              suffixIcon: Icon(Icons.qr_code_scanner),
+            ),
+            readOnly: true,
+            onTap: () => controller.scanBarcodeForSku(),
+          )),
+          const SizedBox(width: 8),
+          Expanded(
+              child: TextFormField(
+                  controller: controller.codeController,
+                  decoration: const InputDecoration(
+                      labelText: 'Code', border: OutlineInputBorder()))),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVariationPriceFields(AddProductController controller) {
+    return Obx(() => Column(
+          children: [
+            ...List.generate(controller.variationGroups.length, (index) {
+              final group = controller.variationGroups[index];
+              return _buildVariationGroup(controller, group, index);
+            }),
+            const SizedBox(height: 12),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: ElevatedButton.icon(
+                onPressed: controller.addVariationGroup,
+                icon: const Icon(Icons.add),
+                label: const Text('Add More Variation'),
+              ),
+            ),
+            if (controller.generatedVariants.isNotEmpty)
+              const SizedBox(height: 16),
+            ...List.generate(controller.generatedVariants.length, (index) {
+              final variant = controller.generatedVariants[index];
+              return _buildVariantInputRow(variant);
+            }),
+          ],
+        ));
+  }
+
+  Widget _buildVariationGroup(
+      AddProductController controller, VariationGroup group, int index) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            flex: 2,
+            child: Obx(() => DropdownButtonFormField<Variation>(
+                  value: group.selectedType.value,
+                  decoration: const InputDecoration(
+                      labelText: 'Variation Type',
+                      border: OutlineInputBorder()),
+                  items: controller.variationList
+                      .map((item) =>
+                          DropdownMenuItem(value: item, child: Text(item.name)))
+                      .toList(),
+                  onChanged: (v) {
+                    group.selectedType.value = v;
+                    group.selectedValues.clear();
+                    controller.update(); // Re-triggers UI build
+                  },
+                  validator: (v) => v == null ? 'Required' : null,
+                )),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+              flex: 3,
+              child: Obx(() {
+                final variationType = group.selectedType.value;
+                return InkWell(
+                  onTap: () {
+                    if (variationType?.values == null ||
+                        variationType!.values.isEmpty) {
+                      CustomSnackbar.showError(
+                          "Error", "Select a variation type first.");
+                      return;
+                    }
+                    _showMultiSelectDialog(
+                      context: Get.context!,
+                      title: 'Select ${variationType.name} Values',
+                      items: variationType.values,
+                      selectedItems: group.selectedValues,
+                      onConfirm: (List<String> newSelection) {
+                        controller.onVariationValuesChanged(
+                            index, newSelection);
+                      },
+                    );
+                  },
+                  child: InputDecorator(
+                    decoration: const InputDecoration(
+                      labelText: 'Variation Value',
+                      border: OutlineInputBorder(),
+                    ),
+                    child: Obx(() => group.selectedValues.isEmpty
+                        ? const Text('Select Values',
+                            style: TextStyle(color: Colors.black54))
+                        : Wrap(
+                            spacing: 6.0,
+                            runSpacing: 0.0,
+                            children: group.selectedValues
+                                .map((value) => Chip(
+                                      label: Text(value),
+                                      materialTapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      labelPadding: const EdgeInsets.symmetric(
+                                          horizontal: 4),
+                                      onDeleted: () {
+                                        List<String> currentSelection =
+                                            List.from(group.selectedValues);
+                                        currentSelection.remove(value);
+                                        controller.onVariationValuesChanged(
+                                            index, currentSelection);
+                                      },
+                                    ))
+                                .toList(),
+                          )),
+                  ),
+                );
+              })),
+          IconButton(
+              onPressed: () => controller.removeVariationGroup(index),
+              icon: const Icon(Icons.delete, color: Colors.red)),
+        ],
+      ),
+    );
+  }
+
+  void _showMultiSelectDialog({
+    required BuildContext context,
+    required String title,
+    required List<String> items,
+    required List<String> selectedItems,
+    required Function(List<String>) onConfirm,
+  }) {
+    final tempSelectedItems = RxList<String>.from(selectedItems);
+
+    Get.dialog(AlertDialog(
+      title: Text(title),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: items.length,
+          itemBuilder: (ctx, index) {
+            final item = items[index];
+            return Obx(() => CheckboxListTile(
+                  controlAffinity: ListTileControlAffinity.leading,
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(item),
+                  value: tempSelectedItems.contains(item),
+                  onChanged: (bool? selected) {
+                    if (selected == true) {
+                      tempSelectedItems.add(item);
+                    } else {
+                      tempSelectedItems.remove(item);
+                    }
+                  },
+                ));
+          },
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Get.back(),
+          child: const Text('Cancel'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            onConfirm(tempSelectedItems.toList());
+            Get.back();
+          },
+          child: const Text('OK'),
+        ),
+      ],
+    ));
+  }
+
+  Widget _buildVariantInputRow(GeneratedVariant variant) {
+    final label = variant.combination.entries.map((e) => e.value).join(' / ');
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          Expanded(
+              flex: 2,
+              child: Text(label,
+                  style: const TextStyle(fontWeight: FontWeight.bold))),
+          const SizedBox(width: 8),
+          Expanded(
+              flex: 2,
+              child: TextFormField(
+                  controller: variant.priceController,
+                  decoration: const InputDecoration(
+                      labelText: 'Price', border: OutlineInputBorder()),
+                  keyboardType: TextInputType.number)),
+          const SizedBox(width: 8),
+          Expanded(
+              flex: 1,
+              child: TextFormField(
+                  controller: variant.stockController,
+                  decoration: const InputDecoration(
+                      labelText: 'Stock', border: OutlineInputBorder()),
+                  keyboardType: TextInputType.number)),
+          const SizedBox(width: 8),
+          Expanded(
+              flex: 2,
+              child: TextFormField(
+                  controller: variant.skuController,
+                  decoration: const InputDecoration(
+                      labelText: 'SKU', border: OutlineInputBorder()))),
+          const SizedBox(width: 8),
+          Expanded(
+              flex: 2,
+              child: TextFormField(
+                  controller: variant.codeController,
+                  decoration: const InputDecoration(
+                      labelText: 'Code', border: OutlineInputBorder()))),
+        ],
+      ),
+    );
+  }
+
+  // Removed _buildDiscountSection and _buildDateField as they are no longer needed
+  // Widget _buildDiscountSection(AddProductController controller) {
+  //   return Column(
+  //     children: [
+  //       Row(
+  //         children: [
+  //           Expanded(
+  //             child: Obx(() => DropdownButtonFormField<String>(
+  //                   value: controller.discountType.value,
+  //                   items: ['fixed', 'percentage']
+  //                       .map((t) => DropdownMenuItem(
+  //                             value: t,
+  //                             child: Text(t[0].toUpperCase() + t.substring(1)),
+  //                           ))
+  //                       .toList(),
+  //                   onChanged: (v) => controller.discountType.value = v!,
+  //                   decoration: const InputDecoration(
+  //                       labelText: 'Type', border: OutlineInputBorder()),
+  //                 )),
+  //           ),
+  //           const SizedBox(width: 8),
+  //           Expanded(
+  //               child: _buildDateField(
+  //                   Get.context!, controller.startDate, 'Start Date')),
+  //           const SizedBox(width: 8),
+  //           Expanded(
+  //               child: _buildDateField(
+  //                   Get.context!, controller.endDate, 'End Date')),
+  //         ],
+  //       ),
+  //       const SizedBox(height: 12),
+  //       TextFormField(
+  //         controller: controller.discountAmountController,
+  //         decoration: const InputDecoration(
+  //             labelText: 'Discount Amount', border: OutlineInputBorder()),
+  //         keyboardType: TextInputType.number,
+  //       ),
+  //     ],
+  //   );
+  // }
+  //
+  // Widget _buildDateField(
+  //     BuildContext context, Rx<DateTime?> date, String label) {
+  //   final format = DateFormat('MM/dd/yyyy');
+  //   return Obx(() => InkWell(
+  //         onTap: () async {
+  //           final picked = await showDatePicker(
+  //             context: context,
+  //             initialDate: date.value ?? DateTime.now(),
+  //             firstDate: DateTime(2000),
+  //             lastDate: DateTime(2101),
+  //           );
+  //           if (picked != null) {
+  //             date.value = picked;
+  //           }
+  //         },
+  //         child: InputDecorator(
+  //           decoration: InputDecoration(
+  //               labelText: label, border: const OutlineInputBorder()),
+  //           child: Text(
+  //               date.value != null ? format.format(date.value!) : 'mm/dd/yyyy'),
+  //         ),
+  //       ));
+  // }
+
+  Widget _buildStatusSelector(AddProductController controller) {
+    return Obx(() => Row(
+          children: [
+            Radio<String>(
+                value: 'active',
+                groupValue: controller.status.value,
+                onChanged: (v) => controller.status.value = v!),
+            const Text('Active'),
+            const SizedBox(width: 16),
+            Radio<String>(
+                value: 'inactive',
+                groupValue: controller.status.value,
+                onChanged: (v) => controller.status.value = v!),
+            const Text('Inactive'),
+          ],
+        ));
+  }
+
+  Widget _buildActionButtons(AddProductController controller, bool isEditMode) {
+    return Obx(() => controller.isLoading.value
+        ? const Center(child: CircularProgressIndicator())
+        : Row(
+            children: [
+              Expanded(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16)),
+                  onPressed: controller.saveProduct,
+                  child: Text(isEditMode ? 'Update Product' : 'Add Product'),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16)),
+                  onPressed: () => Get.back(),
+                  child: const Text('Cancel'),
+                ),
+              ),
+            ],
+          ));
+  }
+}
