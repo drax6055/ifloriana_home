@@ -21,56 +21,54 @@ class Staffdetailsscreen extends StatelessWidget {
         title: 'Staff Details',
         actions: [
           // Branch filter popup menu
-          Obx(() => PopupMenuButton<String>(
-                onSelected: controller.onBranchChanged,
-                itemBuilder: (BuildContext context) => [
-                  const PopupMenuItem<String>(
-                    value: '',
-                    child: Row(
-                      children: [
-                        Icon(Icons.filter_list, color: primaryColor),
-                        SizedBox(width: 8),
-                        Text('All Branches'),
-                      ],
-                    ),
-                  ),
-                  const PopupMenuDivider(),
-                  ...controller.availableBranches
-                      .map(
-                        (branch) => PopupMenuItem<String>(
-                          value: branch.sId,
-                          child: Row(
-                            children: [
-                              const Icon(Icons.location_on,
-                                  color: primaryColor, size: 20),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  branch.name ?? 'Unknown Branch',
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                              ),
-                              if (controller.selectedBranchId.value ==
-                                  branch.sId)
-                                const Icon(Icons.check,
-                                    color: primaryColor, size: 16),
-                            ],
-                          ),
-                        ),
-                      )
-                      .toList(),
-                ],
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.more_vert,
-                          color: Colors.white, size: 20),
-                    ],
-                  ),
+          PopupMenuButton<String>(
+            onSelected: controller.onBranchChanged,
+            itemBuilder: (BuildContext context) => [
+              const PopupMenuItem<String>(
+                value: '',
+                child: Row(
+                  children: [
+                    Icon(Icons.filter_list, color: primaryColor),
+                    SizedBox(width: 8),
+                    Text('All Branches'),
+                  ],
                 ),
-              )),
+              ),
+              const PopupMenuDivider(),
+              ...controller.availableBranches
+                  .map(
+                    (branch) => PopupMenuItem<String>(
+                      value: branch.sId,
+                      child: Row(
+                        children: [
+                          const Icon(Icons.location_on,
+                              color: primaryColor, size: 20),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              branch.name ?? 'Unknown Branch',
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                          ),
+                          if (controller.selectedBranchId.value == branch.sId)
+                            const Icon(Icons.check,
+                                color: primaryColor, size: 16),
+                        ],
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ],
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.more_vert, color: Colors.white, size: 20),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
       body: RefreshIndicator(
