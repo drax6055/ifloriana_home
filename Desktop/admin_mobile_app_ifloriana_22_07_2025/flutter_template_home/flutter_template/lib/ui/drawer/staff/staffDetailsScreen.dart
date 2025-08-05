@@ -4,6 +4,7 @@ import 'package:flutter_template/ui/drawer/staff/staffDetailsController.dart';
 import 'package:flutter_template/utils/app_images.dart';
 import 'package:flutter_template/utils/colors.dart';
 import 'package:get/get.dart';
+import 'package:flutter_template/wiget/appbar/commen_appbar.dart';
 
 import '../../../wiget/loading.dart';
 import '../../../ui/drawer/staff/addNewStaffScreen.dart';
@@ -16,6 +17,62 @@ class Staffdetailsscreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: CustomAppBar(
+        title: 'Staff Details',
+        actions: [
+          // Branch filter popup menu
+          Obx(() => PopupMenuButton<String>(
+                onSelected: controller.onBranchChanged,
+                itemBuilder: (BuildContext context) => [
+                  const PopupMenuItem<String>(
+                    value: '',
+                    child: Row(
+                      children: [
+                        Icon(Icons.filter_list, color: primaryColor),
+                        SizedBox(width: 8),
+                        Text('All Branches'),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuDivider(),
+                  ...controller.availableBranches
+                      .map(
+                        (branch) => PopupMenuItem<String>(
+                          value: branch.sId,
+                          child: Row(
+                            children: [
+                              const Icon(Icons.location_on,
+                                  color: primaryColor, size: 20),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  branch.name ?? 'Unknown Branch',
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                              ),
+                              if (controller.selectedBranchId.value ==
+                                  branch.sId)
+                                const Icon(Icons.check,
+                                    color: primaryColor, size: 16),
+                            ],
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ],
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.more_vert,
+                          color: Colors.white, size: 20),
+                    ],
+                  ),
+                ),
+              )),
+        ],
+      ),
       body: RefreshIndicator(
         color: primaryColor,
         onRefresh: () async {
@@ -26,14 +83,29 @@ class Staffdetailsscreen extends StatelessWidget {
             return const Center(child: CustomLoadingAvatar());
           }
 
-          if (controller.staffList.isEmpty) {
-            return const Center(child: Text("No staff found"));
+          if (controller.filteredStaffList.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.people_outline,
+                      size: 64, color: Colors.grey),
+                  const SizedBox(height: 16),
+                  Text(
+                    controller.selectedBranchId.value.isEmpty
+                        ? "No staff found"
+                        : "No staff found for selected branch",
+                    style: const TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                ],
+              ),
+            );
           }
 
           return ListView.builder(
-            itemCount: controller.staffList.length,
+            itemCount: controller.filteredStaffList.length,
             itemBuilder: (context, index) {
-              final staff = controller.staffList[index];
+              final staff = controller.filteredStaffList[index];
 
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

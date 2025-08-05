@@ -57,7 +57,7 @@ class DrawerScreen extends StatelessWidget {
       {
         'title': 'Staff',
         'widget': Staffdetailsscreen(),
-        'showAppBar': true,
+        'showAppBar': false,
         'actions': [
           IconButton(
             onPressed: () {

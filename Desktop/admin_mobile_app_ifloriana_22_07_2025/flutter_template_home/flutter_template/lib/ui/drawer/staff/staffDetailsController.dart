@@ -228,7 +228,10 @@ class ServiceId {
 
 class Staffdetailscontroller extends GetxController {
   var staffList = <Data>[].obs;
+  var filteredStaffList = <Data>[].obs;
   var isLoading = false.obs;
+  var selectedBranchId = ''.obs;
+  var availableBranches = <BranchId>[].obs;
 
   @override
   void onInit() {
@@ -245,11 +248,50 @@ class Staffdetailscontroller extends GetxController {
         (json) => GetStaffDetails.fromJson(json),
       );
       staffList.value = response.data ?? [];
+
+      // Extract unique branches from staff list
+      _extractBranches();
+
+      // Apply initial filter
+      applyBranchFilter();
     } catch (e) {
       CustomSnackbar.showError('Error', 'Failed to check email: $e');
     } finally {
       isLoading.value = false;
     }
+  }
+
+  void _extractBranches() {
+    final branches = <BranchId>[];
+    final branchIds = <String>{};
+
+    for (final staff in staffList) {
+      if (staff.branchId != null &&
+          staff.branchId!.sId != null &&
+          !branchIds.contains(staff.branchId!.sId)) {
+        branches.add(staff.branchId!);
+        branchIds.add(staff.branchId!.sId!);
+      }
+    }
+
+    availableBranches.value = branches;
+  }
+
+  void applyBranchFilter() {
+    if (selectedBranchId.value.isEmpty) {
+      // Show all staff if no branch is selected
+      filteredStaffList.value = staffList;
+    } else {
+      // Filter staff by selected branch
+      filteredStaffList.value = staffList
+          .where((staff) => staff.branchId?.sId == selectedBranchId.value)
+          .toList();
+    }
+  }
+
+  void onBranchChanged(String? branchId) {
+    selectedBranchId.value = branchId ?? '';
+    applyBranchFilter();
   }
 
   Future<void> deleteStaff(String staffId) async {
