@@ -3,6 +3,7 @@ import 'package:flutter_template/main.dart';
 import 'package:flutter_template/network/network_const.dart';
 import 'package:flutter_template/wiget/custome_snackbar.dart';
 import 'package:get/get.dart';
+import 'package:multi_dropdown/multi_dropdown.dart';
 import 'package:flutter_template/ui/drawer/staff/staffDetailsController.dart';
 
 class Service {
@@ -62,6 +63,7 @@ class Addnewstaffcontroller extends GetxController {
   RxList<Service> serviceList = <Service>[].obs;
   Rx<Service?> selectedService = Rx<Service?>(null);
   RxList<Service> selectedServices = <Service>[].obs;
+  final serviceController = MultiSelectController<Service>();
   var branchList = <Branch>[].obs;
   var commitionList = <Commition>[].obs;
   var selectedBranch = Rx<Branch?>(null);

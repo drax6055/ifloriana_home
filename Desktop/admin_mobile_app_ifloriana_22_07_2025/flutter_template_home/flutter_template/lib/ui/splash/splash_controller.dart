@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter_template/main.dart';
+import 'package:flutter_template/ui/drawer/staff/addNewStaffScreen.dart'
+    show Addnewstaffscreen;
 import 'package:flutter_template/ui/inhouse/get/inhouseProduct_screen.dart'
     show InhouseproductScreen;
 import 'package:get/get.dart';
@@ -31,9 +33,9 @@ class SplashController extends GetxController {
         String? managerAccessToken = managerUser?.token;
 
         if (accessToken != null && accessToken.isNotEmpty) {
-          // Get.to(Getbrandsscreen());
+          Get.to(Addnewstaffscreen());
           // Get.to(StaffServiceReportScreen());
-          Get.offNamed(Routes.drawerScreen); // Regular user
+          // Get.offNamed(Routes.drawerScreen); // Regular user
         } else if (managerAccessToken != null &&
             managerAccessToken.isNotEmpty) {
           Get.offNamed(Routes.managerDashboard); // Manager user

@@ -10,6 +10,7 @@ import 'package:flutter_template/wiget/Custome_textfield.dart';
 import 'package:flutter_template/wiget/custome_dropdown.dart';
 import 'package:flutter_template/wiget/custome_snackbar.dart';
 import 'package:get/get.dart';
+import 'package:multi_dropdown/multi_dropdown.dart';
 import 'package:step_progress/step_progress.dart';
 import 'package:flutter_template/ui/drawer/staff/staffDetailsController.dart';
 
@@ -176,7 +177,7 @@ class Addnewstaffscreen extends StatelessWidget {
 
   Widget Imagepicker() {
     return Obx(() {
-      return GestureDetector( 
+      return GestureDetector(
         onTap: () => pickImage(isMultiple: false),
         child: Container(
           height: 120.h,
@@ -393,51 +394,44 @@ class Addnewstaffscreen extends StatelessWidget {
 
   Widget serviceDropdown() {
     return Obx(() {
-      final allSelected = getController.selectedServices.length ==
-              getController.serviceList.length &&
-          getController.serviceList.isNotEmpty;
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Wrap(
-            spacing: 8.0,
-            runSpacing: 8.0,
-            children: [
-              // Select All chip
-              FilterChip(
-                label: Text(allSelected ? 'Deselect All' : 'Select All'),
-                selected: allSelected,
-                onSelected: (selected) {
-                  if (selected) {
-                    getController.selectedServices
-                        .assignAll(getController.serviceList);
-                  } else {
-                    getController.selectedServices.clear();
-                  }
-                },
-                disabledColor: secondaryColor.withOpacity(0.2),
-                selectedColor: primaryColor.withOpacity(0.2),
-              ),
-
-              ...getController.serviceList.map((service) {
-                final isSelected =
-                    getController.selectedServices.contains(service);
-                return FilterChip(
-                  label: Text(service.name ?? ''),
-                  selected: isSelected,
-                  onSelected: (selected) {
-                    if (selected) {
-                      getController.selectedServices.add(service);
-                    } else {
-                      getController.selectedServices.remove(service);
-                    }
-                  },
-                  selectedColor: primaryColor.withOpacity(0.2),
-                );
-              }).toList(),
-            ],
+      return MultiDropdown<Service>(
+        items: getController.serviceList
+            .map((service) => DropdownItem(
+                  label: service.name ?? '',
+                  value: service,
+                ))
+            .toList(),
+        controller: getController.serviceController,
+        enabled: true,
+        searchEnabled: true,
+        chipDecoration: const ChipDecoration(
+          backgroundColor: secondaryColor,
+          wrap: true,
+          runSpacing: 2,
+          spacing: 10,
+        ),
+        fieldDecoration: FieldDecoration(
+          hintText: 'Select Services',
+          hintStyle: const TextStyle(color: Colors.grey),
+          showClearIcon: true,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: Colors.grey),
           ),
-        ],
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(
+              color: secondaryColor,
+            ),
+          ),
+        ),
+        dropdownItemDecoration: DropdownItemDecoration(
+          selectedIcon: const Icon(Icons.check_box, color: primaryColor),
+          disabledIcon: Icon(Icons.lock, color: Colors.grey.shade300),
+        ),
+        onSelectionChange: (selectedItems) {
+          getController.selectedServices.value = selectedItems;
+        },
       );
     });
   }
