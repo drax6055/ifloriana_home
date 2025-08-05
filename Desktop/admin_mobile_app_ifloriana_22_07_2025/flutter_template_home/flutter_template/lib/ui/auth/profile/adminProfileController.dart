@@ -69,7 +69,7 @@ class Adminprofilecontroller extends GetxController {
     phoneController.text = profileDetails?.admin?.phoneNumber ?? '';
   }
 
- Future<void> onProdileUpdate() async {
+  Future onProdileUpdate() async {
     Map<String, dynamic> data = {
       'full_name': fullnameController.text,
       'phone_number': phoneController.text,
@@ -80,41 +80,17 @@ class Adminprofilecontroller extends GetxController {
 
     try {
       final loginUser = await prefs.getUser();
-
-      final response = await Dio().put(
-        '${Apis.baseUrl}${Endpoints.get_register_details}${loginUser!.adminId}',
-        data: data,
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json',
-            // Add auth token if required
-            // 'Authorization': 'Bearer ${loginUser.token}',
-          },
-        ),
+      final response = await dioClient.putData(
+        '${Apis.baseUrl}${Endpoints.get_register_details}${loginUser?.adminId}',
+        data,
+        (json) => (json),
       );
-
-      // ✅ Ensure the response is decoded to a Map
-      final responseData =
-          response.data is String ? jsonDecode(response.data) : response.data;
-
-      print("🟢 Response data: $responseData");
-
-      // ✅ Check and store details
-      if (responseData is Map<String, dynamic>) {
-        final registerDetails = GetAdminDetails.fromJson(responseData);
-        await prefs.setRegisterdetails(registerDetails);
-        await prefs.getRegisterdetails();
-
-        Get.offAllNamed(Routes.drawerScreen);
-      } else {
-        throw Exception('Unexpected response format from server');
-      }
+      await prefs.onLogout();
     } catch (e) {
-      print("🔴 Error: $e");
-      CustomSnackbar.showError("Error", e.toString());
+      print('==> here Error: $e');
+      CustomSnackbar.showError('Error', e.toString());
     }
   }
-
 
   Future onChangePAssword() async {
     final loginUser = await prefs.getUser();
