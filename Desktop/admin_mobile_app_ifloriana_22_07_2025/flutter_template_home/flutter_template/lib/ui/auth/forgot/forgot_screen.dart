@@ -20,6 +20,18 @@ class ForgotScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: white),
+          onPressed: () => Get.back(),
+        ),
+        title: CustomTextWidget(
+          text: 'Forgot Password',
+          textStyle:
+              CustomTextStyles.textFontSemiBold(size: 16.sp, color: white),
+        ),
+        backgroundColor: primaryColor,
+      ),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -62,7 +74,7 @@ class ForgotScreen extends StatelessWidget {
       alignment: Alignment.center,
       children: [
         Container(
-          height: 170.h,
+          height: 100.h,
           width: double.infinity,
           decoration: BoxDecoration(
             color: primaryColor,

@@ -11,6 +11,8 @@ import 'package:flutter_template/wiget/Custome_textfield.dart';
 import 'package:flutter_template/wiget/custome_text.dart';
 import 'package:get/get.dart';
 
+import '../../../wiget/appbar/commen_appbar.dart';
+
 class RegisterScreen extends StatelessWidget {
   final RegisterController getController = Get.put(RegisterController());
   final _formKey = GlobalKey<FormState>();
@@ -18,12 +20,16 @@ class RegisterScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: CustomAppBar(
+        title: 'Register',
+        backgroundColor: primaryColor,
+      ),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
           child: Column(
             children: [
-              loginScreenHeader(),
+              // loginScreenHeader(),
               Padding(
                 padding: const EdgeInsets.all(10),
                 child: Column(
@@ -86,36 +92,36 @@ class RegisterScreen extends StatelessWidget {
     );
   }
 
-  Widget loginScreenHeader() {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: primaryColor,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(20.r),
-          bottomRight: Radius.circular(20.r),
-        ),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(height: 20.h),
-            Text(
-              'Register',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20.sp,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 2.h),
-          ],
-        ),
-      ),
-    );
-  }
+  // Widget loginScreenHeader() {
+  //   return Container(
+  //     width: double.infinity,
+  //     decoration: BoxDecoration(
+  //       color: primaryColor,
+  //       borderRadius: BorderRadius.only(
+  //         bottomLeft: Radius.circular(20.r),
+  //         bottomRight: Radius.circular(20.r),
+  //       ),
+  //     ),
+  //     child: Padding(
+  //       padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+  //       child: Column(
+  //         mainAxisSize: MainAxisSize.min,
+  //         children: [
+  //           SizedBox(height: 20.h),
+  //           Text(
+  //             'Register',
+  //             style: TextStyle(
+  //               color: Colors.white,
+  //               fontSize: 20.sp,
+  //               fontWeight: FontWeight.bold,
+  //             ),
+  //           ),
+  //           SizedBox(height: 2.h),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget InputTxtfield_fullName() {
     return CustomTextFormField(

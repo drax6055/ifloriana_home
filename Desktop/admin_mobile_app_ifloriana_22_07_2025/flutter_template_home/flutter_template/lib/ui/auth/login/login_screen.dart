@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_template/ui/auth/forgot/forgot_screen.dart'
+    show ForgotScreen;
 import 'package:flutter_template/utils/app_images.dart';
 import 'package:flutter_template/utils/colors.dart';
 import 'package:get/get.dart';
@@ -11,6 +13,7 @@ import '../../../wiget/Custome_button.dart';
 import '../../../wiget/custome_dropdown.dart';
 import '../../../wiget/custome_snackbar.dart';
 import '../../../wiget/custome_text.dart';
+import '../register/register_screen.dart';
 import 'login_controller.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -39,7 +42,12 @@ class LoginScreen extends StatelessWidget {
       controller: getController.emailController,
       labelText: 'Email',
       keyboardType: TextInputType.emailAddress,
-      validator: (value) => Validation.validateEmail(value),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter your email';
+        }
+        return Validation.validateEmail(value);
+      },
     );
   }
 
@@ -75,7 +83,12 @@ class LoginScreen extends StatelessWidget {
               color: grey,
             ),
           ),
-          // validator: (value) => Validation.validatePassword(value),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter your password';
+            }
+            return null; // Return null if the input is valid
+          },
         ));
   }
 
@@ -147,27 +160,26 @@ class LoginScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
+        spacing: 10.h,
         children: [
           CustomTextWidget(
             text: 'Welcome Back!',
-            textStyle: CustomTextStyles.textFontSemiBold(size: 16.sp),
+            textStyle: CustomTextStyles.textFontSemiBold(
+              size: 16.sp,
+            ),
           ),
-          SizedBox(height: 3.h),
           CustomTextWidget(
             text: 'You Have Been Missed For Long Time',
             textStyle:
                 CustomTextStyles.textFontSemiBold(size: 12.sp, color: grey),
           ),
           Role(),
-          SizedBox(height: 20.h),
           InputTxtfield_Email(),
-          SizedBox(height: 16.h),
           InputTxtfield_Pass(),
-          SizedBox(height: 16.h),
           Obx(() => getController.selectedRole.value == 'Admin'
               ? GestureDetector(
                   onTap: () {
-                    Get.toNamed(Routes.forgotScreen);
+                    Get.to(ForgotScreen());
                   },
                   child: Align(
                       alignment: Alignment.topRight,
@@ -178,12 +190,11 @@ class LoginScreen extends StatelessWidget {
                               color: primaryColor,
                               textOverflow: TextOverflow.ellipsis))))
               : SizedBox.shrink()),
-          SizedBox(height: 30.h),
+          SizedBox(height: 10.h),
           Btn_Login(),
-          SizedBox(height: 16.h),
           Obx(() => getController.selectedRole.value == 'Admin'
               ? GestureDetector(
-                  onTap: () => Get.toNamed(Routes.registerScreen),
+                  onTap: () => Get.to(RegisterScreen()),
                   child: Align(
                       alignment: Alignment.center,
                       child: CustomTextWidget(
@@ -200,9 +211,9 @@ class LoginScreen extends StatelessWidget {
 
   Widget Login_screen() {
     return Column(
+      spacing: 35.h,
       children: [
         login_screen_header(),
-        SizedBox(height: 45.h),
         login_screen_body(),
       ],
     );

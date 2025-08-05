@@ -39,7 +39,7 @@ class LoginController extends GetxController {
 
       await prefs.setUser(loginResponse);
       callgetSignupApi();
-      CustomSnackbar.showSuccess('success', 'Login Successfully');
+      // CustomSnackbar.showSuccess('success', 'Login Successfully');
       await Get.showOverlay(
         asyncFunction: () async {
           await Future.delayed(const Duration(seconds: 2));
@@ -48,7 +48,6 @@ class LoginController extends GetxController {
       );
       Get.offNamed(Routes.drawerScreen);
     } catch (e) {
-
       CustomSnackbar.showError('Error', e.toString());
     }
   }
