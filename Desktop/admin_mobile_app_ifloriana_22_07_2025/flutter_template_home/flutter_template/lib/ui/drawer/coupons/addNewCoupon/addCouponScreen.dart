@@ -7,6 +7,7 @@ import 'package:flutter_template/utils/custom_text_styles.dart';
 import 'package:flutter_template/utils/validation.dart';
 import 'package:flutter_template/wiget/Custome_button.dart';
 import 'package:flutter_template/wiget/Custome_textfield.dart';
+import 'package:flutter_template/wiget/appbar/commen_appbar.dart';
 import 'package:flutter_template/wiget/custome_dropdown.dart';
 import 'package:flutter_template/wiget/custome_text.dart';
 import 'package:get/get.dart';
@@ -22,152 +23,159 @@ class AddCouponScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
+      appBar: CustomAppBar(
+        title: getController.isEditMode.value ? 'Edit Coupon' : 'Add Coupon',
+      ),
       body: SingleChildScrollView(
-        child: Column(
-          spacing: 10,
-          children: [
-            CustomTextFormField(
-              controller: getController.nameController,
-              labelText: 'Name',
-              keyboardType: TextInputType.text,
-              validator: (value) => Validation.validatename(value),
-            ),
-            CustomTextFormField(
-              controller: getController.descriptionController,
-              labelText: 'Description',
-              maxLines: 2,
-              keyboardType: TextInputType.text,
-              validator: (value) => Validation.validatedisscription(value),
-            ),
-            Row(
-              children: [
-                Expanded(child: coupon_type()),
-                SizedBox(
-                  width: 5,
-                ),
-                Expanded(child: discount_type()),
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(child: startTime(context)),
-                SizedBox(
-                  width: 5,
-                ),
-                Expanded(child: endTime(context)),
-              ],
-            ),
-            branchChips(),
-            CustomTextFormField(
-              controller: getController.coponCodeController,
-              labelText: 'Coupon Code',
-              keyboardType: TextInputType.text,
-              validator: (value) => Validation.validateisBlanck(value),
-            ),
-            CustomTextFormField(
-              controller: getController.discountAmtController,
-              labelText: 'Discount Amount',
-              keyboardType: TextInputType.number,
-              validator: (value) => Validation.validateisBlanck(value),
-            ),
-            CustomTextFormField(
-              controller: getController.userLimitController,
-              labelText: 'Use Limit',
-              keyboardType: TextInputType.number,
-              validator: (value) => Validation.validateisBlanck(value),
-            ),
-            Obx(() => Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CustomTextWidget(
-                      text: 'Status',
-                      textStyle: CustomTextStyles.textFontRegular(size: 14.sp),
-                    ),
-                    Switch(
-                      value: getController.isActive.value,
-                      onChanged: (value) {
-                        getController.isActive.value = value;
-                      },
-                      activeColor: primaryColor,
-                    ),
-                  ],
-                )),
-            // Add image picker and preview
-            Obx(() {
-              final file = getController.singleImage.value;
-              final netUrl = getController.editImageUrl.value;
-              return GestureDetector(
-                onTap: () async {
-                  Get.bottomSheet(
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            spacing: 10,
+            children: [
+              CustomTextFormField(
+                controller: getController.nameController,
+                labelText: 'Name',
+                keyboardType: TextInputType.text,
+                validator: (value) => Validation.validatename(value),
+              ),
+              CustomTextFormField(
+                controller: getController.descriptionController,
+                labelText: 'Description',
+                maxLines: 2,
+                keyboardType: TextInputType.text,
+                validator: (value) => Validation.validatedisscription(value),
+              ),
+              Row(
+                children: [
+                  Expanded(child: coupon_type()),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Expanded(child: discount_type()),
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(child: startTime(context)),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Expanded(child: endTime(context)),
+                ],
+              ),
+              branchChips(),
+              CustomTextFormField(
+                controller: getController.coponCodeController,
+                labelText: 'Coupon Code',
+                keyboardType: TextInputType.text,
+                validator: (value) => Validation.validateisBlanck(value),
+              ),
+              CustomTextFormField(
+                controller: getController.discountAmtController,
+                labelText: 'Discount Amount',
+                keyboardType: TextInputType.number,
+                validator: (value) => Validation.validateisBlanck(value),
+              ),
+              CustomTextFormField(
+                controller: getController.userLimitController,
+                labelText: 'Use Limit',
+                keyboardType: TextInputType.number,
+                validator: (value) => Validation.validateisBlanck(value),
+              ),
+              Obx(() => Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      CustomTextWidget(
+                        text: 'Status',
+                        textStyle:
+                            CustomTextStyles.textFontRegular(size: 14.sp),
+                      ),
+                      Switch(
+                        value: getController.isActive.value,
+                        onChanged: (value) {
+                          getController.isActive.value = value;
+                        },
+                        activeColor: primaryColor,
+                      ),
+                    ],
+                  )),
+              // Add image picker and preview
+              Obx(() {
+                final file = getController.singleImage.value;
+                final netUrl = getController.editImageUrl.value;
+                return GestureDetector(
+                  onTap: () async {
+                    Get.bottomSheet(
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(16)),
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ListTile(
+                              leading: const Icon(Icons.photo_library),
+                              title: const Text('Choose from Gallery'),
+                              onTap: () async {
+                                Get.back();
+                                await getController.pickImageFromGallery();
+                              },
+                            ),
+                            ListTile(
+                              leading: const Icon(Icons.camera_alt),
+                              title: const Text('Take Photo'),
+                              onTap: () async {
+                                Get.back();
+                                await getController.pickImageFromCamera();
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      isScrollControlled: true,
+                      shape: const RoundedRectangleBorder(
                         borderRadius:
                             BorderRadius.vertical(top: Radius.circular(16)),
                       ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ListTile(
-                            leading: const Icon(Icons.photo_library),
-                            title: const Text('Choose from Gallery'),
-                            onTap: () async {
-                              Get.back();
-                              await getController.pickImageFromGallery();
-                            },
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.camera_alt),
-                            title: const Text('Take Photo'),
-                            onTap: () async {
-                              Get.back();
-                              await getController.pickImageFromCamera();
-                            },
-                          ),
-                        ],
-                      ),
+                    );
+                  },
+                  child: Container(
+                    height: 100,
+                    width: 100,
+                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: primaryColor),
+                      borderRadius: BorderRadius.circular(10),
+                      color: secondaryColor.withOpacity(0.2),
                     ),
-                    isScrollControlled: true,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.vertical(top: Radius.circular(16)),
-                    ),
-                  );
-                },
-                child: Container(
-                  height: 100,
-                  width: 100,
-                  margin: const EdgeInsets.symmetric(vertical: 8),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: primaryColor),
-                    borderRadius: BorderRadius.circular(10),
-                    color: secondaryColor.withOpacity(0.2),
+                    child: file != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.file(
+                              file,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : (netUrl.isNotEmpty
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.network(
+                                  // Use your coupon image base URL if needed
+                                  '${Apis.pdfUrl}$netUrl?v=${DateTime.now().millisecondsSinceEpoch}',
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                            : Icon(Icons.image_rounded,
+                                color: primaryColor, size: 40)),
                   ),
-                  child: file != null
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Image.file(
-                            file,
-                            fit: BoxFit.cover,
-                          ),
-                        )
-                      : (netUrl.isNotEmpty
-                          ? ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: Image.network(
-                                // Use your coupon image base URL if needed
-                                '${Apis.pdfUrl}$netUrl?v=${DateTime.now().millisecondsSinceEpoch}',
-                                fit: BoxFit.cover,
-                              ),
-                            )
-                          : Icon(Icons.image_rounded,
-                              color: primaryColor, size: 40)),
-                ),
-              );
-            }),
-            Btn_Coupons(),
-          ],
+                );
+              }),
+              Btn_Coupons(),
+            ],
+          ),
         ),
       ),
     ));
