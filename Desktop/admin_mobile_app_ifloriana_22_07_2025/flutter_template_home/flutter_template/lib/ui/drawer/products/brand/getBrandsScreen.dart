@@ -5,6 +5,7 @@ import 'package:flutter_template/utils/colors.dart';
 import 'package:get/get.dart';
 import 'package:multi_dropdown/multi_dropdown.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart';
 import 'dart:io';
 
 import '../../../../../commen_items/commen_class.dart';
@@ -39,6 +40,7 @@ class Getbrandsscreen extends StatelessWidget {
       ),
       body: Container(
           child: RefreshIndicator(
+              color: primaryColor,
               onRefresh: () async {
                 getController.getBrands();
               },
@@ -283,18 +285,40 @@ class Getbrandsscreen extends StatelessWidget {
     return Obx(() {
       return GestureDetector(
         onTap: () async {
-          final ImagePicker picker = ImagePicker();
-          final XFile? pickedFile =
-              await picker.pickImage(source: ImageSource.gallery);
-          if (pickedFile != null) {
-            if (_isAllowedImageExtension(pickedFile.path)) {
-              getController.singleImage.value = File(pickedFile.path);
-            } else {
-              // Show error snackbar for unsupported format
-              CustomSnackbar.showError(
-                  'Invalid Image', 'Only JPG, JPEG, PNG images are allowed!');
-            }
-          }
+          Get.bottomSheet(
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.photo_library),
+                    title: const Text('Choose from Gallery'),
+                    onTap: () async {
+                      Get.back();
+                      await getController.pickImageFromGallery();
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.camera_alt),
+                    title: const Text('Take Photo'),
+                    onTap: () async {
+                      Get.back();
+                      await getController.pickImageFromCamera();
+                    },
+                  ),
+                ],
+              ),
+            ),
+            isScrollControlled: true,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+            ),
+          );
         },
         child: Container(
           height: 51.h,

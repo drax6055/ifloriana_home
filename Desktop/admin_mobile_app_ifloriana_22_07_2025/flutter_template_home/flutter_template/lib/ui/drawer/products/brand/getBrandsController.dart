@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_template/network/model/brand.dart';
+import 'package:flutter_template/utils/colors.dart';
 import 'package:get/get.dart';
 import 'package:multi_dropdown/multi_dropdown.dart';
 import 'package:dio/dio.dart' as dio;
@@ -240,13 +242,31 @@ class Getbrandscontroller extends GetxController {
     }
   }
 
-  Future<void> pickImage() async {
+  // Helper to show image source dialog (camera or gallery)
+  
+
+  Future<void> pickImageFromGallery() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    const maxSizeInBytes = 150 * 1024; // 150 KB
+    await _handlePickedFile(pickedFile);
+  }
 
+  Future<void> pickImageFromCamera() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+    await _handlePickedFile(pickedFile);
+  }
+
+  Future<void> _handlePickedFile(XFile? pickedFile) async {
+    const maxSizeInBytes = 150 * 1024; // 150 KB
     if (pickedFile != null) {
       final file = File(pickedFile.path);
+      final mimeType = _getMimeType(pickedFile.path);
+      if (mimeType == null) {
+        CustomSnackbar.showError(
+            'Invalid Image', 'Only JPG, JPEG, PNG images are allowed!');
+        return;
+      }
       if (await file.length() < maxSizeInBytes) {
         singleImage.value = file;
       } else {
