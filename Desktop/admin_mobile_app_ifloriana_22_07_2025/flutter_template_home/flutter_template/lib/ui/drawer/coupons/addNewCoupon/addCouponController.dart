@@ -10,6 +10,7 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:dio/dio.dart' as dio;
+import 'package:multi_dropdown/multi_dropdown.dart';
 
 class Branch {
   final String? id;
@@ -58,16 +59,22 @@ class Addcouponcontroller extends GetxController {
         EndtimeController.text =
             "${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}";
       }
-      // Select branches if they exist
-      if (coupon.branchIds != null) {
-        selectedBranches.value = branchList
-            .where((branch) => coupon.branchIds!.contains(branch.id))
-            .toList();
-      }
     } else {
       singleImage.value = null;
       editImageUrl.value = '';
     }
+  }
+
+  @override
+  void onClose() {
+    nameController.dispose();
+    descriptionController.dispose();
+    coponCodeController.dispose();
+    discountAmtController.dispose();
+    userLimitController.dispose();
+    StarttimeController.dispose();
+    EndtimeController.dispose();
+    super.onClose();
   }
 
   var isEditMode = false.obs;
@@ -121,7 +128,7 @@ class Addcouponcontroller extends GetxController {
 
       // After branches are loaded, check if we need to select any
       final coupon = Get.arguments as CouponModel?;
-      if (coupon != null) {
+      if (coupon != null && coupon.branchIds != null) {
         selectBranches(coupon.branchIds);
       }
     } catch (e) {
@@ -133,17 +140,31 @@ class Addcouponcontroller extends GetxController {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     editImageUrl.value = '';
-    if (pickedFile != null) {
-      singleImage.value = File(pickedFile.path);
-    }
+    await _handlePickedFile(pickedFile);
   }
 
   Future<void> pickImageFromCamera() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
     editImageUrl.value = '';
+    await _handlePickedFile(pickedFile);
+  }
+
+  Future<void> _handlePickedFile(XFile? pickedFile) async {
+    const maxSizeInBytes = 150 * 1024; // 150 KB
     if (pickedFile != null) {
-      singleImage.value = File(pickedFile.path);
+      final file = File(pickedFile.path);
+      final mimeType = _getMimeType(pickedFile.path);
+      if (mimeType == null) {
+        CustomSnackbar.showError(
+            'Invalid Image', 'Only JPG, JPEG, PNG images are allowed!');
+        return;
+      }
+      if (await file.length() < maxSizeInBytes) {
+        singleImage.value = file;
+      } else {
+        CustomSnackbar.showError('Error', 'Image size must be less than 150KB');
+      }
     }
   }
 
@@ -219,20 +240,18 @@ class Addcouponcontroller extends GetxController {
           options:
               dio.Options(headers: {'Content-Type': 'multipart/form-data'}),
         );
-        CustomSnackbar.showSuccess('Success', 'Coupon updated successfully');
+        Get.back();
       } else {
-        // Create new coupon
         await dioClient.dio.post(
           '${Apis.baseUrl}${Endpoints.coupons}',
           data: formData,
           options:
               dio.Options(headers: {'Content-Type': 'multipart/form-data'}),
         );
-        CustomSnackbar.showSuccess('Success', 'Coupon added successfully');
+        Get.back();
       }
       var updateList = Get.put(CouponsController());
-      updateList.getCoupons();
-      Get.back();
+      await updateList.getCoupons();
     } catch (e) {
       print('==> here Error: $e');
       CustomSnackbar.showError('Error', e.toString());
