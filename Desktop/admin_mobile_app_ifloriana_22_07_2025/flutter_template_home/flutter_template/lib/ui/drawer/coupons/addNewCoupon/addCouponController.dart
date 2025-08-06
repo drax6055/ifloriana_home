@@ -123,8 +123,12 @@ class Addcouponcontroller extends GetxController {
         (json) => json,
       );
 
+      print('Coupon getBranches response: $response');
       final data = response['data'] as List;
       branchList.value = data.map((e) => Branch.fromJson(e)).toList();
+      print('Coupon branchList length: ${branchList.length}');
+      print(
+          'Coupon branchList: ${branchList.map((b) => '${b.name} (${b.id})').toList()}');
 
       // After branches are loaded, check if we need to select any
       final coupon = Get.arguments as CouponModel?;
@@ -132,6 +136,7 @@ class Addcouponcontroller extends GetxController {
         selectBranches(coupon.branchIds);
       }
     } catch (e) {
+      print('Coupon getBranches error: $e');
       CustomSnackbar.showError('Error', 'Failed to get data: $e');
     }
   }
