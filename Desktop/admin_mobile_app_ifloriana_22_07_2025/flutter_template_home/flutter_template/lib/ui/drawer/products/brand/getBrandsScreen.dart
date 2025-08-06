@@ -64,7 +64,7 @@ class Getbrandsscreen extends StatelessWidget {
                                   ? ClipRRect(
                                       borderRadius: BorderRadius.circular(8),
                                       child: Image.network(
-                                        '${Apis.pdfUrl}${brand.image}',
+                                        '${Apis.pdfUrl}${brand.image}?v=${DateTime.now().millisecondsSinceEpoch}',
                                         width: 50,
                                         height: 50,
                                         fit: BoxFit.cover,
@@ -143,6 +143,8 @@ class Getbrandsscreen extends StatelessWidget {
     getController.isActive.value = true;
     getController.selectedBranches.clear();
     getController.branchController.clearAll();
+    getController.singleImage.value = null; // Clear picked image for add
+    getController.editImageUrl.value = ''; // Clear network image for add
     showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -212,6 +214,8 @@ class Getbrandsscreen extends StatelessWidget {
 
     // Reset image selection for editing
     getController.singleImage.value = null;
+    getController.editImageUrl.value =
+        brand.image; // Set network image for edit
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       getController.branchController
@@ -336,7 +340,15 @@ class Getbrandsscreen extends StatelessWidget {
                     fit: BoxFit.cover,
                   ),
                 )
-              : Icon(Icons.image_rounded, color: primaryColor, size: 30.sp),
+              : getController.editImageUrl.value.isNotEmpty
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(10.r),
+                      child: Image.network(
+                        '${Apis.pdfUrl}${getController.editImageUrl.value}?v=${DateTime.now().millisecondsSinceEpoch}',
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : Icon(Icons.image_rounded, color: primaryColor, size: 30.sp),
         ),
       );
     });

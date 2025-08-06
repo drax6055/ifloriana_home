@@ -38,6 +38,8 @@ class Getbrandscontroller extends GetxController {
   var nameController = TextEditingController();
   final branchController = MultiSelectController<Branch1>();
   final Rx<File?> singleImage = Rx<File?>(null);
+  final RxString editImageUrl =
+      ''.obs; // Add this for network image in edit mode
 
   @override
   void onInit() {
@@ -243,17 +245,18 @@ class Getbrandscontroller extends GetxController {
   }
 
   // Helper to show image source dialog (camera or gallery)
-  
 
   Future<void> pickImageFromGallery() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    editImageUrl.value = ''; // Clear network image when picking new
     await _handlePickedFile(pickedFile);
   }
 
   Future<void> pickImageFromCamera() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
+    editImageUrl.value = ''; // Clear network image when picking new
     await _handlePickedFile(pickedFile);
   }
 
@@ -280,5 +283,6 @@ class Getbrandscontroller extends GetxController {
     isActive.value = true;
     selectedBranches.clear();
     singleImage.value = null; // Reset image selection
+    editImageUrl.value = ''; // Reset network image
   }
 }
