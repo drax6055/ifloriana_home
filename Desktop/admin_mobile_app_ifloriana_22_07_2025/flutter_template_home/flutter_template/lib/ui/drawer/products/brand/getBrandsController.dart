@@ -4,6 +4,8 @@ import 'package:flutter_template/network/model/brand.dart';
 import 'package:get/get.dart';
 import 'package:multi_dropdown/multi_dropdown.dart';
 import 'package:dio/dio.dart' as dio;
+import 'package:image_picker/image_picker.dart';
+import 'package:http_parser/http_parser.dart';
 
 import '../../../../main.dart';
 import '../../../../commen_items/commen_class.dart';
@@ -33,6 +35,7 @@ class Getbrandscontroller extends GetxController {
   var selectedBranches = <Branch1>[].obs;
   var nameController = TextEditingController();
   final branchController = MultiSelectController<Branch1>();
+  final Rx<File?> singleImage = Rx<File?>(null);
 
   @override
   void onInit() {
@@ -107,7 +110,18 @@ class Getbrandscontroller extends GetxController {
     }
   }
 
-  Future onAddBranch() async {
+  // Helper to get MIME type from file extension
+  String? _getMimeType(String path) {
+    final ext = path.toLowerCase();
+    if (ext.endsWith('.jpg') || ext.endsWith('.jpeg')) {
+      return 'image/jpeg';
+    } else if (ext.endsWith('.png')) {
+      return 'image/png';
+    }
+    return null;
+  }
+
+  Future onAddBrand() async {
     if (nameController.text.isEmpty) {
       CustomSnackbar.showError('Error', 'Please enter brand name');
       return;
@@ -132,9 +146,18 @@ class Getbrandscontroller extends GetxController {
 
       // Add image if selected
       if (singleImage.value != null) {
+        final mimeType = _getMimeType(singleImage.value!.path);
+        if (mimeType == null) {
+          CustomSnackbar.showError(
+              'Invalid Image', 'Only JPG, JPEG, PNG images are allowed!');
+          isLoading.value = false;
+          return;
+        }
+        final mimeParts = mimeType.split('/');
         brandData['image'] = await dio.MultipartFile.fromFile(
           singleImage.value!.path,
           filename: singleImage.value!.path.split(Platform.pathSeparator).last,
+          contentType: MediaType(mimeParts[0], mimeParts[1]),
         );
       }
 
@@ -178,9 +201,18 @@ class Getbrandscontroller extends GetxController {
 
       // Add image if selected
       if (singleImage.value != null) {
+        final mimeType = _getMimeType(singleImage.value!.path);
+        if (mimeType == null) {
+          CustomSnackbar.showError(
+              'Invalid Image', 'Only JPG, JPEG, PNG images are allowed!');
+          isLoading.value = false;
+          return;
+        }
+        final mimeParts = mimeType.split('/');
         brandData['image'] = await dio.MultipartFile.fromFile(
           singleImage.value!.path,
           filename: singleImage.value!.path.split(Platform.pathSeparator).last,
+          contentType: MediaType(mimeParts[0], mimeParts[1]),
         );
       }
 
@@ -193,7 +225,7 @@ class Getbrandscontroller extends GetxController {
         options: dio.Options(
           headers: {
             'Content-Type': 'multipart/form-data',
-          },  
+          },
         ),
       );
 
@@ -205,6 +237,21 @@ class Getbrandscontroller extends GetxController {
       CustomSnackbar.showError('Error', e.toString());
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    const maxSizeInBytes = 150 * 1024; // 150 KB
+
+    if (pickedFile != null) {
+      final file = File(pickedFile.path);
+      if (await file.length() < maxSizeInBytes) {
+        singleImage.value = file;
+      } else {
+        CustomSnackbar.showError('Error', 'Image size must be less than 150KB');
+      }
     }
   }
 

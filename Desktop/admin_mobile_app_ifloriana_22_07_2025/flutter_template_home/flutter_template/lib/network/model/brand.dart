@@ -71,7 +71,7 @@ class Branch {
       latitude: (json['latitude'] ?? 0.0).toDouble(),
       longitude: (json['longitude'] ?? 0.0).toDouble(),
       description: json['description'] ?? '',
-      image: json['image'] ?? '',
+      image: json['image_url'] ?? '',
       ratingStar: json['rating_star'] ?? 0,
       totalReview: json['total_review'] ?? 0,
       createdAt:
@@ -110,7 +110,7 @@ class Brand {
               ?.map((branch) => Branch.fromJson(branch))
               .toList() ??
           [],
-      image: json['image'] ?? '',
+      image: json['image_url'] ?? '',
       name: json['name'] ?? '',
       status: json['status'] ?? 0,
       salonId: json['salon_id'] ?? '',

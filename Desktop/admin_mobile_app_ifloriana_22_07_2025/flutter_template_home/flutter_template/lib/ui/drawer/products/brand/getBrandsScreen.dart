@@ -4,6 +4,8 @@ import 'package:flutter_template/ui/drawer/products/brand/getBrandsController.da
 import 'package:flutter_template/utils/colors.dart';
 import 'package:get/get.dart';
 import 'package:multi_dropdown/multi_dropdown.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 import '../../../../../commen_items/commen_class.dart';
 import '../../../../../utils/custom_text_styles.dart';
@@ -15,10 +17,19 @@ import '../../../../network/network_const.dart';
 import '../../../../wiget/appbar/commen_appbar.dart';
 import '../../../../wiget/loading.dart';
 import '../../../../network/model/brand.dart';
+import '../../../../wiget/custome_snackbar.dart';
 
 class Getbrandsscreen extends StatelessWidget {
   Getbrandsscreen({super.key});
   final Getbrandscontroller getController = Get.put(Getbrandscontroller());
+
+  // Helper to check allowed image extensions
+  bool _isAllowedImageExtension(String path) {
+    final ext = path.toLowerCase();
+    return ext.endsWith('.jpg') ||
+        ext.endsWith('.jpeg') ||
+        ext.endsWith('.png');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +61,7 @@ class Getbrandsscreen extends StatelessWidget {
                               leading: brand.image.isNotEmpty
                                   ? ClipRRect(
                                       borderRadius: BorderRadius.circular(8),
-                                      child: Image.network( 
+                                      child: Image.network(
                                         '${Apis.pdfUrl}${brand.image}',
                                         width: 50,
                                         height: 50,
@@ -198,7 +209,7 @@ class Getbrandsscreen extends StatelessWidget {
     getController.branchController.clearAll();
 
     // Reset image selection for editing
-    singleImage.value = null;
+    getController.singleImage.value = null;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       getController.branchController
@@ -271,7 +282,20 @@ class Getbrandsscreen extends StatelessWidget {
   Widget Imagepicker() {
     return Obx(() {
       return GestureDetector(
-        onTap: () => pickImage(isMultiple: false),
+        onTap: () async {
+          final ImagePicker picker = ImagePicker();
+          final XFile? pickedFile =
+              await picker.pickImage(source: ImageSource.gallery);
+          if (pickedFile != null) {
+            if (_isAllowedImageExtension(pickedFile.path)) {
+              getController.singleImage.value = File(pickedFile.path);
+            } else {
+              // Show error snackbar for unsupported format
+              CustomSnackbar.showError(
+                  'Invalid Image', 'Only JPG, JPEG, PNG images are allowed!');
+            }
+          }
+        },
         child: Container(
           height: 51.h,
           decoration: BoxDecoration(
@@ -280,11 +304,11 @@ class Getbrandsscreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(10.r),
             color: secondaryColor.withOpacity(0.2),
           ),
-          child: singleImage.value != null
+          child: getController.singleImage.value != null
               ? ClipRRect(
                   borderRadius: BorderRadius.circular(10.r),
                   child: Image.file(
-                    singleImage.value!,
+                    getController.singleImage.value!,
                     fit: BoxFit.cover,
                   ),
                 )
@@ -314,16 +338,27 @@ class Getbrandsscreen extends StatelessWidget {
         ),
         fieldDecoration: FieldDecoration(
           hintText: 'Select Branches',
-          hintStyle: const TextStyle(color: Colors.grey),
+          hintStyle: CustomTextStyles.textFontMedium(size: 14.sp, color: grey),
           showClearIcon: true,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Colors.grey),
+          border: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+            borderSide: BorderSide(
+              color: grey,
+              width: 1.0,
+            ),
           ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(
-              color: secondaryColor,
+          focusedBorder: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+            borderSide: BorderSide(
+              color: primaryColor,
+              width: 2.0,
+            ),
+          ),
+          errorBorder: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+            borderSide: BorderSide(
+              color: red,
+              width: 1.0,
             ),
           ),
         ),
@@ -342,7 +377,7 @@ class Getbrandsscreen extends StatelessWidget {
     return ElevatedButtonExample(
       text: "Add Brand",
       onPressed: () {
-        getController.onAddBranch();
+        getController.onAddBrand();
       },
     );
   }
