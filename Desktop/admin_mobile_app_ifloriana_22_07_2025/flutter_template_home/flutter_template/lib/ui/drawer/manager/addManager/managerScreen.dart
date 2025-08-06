@@ -62,7 +62,8 @@ class Managerscreen extends StatelessWidget {
                   InputTxtfield_password(),
                   InputTxtfield_confirmPassword(),
                   Gender(),
-                  branchDropdown(),
+                  // branchDropdown(),
+                  _buildBranchDropdown(),
                   Btn_saveManager(context),
                 ],
               )),
@@ -216,6 +217,23 @@ class Managerscreen extends StatelessWidget {
 //       );
 //     });
 //   }
+  Widget _buildBranchDropdown() {
+    return Obx(() => DropdownButtonFormField<Branch>(
+          value: getController.selectedBranch.value,
+          decoration: const InputDecoration(
+              labelText: 'Branch *', border: OutlineInputBorder()),
+          items: getController.branchList
+              .map((item) =>
+                  DropdownMenuItem(value: item, child: Text(item.name ?? '')))
+              .toList(),
+          onChanged: (v) {
+            if (v != null) {
+              getController.selectedBranch.value = v;
+            }
+          },
+          validator: (v) => v == null ? 'Required' : null,
+        ));
+  }
 
   Widget Btn_saveManager(BuildContext context) {
     return ElevatedButtonExample(

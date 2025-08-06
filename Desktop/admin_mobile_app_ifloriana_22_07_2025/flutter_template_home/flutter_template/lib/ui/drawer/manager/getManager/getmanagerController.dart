@@ -6,7 +6,7 @@ import '../../../../wiget/custome_snackbar.dart';
 class Manager {
   final String id;
   final String full_name;
-  // final String lastName;
+  final String image_url;
   final String email;
   final String contactNumber;
   final String password;
@@ -16,7 +16,7 @@ class Manager {
   Manager({
     required this.id,
     required this.full_name,
-    // required this.lastName,
+    required this.image_url,
     required this.email,
     required this.contactNumber,
     required this.password,
@@ -28,7 +28,7 @@ class Manager {
     return Manager(
       id: json['_id'],
       full_name: json['full_name'],
-      // lastName: json['last_name'],
+      image_url: json['image_url'],
       email: json['email'],
       contactNumber: json['contact_number'],
       branchName: json['branch_id']?['name'] ?? '',

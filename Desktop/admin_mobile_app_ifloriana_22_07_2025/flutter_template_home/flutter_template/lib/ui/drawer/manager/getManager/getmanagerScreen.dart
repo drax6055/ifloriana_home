@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_template/network/network_const.dart';
 import 'package:flutter_template/ui/drawer/manager/getManager/getmanagerController.dart';
+import 'package:flutter_template/utils/colors.dart';
 import 'package:flutter_template/wiget/appbar/commen_appbar.dart';
 import 'package:get/get.dart';
 import 'package:flutter_template/ui/drawer/manager/addManager/managerScreen.dart';
@@ -18,6 +20,7 @@ class Getmanagerscreen extends StatelessWidget {
       ),
       body: Obx(() {
         return RefreshIndicator(
+          color: primaryColor,
           onRefresh: () async {
             await getController.getManagers();
           },
@@ -33,13 +36,26 @@ class Getmanagerscreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final manager = getController.managers[index];
                     return ExpansionTile(
+                      leading: CircleAvatar(
+                        backgroundImage:
+                            NetworkImage('${Apis.pdfUrl}${manager.image_url}'),
+                      ),
                       shape: Border.all(color: Colors.transparent),
                       title: Text('${manager.full_name}'),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('${manager.contactNumber}'),
+                          // Text('${manager.email}'),
+                          // Text('${manager.branchName}'),
+                        ],
+                      ),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
-                            icon: Icon(Icons.edit, color: Colors.blue),
+                            icon:
+                                Icon(Icons.edit_outlined, color: primaryColor),
                             onPressed: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
@@ -50,7 +66,8 @@ class Getmanagerscreen extends StatelessWidget {
                             },
                           ),
                           IconButton(
-                            icon: Icon(Icons.delete, color: Colors.red),
+                            icon:
+                                Icon(Icons.delete_outline, color: primaryColor),
                             onPressed: () {
                               getController.deleteManager(manager.id);
                             },
@@ -68,37 +85,115 @@ class Getmanagerscreen extends StatelessWidget {
         );
       }),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: primaryColor,
         onPressed: () {
           showDialog(
-            context: Get.context!,
-            builder: (context) {
+            context: context,
+            builder: (BuildContext context) {
               return AlertDialog(
-                title: Text('Create Manager'),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15.0)),
+                title: const Text(
+                  'Create Manager',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: primaryColor,
+                  ),
+                ),
+                contentPadding:
+                    const EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 0.0),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        Get.to(Upgradefromexistingscreen());
-                      },
-                      child: Text('From existing staff'),
+                    const Text(
+                      'Choose how you want to create the manager:',
+                      style: TextStyle(fontSize: 16, color: Colors.black87),
+                      textAlign: TextAlign.center,
                     ),
-                    SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        Get.to(Managerscreen());
-                      },
-                      child: Text('Create new'),
+                    const SizedBox(height: 30),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildOptionButton(
+                          icon: Icons.group,
+                          label: 'From Staff',
+                          color: Colors.orange,
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            Get.to(Upgradefromexistingscreen());
+                          },
+                        ),
+                        _buildOptionButton(
+                          icon: Icons.person_add_alt_1,
+                          label: 'Create New',
+                          color: Colors.blue,
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            Get.to(Managerscreen());
+                          },
+                        ),
+                      ],
                     ),
+                    const SizedBox(height: 20),
                   ],
                 ),
+                actionsPadding: const EdgeInsets.all(16.0),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text(
+                      'Cancel',
+                      style: TextStyle(color: Colors.grey, fontSize: 16),
+                    ),
+                  ),
+                ],
               );
             },
           );
         },
-        child: Icon(Icons.add),
+        child: Icon(
+          Icons.add,
+          color: white,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOptionButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        width: 100,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          border: Border.all(color: color),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, size: 30, color: color),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: color,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
