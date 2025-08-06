@@ -11,9 +11,6 @@ import 'package:flutter_template/wiget/appbar/commen_appbar.dart';
 import 'package:flutter_template/wiget/custome_dropdown.dart';
 import 'package:flutter_template/wiget/custome_text.dart';
 import 'package:get/get.dart';
-import 'package:multi_dropdown/multi_dropdown.dart';
-import 'dart:io';
-
 import '../../../../network/network_const.dart';
 
 class AddCouponScreen extends StatelessWidget {
@@ -33,6 +30,9 @@ class AddCouponScreen extends StatelessWidget {
           child: Column(
             spacing: 10,
             children: [
+              SizedBox(
+                height: 2.h,
+              ),
               CustomTextFormField(
                 controller: getController.nameController,
                 labelText: 'Name',
@@ -175,6 +175,9 @@ class AddCouponScreen extends StatelessWidget {
                 );
               }),
               Btn_Coupons(),
+              SizedBox(
+                height: 5.h,
+              )
             ],
           ),
         ),
@@ -297,7 +300,7 @@ class AddCouponScreen extends StatelessWidget {
 
   Widget Btn_Coupons() {
     return ElevatedButtonExample(
-      text: "Add Coupons",
+      text: getController.isEditMode.value ? 'Update Coupon' : 'Add Coupon',
       onPressed: () {
         getController.onCoupons();
       },

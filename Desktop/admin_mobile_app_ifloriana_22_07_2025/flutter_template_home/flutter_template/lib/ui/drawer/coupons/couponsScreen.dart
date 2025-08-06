@@ -18,19 +18,22 @@ class CouponsScreen extends StatelessWidget {
       appBar: CustomAppBar(
         title: 'Coupons',
       ),
-      body: Obx(() {
-        if (getController.couponList.isEmpty) {
-          return const Center(child: Text("No coupons available"));
-        }
-        return ListView.builder(
-          itemCount: getController.couponList.length,
-          itemBuilder: (context, index) {
-            final coupon = getController.couponList[index];
-            return Card(
-              margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: ListTile(
-                leading:
-                    (coupon.image_url != null && coupon.image_url!.isNotEmpty)
+      body: RefreshIndicator(
+          color: primaryColor,
+          child: Obx(() {
+            if (getController.couponList.isEmpty) {
+              return const Center(child: Text("No coupons available"));
+            }
+            return ListView.builder(
+              itemCount: getController.couponList.length,
+              itemBuilder: (context, index) {
+                final coupon = getController.couponList[index];
+                return Card(
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  child: ListTile(
+                    leading: (coupon.image_url != null &&
+                            coupon.image_url!.isNotEmpty)
                         ? ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: Image.network(
@@ -60,47 +63,51 @@ class CouponsScreen extends StatelessWidget {
                             ),
                             child: const Icon(Icons.image_not_supported),
                           ),
-                title: Text(coupon.name ?? '-',
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Type: ${coupon.type ?? '-'}"),
-                    Text("Discount Type: ${coupon.discountType ?? '-'}"),
-                    Text("Use Limit: ${coupon.useLimit ?? 0}"),
-                    Text(
-                      "Status: ${coupon.status == 1 ? 'Active' : 'Deactive'}",
-                      style: TextStyle(
-                        color: coupon.status == 1 ? Colors.green : Colors.red,
-                        fontWeight: FontWeight.w500,
-                      ),
+                    title: Text(coupon.name ?? '-',
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Type: ${coupon.type ?? '-'}"),
+                        Text("Discount Type: ${coupon.discountType ?? '-'}"),
+                        Text("Use Limit: ${coupon.useLimit ?? 0}"),
+                        Text(
+                          "Status: ${coupon.status == 1 ? 'Active' : 'Deactive'}",
+                          style: TextStyle(
+                            color:
+                                coupon.status == 1 ? Colors.green : Colors.red,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon:
-                          const Icon(Icons.edit_outlined, color: primaryColor),
-                      onPressed: () {
-                        Get.toNamed(Routes.addCoupon, arguments: coupon);
-                      },
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.edit_outlined,
+                              color: primaryColor),
+                          onPressed: () {
+                            Get.toNamed(Routes.addCoupon, arguments: coupon);
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete_outline,
+                              color: primaryColor),
+                          onPressed: () async {
+                            await getController.deleteCoupon(coupon.id);
+                          },
+                        ),
+                      ],
                     ),
-                    IconButton(
-                      icon:
-                          const Icon(Icons.delete_outline, color: primaryColor),
-                      onPressed: () async {
-                        await getController.deleteCoupon(coupon.id);
-                      },
-                    ),
-                  ],
-                ),
-              ),
+                  ),
+                );
+              },
             );
-          },
-        );
-      }),
+          }),
+          onRefresh: () async {
+            await getController.getCoupons();
+          }),
       floatingActionButton: FloatingActionButton(
         backgroundColor: primaryColor,
         onPressed: () {
