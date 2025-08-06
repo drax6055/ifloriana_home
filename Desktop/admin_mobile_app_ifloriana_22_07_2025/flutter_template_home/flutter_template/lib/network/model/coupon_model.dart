@@ -11,6 +11,7 @@ class CouponModel {
   final String? startDate;
   final String? endDate;
   final List<String>? branchIds;
+  final String? image_url;
 
   CouponModel({
     this.id,
@@ -25,6 +26,7 @@ class CouponModel {
     this.startDate,
     this.endDate,
     this.branchIds,
+    this.image_url,
   });
 
   factory CouponModel.fromJson(Map<String, dynamic> json) {
@@ -74,6 +76,7 @@ class CouponModel {
       startDate: getString(json['start_date']),
       endDate: getString(json['end_date']),
       branchIds: getStringList(json['branch_id']),
+      image_url: getString(json['image_url']),
     );
   }
 
@@ -91,6 +94,7 @@ class CouponModel {
       'start_date': startDate,
       'end_date': endDate,
       'branch_id': branchIds,
+      'image_url': image_url,
     };
   }
 }

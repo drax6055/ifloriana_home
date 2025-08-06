@@ -3,6 +3,9 @@ import 'package:flutter_template/route/app_route.dart';
 import 'package:flutter_template/ui/drawer/coupons/couponsController.dart';
 import 'package:get/get.dart';
 
+import '../../../network/network_const.dart';
+
+
 class CouponsScreen extends StatelessWidget {
   CouponsScreen({super.key});
   final CouponsController getController = Get.put(CouponsController());
@@ -22,6 +25,36 @@ class CouponsScreen extends StatelessWidget {
             return Card(
               margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: ListTile(
+                leading: (coupon.image_url != null && coupon.image_url!.isNotEmpty)
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          '${Apis.pdfUrl}${coupon.image_url}?v=${DateTime.now().millisecondsSinceEpoch}',
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(Icons.image_not_supported),
+                            );
+                          },
+                        ),
+                      )
+                    : Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(Icons.image_not_supported),
+                      ),
                 title: Text(coupon.name ?? '-',
                     style: const TextStyle(fontWeight: FontWeight.bold)),
                 subtitle: Column(

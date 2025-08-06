@@ -10,6 +10,9 @@ import 'package:flutter_template/wiget/Custome_textfield.dart';
 import 'package:flutter_template/wiget/custome_dropdown.dart';
 import 'package:flutter_template/wiget/custome_text.dart';
 import 'package:get/get.dart';
+import 'dart:io';
+
+import '../../../../network/network_const.dart';
 
 class AddCouponScreen extends StatelessWidget {
   AddCouponScreen({super.key});
@@ -89,6 +92,80 @@ class AddCouponScreen extends StatelessWidget {
                     ),
                   ],
                 )),
+            // Add image picker and preview
+            Obx(() {
+              final file = getController.singleImage.value;
+              final netUrl = getController.editImageUrl.value;
+              return GestureDetector(
+                onTap: () async {
+                  Get.bottomSheet(
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(16)),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ListTile(
+                            leading: const Icon(Icons.photo_library),
+                            title: const Text('Choose from Gallery'),
+                            onTap: () async {
+                              Get.back();
+                              await getController.pickImageFromGallery();
+                            },
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.camera_alt),
+                            title: const Text('Take Photo'),
+                            onTap: () async {
+                              Get.back();
+                              await getController.pickImageFromCamera();
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    isScrollControlled: true,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(16)),
+                    ),
+                  );
+                },
+                child: Container(
+                  height: 100,
+                  width: 100,
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: primaryColor),
+                    borderRadius: BorderRadius.circular(10),
+                    color: secondaryColor.withOpacity(0.2),
+                  ),
+                  child: file != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.file(
+                            file,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : (netUrl.isNotEmpty
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.network(
+                                // Use your coupon image base URL if needed
+                                '${Apis.pdfUrl}$netUrl?v=${DateTime.now().millisecondsSinceEpoch}',
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                          : Icon(Icons.image_rounded,
+                              color: primaryColor, size: 40)),
+                ),
+              );
+            }),
             Btn_Coupons(),
           ],
         ),

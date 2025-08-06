@@ -9,6 +9,7 @@ import '../../route/app_route.dart';
 import '../../wiget/custome_snackbar.dart';
 import '../buy_product/buy_product_screen.dart';
 import '../buy_product/getOrderList/getOrderListScreen.dart';
+import '../drawer/coupons/couponsScreen.dart';
 import '../drawer/customers/addCustomer/addCustomerScreen.dart';
 import '../drawer/customers/customersScreen.dart';
 import '../drawer/products/brand/getBrandsScreen.dart';
@@ -33,7 +34,7 @@ class SplashController extends GetxController {
         String? managerAccessToken = managerUser?.token;
 
         if (accessToken != null && accessToken.isNotEmpty) {
-          Get.to(Getbrandsscreen());
+          Get.to(CouponsScreen());
           // Get.to(StaffServiceReportScreen());
           // Get.offNamed(Routes.drawerScreen); // Regular user
         } else if (managerAccessToken != null &&
