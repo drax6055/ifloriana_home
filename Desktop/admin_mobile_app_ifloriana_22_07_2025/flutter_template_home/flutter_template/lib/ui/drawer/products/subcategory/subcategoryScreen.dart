@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_template/network/network_const.dart';
 import 'package:flutter_template/ui/drawer/products/subcategory/subcategoryController.dart';
 import 'package:flutter_template/utils/colors.dart';
 import 'package:get/get.dart';
@@ -47,7 +48,7 @@ class Subcategoryscreen extends StatelessWidget {
                           ? ClipRRect(
                               borderRadius: BorderRadius.circular(8),
                               child: Image.network(
-                                subCategory.image,
+                                "${Apis.pdfUrl}${subCategory.image}",
                                 width: 50,
                                 height: 50,
                                 fit: BoxFit.cover,
@@ -327,8 +328,8 @@ class Subcategoryscreen extends StatelessWidget {
             .toList(),
         controller: getController.branchController,
         enabled: true,
-          searchEnabled: true,
-          chipDecoration: const ChipDecoration(
+        searchEnabled: true,
+        chipDecoration: const ChipDecoration(
           backgroundColor: secondaryColor,
           wrap: true,
           runSpacing: 2,

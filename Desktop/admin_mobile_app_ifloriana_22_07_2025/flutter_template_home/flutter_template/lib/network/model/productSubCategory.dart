@@ -24,13 +24,24 @@ class ProductSubCategory {
   });
 
   factory ProductSubCategory.fromJson(Map<String, dynamic> json) {
+    // Handle image_url or image (string or map)
+    String imageUrl = '';
+    if (json['image_url'] != null && json['image_url'] is String) {
+      imageUrl = json['image_url'];
+    } else if (json['image_url'] != null) {
+      if (json['image_url'] is String) {
+        imageUrl = json['image_url'];
+      } else if (json['image_url'] is Map && json['image']['data'] != null) {
+        imageUrl = json['image_url']['data'];
+      }
+    }
     return ProductSubCategory(
       id: json['_id'] ?? '',
       branchId: (json['branch_id'] as List<dynamic>?)
               ?.map((branch) => Branch.fromJson(branch))
               .toList() ??
           [],
-      image: json['image'] ?? '',
+      image: imageUrl,
       name: json['name'] ?? '',
       productCategoryId:
           ProductCategory.fromJson(json['product_category_id'] ?? {}),
@@ -98,6 +109,15 @@ class Branch {
   });
 
   factory Branch.fromJson(Map<String, dynamic> json) {
+    // Handle image as string or map
+    String imageUrl = '';
+    if (json['image'] != null) {
+      if (json['image'] is String) {
+        imageUrl = json['image'];
+      } else if (json['image'] is Map && json['image']['data'] != null) {
+        imageUrl = json['image']['data'];
+      }
+    }
     return Branch(
       id: json['_id'] ?? '',
       name: json['name'] ?? '',
@@ -117,7 +137,7 @@ class Branch {
       latitude: (json['latitude'] ?? 0.0).toDouble(),
       longitude: (json['longitude'] ?? 0.0).toDouble(),
       description: json['description'] ?? '',
-      image: json['image'] ?? '',
+      image: imageUrl,
       ratingStar: json['rating_star'] ?? 0,
       totalReview: json['total_review'] ?? 0,
       createdAt: json['createdAt'] ?? '',
@@ -150,10 +170,19 @@ class ProductCategory {
   });
 
   factory ProductCategory.fromJson(Map<String, dynamic> json) {
+    // Handle image as string or map
+    String imageUrl = '';
+    if (json['image'] != null) {
+      if (json['image'] is String) {
+        imageUrl = json['image'];
+      } else if (json['image'] is Map && json['image']['data'] != null) {
+        imageUrl = json['image']['data'];
+      }
+    }
     return ProductCategory(
       id: json['_id'] ?? '',
       branchId: List<String>.from(json['branch_id'] ?? []),
-      image: json['image'] ?? '',
+      image: imageUrl,
       name: json['name'] ?? '',
       brandId: List<String>.from(json['brand_id'] ?? []),
       status: json['status'] ?? 0,
@@ -186,10 +215,21 @@ class Brand {
   });
 
   factory Brand.fromJson(Map<String, dynamic> json) {
+    // Handle image as string, map, or image_url
+    String imageUrl = '';
+    if (json['image_url'] != null && json['image_url'] is String) {
+      imageUrl = json['image_url'];
+    } else if (json['image'] != null) {
+      if (json['image'] is String) {
+        imageUrl = json['image'];
+      } else if (json['image'] is Map && json['image']['data'] != null) {
+        imageUrl = json['image']['data'];
+      }
+    }
     return Brand(
       id: json['_id'] ?? '',
       branchId: List<String>.from(json['branch_id'] ?? []),
-      image: json['image'] ?? '',
+      image: imageUrl,
       name: json['name'] ?? '',
       status: json['status'] ?? 0,
       salonId: json['salon_id'] ?? '',
