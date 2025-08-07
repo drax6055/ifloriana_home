@@ -9,7 +9,9 @@ import 'package:get/get.dart';
 import '../../../../utils/validation.dart';
 import '../../../../wiget/Custome_textfield.dart';
 import '../../../../wiget/Custome_button.dart';
+import '../../../../wiget/appbar/commen_appbar.dart';
 import '../../../../wiget/custome_snackbar.dart';
+import '../../../../network/network_const.dart';
 
 class AddNewCategotyScreen extends StatelessWidget {
   AddNewCategotyScreen({super.key});
@@ -21,7 +23,7 @@ class AddNewCategotyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Service Categories")),
+      appBar: CustomAppBar(title: 'Service Categories'),
       body: Obx(() {
         if (getController.serviceList.isEmpty) {
           return Center(child: Text("No services found."));
@@ -35,7 +37,36 @@ class AddNewCategotyScreen extends StatelessWidget {
               color: white,
               margin: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
               child: ListTile(
-                leading: Icon(Icons.image_not_supported),
+                leading: item.image != null && item.image!.isNotEmpty
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          '${Apis.pdfUrl}${item.image}?v=${DateTime.now().millisecondsSinceEpoch}',
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(Icons.image_not_supported),
+                            );
+                          },
+                        ),
+                      )
+                    : Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(Icons.image_not_supported),
+                      ),
                 title: Text(item.name ?? 'No Name'),
                 subtitle: Text((item.status == 1) ? "Active" : "Deactive"),
                 trailing: Row(
@@ -62,11 +93,12 @@ class AddNewCategotyScreen extends StatelessWidget {
         );
       }),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: primaryColor,
         onPressed: () {
           getController.resetForm();
           showAddCategorySheet(context);
         },
-        child: Icon(Icons.add),
+        child: Icon(Icons.add, color: white),
       ),
     );
   }
@@ -156,7 +188,42 @@ class AddNewCategotyScreen extends StatelessWidget {
   Widget Imagepicker() {
     return Obx(() {
       return GestureDetector(
-        onTap: () => pickImage(isMultiple: false),
+        onTap: () {
+          Get.bottomSheet(
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.photo_library),
+                    title: const Text('Choose from Gallery'),
+                    onTap: () {
+                      Get.back();
+                      getController.pickImageFromGallery();
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.camera_alt),
+                    title: const Text('Take Photo'),
+                    onTap: () {
+                      Get.back();
+                      getController.pickImageFromCamera();
+                    },
+                  ),
+                ],
+              ),
+            ),
+            isScrollControlled: true,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+            ),
+          );
+        },
         child: Container(
           height: 50.h,
           width: double.infinity,
@@ -168,22 +235,31 @@ class AddNewCategotyScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(10.r),
             color: secondaryColor.withOpacity(0.2),
           ),
-          child: singleImage.value != null
+          child: getController.singleImage.value != null
               ? ClipRRect(
                   borderRadius: BorderRadius.circular(10.r),
                   child: Image.file(
-                    singleImage.value!,
+                    getController.singleImage.value!,
                     fit: BoxFit.cover,
                     width: double.infinity,
                   ),
                 )
-              : Center(
-                  child: Icon(
-                    Icons.image_rounded,
-                    color: primaryColor,
-                    size: 40.sp,
-                  ),
-                ),
+              : getController.editImageUrl.value.isNotEmpty
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(10.r),
+                      child: Image.network(
+                        '${Apis.pdfUrl}${getController.editImageUrl.value}?v=${DateTime.now().millisecondsSinceEpoch}',
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                      ),
+                    )
+                  : Center(
+                      child: Icon(
+                        Icons.image_rounded,
+                        color: primaryColor,
+                        size: 40.sp,
+                      ),
+                    ),
         ),
       );
     });

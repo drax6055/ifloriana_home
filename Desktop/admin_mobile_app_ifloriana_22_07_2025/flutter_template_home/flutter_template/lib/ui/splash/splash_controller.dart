@@ -15,6 +15,7 @@ import '../drawer/coupons/couponsScreen.dart';
 import '../drawer/customers/addCustomer/addCustomerScreen.dart';
 import '../drawer/customers/customersScreen.dart';
 import '../drawer/products/brand/getBrandsScreen.dart';
+import '../drawer/services/categotys/addNewServicesScreen.dart';
 import '../inhouse/post/addInhouseProduct_screen.dart';
 
 class SplashController extends GetxController {
@@ -36,7 +37,7 @@ class SplashController extends GetxController {
         String? managerAccessToken = managerUser?.token;
 
         if (accessToken != null && accessToken.isNotEmpty) {
-          Get.to(Getmanagerscreen());
+          Get.to(AddNewCategotyScreen());
           // Get.to(StaffServiceReportScreen());
           // Get.offNamed(Routes.drawerScreen); // Regular user
         } else if (managerAccessToken != null &&

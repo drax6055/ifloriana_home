@@ -257,7 +257,7 @@ class Addcustomercontroller extends GetxController {
         customerData['branch_package'] =
             selectedPackages.map((p) => p.id).toList();
         customerData['branch_membership'] = selectedBranchMembership.value;
-      }
+      } 
 
       // Add image if selected
       if (selectedImage.value != null) {

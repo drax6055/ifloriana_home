@@ -86,6 +86,30 @@ class CustomerController extends GetxController {
   var branchMembershipList = <dynamic>[].obs;
 
   // Image picker
+  static const int maxImageSizeInBytes = 150 * 1024; // 150 KB
+  static const List<String> allowedExtensions = ['.jpg', '.jpeg', '.png'];
+
+  bool _isAllowedImageExtension(String path) {
+    final ext = path.toLowerCase();
+    return allowedExtensions.any((e) => ext.endsWith(e));
+  }
+
+  Future<void> _handlePickedFile(XFile? pickedFile) async {
+    if (pickedFile != null) {
+      final file = File(pickedFile.path);
+      if (!_isAllowedImageExtension(pickedFile.path)) {
+        CustomSnackbar.showError(
+            'Invalid Image', 'Only JPG, JPEG, PNG images are allowed!');
+        return;
+      }
+      if (await file.length() > maxImageSizeInBytes) {
+        CustomSnackbar.showError('Error', 'Image size must be less than 150KB');
+        return;
+      }
+      selectedImage.value = file;
+    }
+  }
+
   final ImagePicker _picker = ImagePicker();
   var selectedImage = Rx<File?>(null);
   var existingImageUrl = Rx<String?>(null);
@@ -111,9 +135,7 @@ class CustomerController extends GetxController {
         source: ImageSource.gallery,
         imageQuality: 50,
       );
-      if (image != null) {
-        selectedImage.value = File(image.path);
-      }
+      await _handlePickedFile(image);
     } catch (e) {
       CustomSnackbar.showError(
           'Error', 'Failed to pick image from gallery: $e');
@@ -126,9 +148,7 @@ class CustomerController extends GetxController {
         source: ImageSource.camera,
         imageQuality: 50,
       );
-      if (image != null) {
-        selectedImage.value = File(image.path);
-      }
+      await _handlePickedFile(image);
     } catch (e) {
       CustomSnackbar.showError(
           'Error', 'Failed to capture image from camera: $e');
@@ -220,17 +240,12 @@ class CustomerController extends GetxController {
         'phone_number': phoneController.text,
         'gender': selectedGender.value.toLowerCase(),
         'status': isActive.value ? 1 : 0,
-        'salon_id': loginUser!.salonId
+        'salon_id': loginUser != null ? loginUser.salonId : null
       };
 
       if (showPackageFields.value) {
-        final packageIds = selectedPackages
-            .map((p) => p.id)
-            .where((id) => id != null && id.toString().isNotEmpty)
-            .toList();
-        if (packageIds.isNotEmpty) {
-          customerData['branch_package'] = packageIds;
-        }
+        customerData['branch_package'] =
+            selectedPackages.map((p) => p.id).toList();
         if (selectedBranchMembership.value.isNotEmpty) {
           customerData['branch_membership'] = selectedBranchMembership.value;
         }
