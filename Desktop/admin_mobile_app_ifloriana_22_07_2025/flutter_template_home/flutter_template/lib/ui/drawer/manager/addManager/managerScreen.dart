@@ -29,8 +29,8 @@ class Managerscreen extends StatelessWidget {
       getController.contactNumberController.text = manager!.contactNumber;
       getController.passwordController.text = manager!.password;
       getController.confirmPasswordController.text = manager!.password;
-      // getController.selectedGender.value = manager!.gender ?? "Male";
-
+      getController.selectedGender.value = manager!.gender?.capitalizeFirst ?? 'Male' ?? 'male';
+     
       // Set network image for edit mode
       getController.editImageUrl.value = manager!.image_url;
 
