@@ -10,8 +10,12 @@ import 'package:flutter_template/wiget/custome_dropdown.dart';
 import 'package:flutter_template/wiget/custome_snackbar.dart';
 import 'package:get/get.dart';
 import 'package:flutter_template/ui/drawer/manager/getManager/getmanagerController.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 import '../../../../utils/colors.dart';
+import '../../../../network/network_const.dart';
+import '../../../../wiget/loading.dart';
 
 class Managerscreen extends StatelessWidget {
   final Manager? manager;
@@ -21,12 +25,15 @@ class Managerscreen extends StatelessWidget {
   void prefillFields() {
     if (manager != null) {
       getController.fullNameController.text = manager!.full_name;
-      // getController.lastNameController.text = manager!.lastName;
       getController.emailController.text = manager!.email;
       getController.contactNumberController.text = manager!.contactNumber;
       getController.passwordController.text = manager!.password;
       getController.confirmPasswordController.text = manager!.password;
-      // No gender field in Manager model, so skip gender prefill
+      // getController.selectedGender.value = manager!.gender ?? "Male";
+
+      // Set network image for edit mode
+      getController.editImageUrl.value = manager!.image_url;
+
       // Branch prefill can be handled after branchList is loaded
       if (manager!.branchId != null) {
         ever(getController.branchList, (_) {
@@ -45,29 +52,139 @@ class Managerscreen extends StatelessWidget {
     prefillFields();
     return Scaffold(
         appBar: CustomAppBar(
-          title: "done",
+          title: manager == null ? "Add Manager" : "Edit Manager",
         ),
-        body: SingleChildScrollView(
-          child: Padding(
-              padding: EdgeInsets.all(10),
+        body: Obx(() => getController.isLoading.value
+            ? const Center(child: CustomLoadingAvatar())
+            : SingleChildScrollView(
+                child: Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Column(
+                      spacing: 10,
+                      children: [
+                        SizedBox(
+                          height: 1.h,
+                        ),
+                        ImagePickerWidget(),
+                        InputTxtfield_firstName(),
+                        InputTxtfield_Email(),
+                        InputTxtfield_Phone(),
+                        InputTxtfield_password(),
+                        InputTxtfield_confirmPassword(),
+                        Gender(),
+                        _buildBranchDropdown(),
+                        Btn_saveManager(context),
+                      ],
+                    )),
+              )));
+  }
+
+  Widget ImagePickerWidget() {
+    return Obx(() {
+      return GestureDetector(
+        onTap: () async {
+          Get.bottomSheet(
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              ),
               child: Column(
-                spacing: 10,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  SizedBox(
-                    height: 1.h,
+                  ListTile(
+                    leading: const Icon(Icons.photo_library),
+                    title: const Text('Choose from Gallery'),
+                    onTap: () async {
+                      Get.back();
+                      await getController.pickImageFromGallery();
+                    },
                   ),
-                  InputTxtfield_firstName(),
-                  InputTxtfield_Email(),
-                  InputTxtfield_Phone(),
-                  InputTxtfield_password(),
-                  InputTxtfield_confirmPassword(),
-                  Gender(),
-                  // branchDropdown(),
-                  _buildBranchDropdown(),
-                  Btn_saveManager(context),
+                  ListTile(
+                    leading: const Icon(Icons.camera_alt),
+                    title: const Text('Take Photo'),
+                    onTap: () async {
+                      Get.back();
+                      await getController.pickImageFromCamera();
+                    },
+                  ),
                 ],
-              )),
-        ));
+              ),
+            ),
+            isScrollControlled: true,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+            ),
+          );
+        },
+        child: Container(
+          height: 120.h,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            border: Border.all(color: primaryColor),
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.circular(10.r),
+            color: secondaryColor.withOpacity(0.2),
+          ),
+          child: getController.singleImage.value != null
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(10.r),
+                  child: Image.file(
+                    getController.singleImage.value!,
+                    fit: BoxFit.cover,
+                  ),
+                )
+              : getController.editImageUrl.value.isNotEmpty
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(10.r),
+                      child: Image.network(
+                        '${Apis.pdfUrl}${getController.editImageUrl.value}?v=${DateTime.now().millisecondsSinceEpoch}',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(10.r),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.image_not_supported,
+                                    color: Colors.grey[600], size: 40.sp),
+                                SizedBox(height: 8.h),
+                                Text(
+                                  'Image Corrupted',
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 12.sp,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    )
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.add_a_photo,
+                            color: primaryColor, size: 40.sp),
+                        SizedBox(height: 8.h),
+                        Text(
+                          'Add Photo',
+                          style: TextStyle(
+                            color: primaryColor,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+        ),
+      );
+    });
   }
 
   Widget Gender() {
@@ -166,57 +283,6 @@ class Managerscreen extends StatelessWidget {
         ));
   }
 
-  Widget branchDropdown() {
-    return Obx(() {
-      return DropdownButton<Branch>(
-        value: getController.selectedBranch.value,
-        hint: Text("Select Branch"),
-        items: getController.branchList.map((Branch branch) {
-          return DropdownMenuItem<Branch>(
-            value: branch,
-            child: Text(branch.name ?? ''),
-          );
-        }).toList(),
-        onChanged: (Branch? newValue) {
-          if (newValue != null) {
-            getController.selectedBranch.value = newValue;
-
-            CustomSnackbar.showSuccess(
-              'Branch Selected',
-              'ID: ${newValue.id}',
-            );
-          }
-        },
-      );
-    });
-  }
-// Widget branchDropdown() {
-//     return Obx(() {
-//       return DropdownButtonFormField<Branch>(
-//         value: getController.selectedBranch.value,
-//         decoration: InputDecoration(
-//           labelText: "Select Branch",
-//           border: OutlineInputBorder(),
-//         ),
-//         items: getController.branchList.map((Branch branch) {
-//           return DropdownMenuItem<Branch>(
-//             value: branch,
-//             child: Text(branch.name ?? ''),
-//           );
-//         }).toList(),
-//         onChanged: (Branch? newValue) {
-//           if (newValue != null) {
-//             getController.selectedBranch.value = newValue;
-
-//             CustomSnackbar.showSuccess(
-//               'Branch Selected',
-//               'ID: ${newValue.id}',
-//             );
-//           }
-//         },
-//       );
-//     });
-//   }
   Widget _buildBranchDropdown() {
     return Obx(() => DropdownButtonFormField<Branch>(
           value: getController.selectedBranch.value,

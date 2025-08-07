@@ -12,6 +12,7 @@ class Manager {
   final String password;
   final String branchName;
   final String? branchId;
+  final String? gender;
 
   Manager({
     required this.id,
@@ -22,6 +23,7 @@ class Manager {
     required this.password,
     required this.branchName,
     this.branchId,
+    this.gender,
   });
 
   factory Manager.fromJson(Map<String, dynamic> json) {
@@ -34,12 +36,14 @@ class Manager {
       branchName: json['branch_id']?['name'] ?? '',
       password: json['password'],
       branchId: json['branch_id']?['_id'],
+      gender: json['gender'],
     );
   }
 }
 
 class Getmanagercontroller extends GetxController {
   RxList<Manager> managers = <Manager>[].obs;
+  var isLoading = false.obs;
 
   @override
   void onInit() {
@@ -50,6 +54,7 @@ class Getmanagercontroller extends GetxController {
   Future<void> getManagers() async {
     final loginUser = await prefs.getUser();
     try {
+      isLoading.value = true;
       final response = await dioClient.getData(
         '${Apis.baseUrl}${Endpoints.getManager}${loginUser!.salonId}',
         (json) => json,
@@ -58,6 +63,8 @@ class Getmanagercontroller extends GetxController {
       managers.value = data.map((e) => Manager.fromJson(e)).toList();
     } catch (e) {
       CustomSnackbar.showError('Error', 'Failed to get data: $e');
+    } finally {
+      isLoading.value = false;
     }
   }
 
@@ -65,6 +72,7 @@ class Getmanagercontroller extends GetxController {
     final loginUser = await prefs.getUser();
     if (managerId == null) return;
     try {
+      isLoading.value = true;
       await dioClient.deleteData(
         '${Apis.baseUrl}${Endpoints.addManager}/$managerId?salon_id=${loginUser!.salonId}',
         (json) => json,
@@ -73,6 +81,8 @@ class Getmanagercontroller extends GetxController {
       CustomSnackbar.showSuccess('Deleted', 'Manager deleted successfully');
     } catch (e) {
       CustomSnackbar.showError('Error', 'Failed to delete manager: $e');
+    } finally {
+      isLoading.value = false;
     }
   }
 }

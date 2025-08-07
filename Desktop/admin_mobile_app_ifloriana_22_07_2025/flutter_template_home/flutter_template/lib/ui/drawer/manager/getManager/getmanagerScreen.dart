@@ -5,6 +5,7 @@ import 'package:flutter_template/utils/colors.dart';
 import 'package:flutter_template/wiget/appbar/commen_appbar.dart';
 import 'package:get/get.dart';
 import 'package:flutter_template/ui/drawer/manager/addManager/managerScreen.dart';
+import 'package:flutter_template/wiget/loading.dart';
 
 import '../udpateFromExisting/upgradeFromExistingScreen.dart';
 
@@ -19,70 +20,86 @@ class Getmanagerscreen extends StatelessWidget {
         title: "Manager",
       ),
       body: Obx(() {
-        return RefreshIndicator(
-          color: primaryColor,
-          onRefresh: () async {
-            await getController.getManagers();
-          },
-          child: getController.managers.isEmpty
-              ? ListView(
-                  children: [
-                    SizedBox(height: 200),
-                    Center(child: Text("No managers found")),
-                  ],
-                )
-              : ListView.builder(
-                  itemCount: getController.managers.length,
-                  itemBuilder: (context, index) {
-                    final manager = getController.managers[index];
-                    return ExpansionTile(
-                      leading: CircleAvatar(
-                        backgroundImage:
-                            NetworkImage('${Apis.pdfUrl}${manager.image_url}'),
-                      ),
-                      shape: Border.all(color: Colors.transparent),
-                      title: Text('${manager.full_name}'),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+        return getController.isLoading.value
+            ? const Center(child: CustomLoadingAvatar())
+            : RefreshIndicator(
+                color: primaryColor,
+                onRefresh: () async {
+                  await getController.getManagers();
+                },
+                child: getController.managers.isEmpty
+                    ? ListView(
                         children: [
-                          Text('${manager.contactNumber}'),
-                          // Text('${manager.email}'),
-                          // Text('${manager.branchName}'),
+                          SizedBox(height: 200),
+                          Center(child: Text("No managers found")),
                         ],
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon:
-                                Icon(Icons.edit_outlined, color: primaryColor),
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      Managerscreen(manager: manager),
+                      )
+                    : ListView.builder(
+                        itemCount: getController.managers.length,
+                        itemBuilder: (context, index) {
+                          final manager = getController.managers[index];
+                          return ExpansionTile(
+                            leading: CircleAvatar(
+                              backgroundColor: Colors.grey[300],
+                              child: manager.image_url.isNotEmpty
+                                  ? ClipOval(
+                                      child: Image.network(
+                                        '${Apis.pdfUrl}${manager.image_url}?v=${DateTime.now().millisecondsSinceEpoch}',
+                                        width: 40,
+                                        height: 40,
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          return Icon(Icons.person,
+                                              color: Colors.grey[600]);
+                                        },
+                                      ),
+                                    )
+                                  : Icon(Icons.person, color: Colors.grey[600]),
+                            ),
+                            shape: Border.all(color: Colors.transparent),
+                            title: Text('${manager.full_name}'),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('${manager.contactNumber}'),
+                                // Text('${manager.email}'),
+                                // Text('${manager.branchName}'),
+                              ],
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: Icon(Icons.edit_outlined,
+                                      color: primaryColor),
+                                  onPressed: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            Managerscreen(manager: manager),
+                                      ),
+                                    );
+                                  },
                                 ),
-                              );
-                            },
-                          ),
-                          IconButton(
-                            icon:
-                                Icon(Icons.delete_outline, color: primaryColor),
-                            onPressed: () {
-                              getController.deleteManager(manager.id);
-                            },
-                          ),
-                        ],
+                                IconButton(
+                                  icon: Icon(Icons.delete_outline,
+                                      color: primaryColor),
+                                  onPressed: () {
+                                    getController.deleteManager(manager.id);
+                                  },
+                                ),
+                              ],
+                            ),
+                            children: [
+                              Text('Email: ${manager.email}'),
+                              Text('Contact: ${manager.contactNumber}'),
+                              Text('Branch: ${manager.branchName}'),
+                            ],
+                          );
+                        },
                       ),
-                      children: [
-                        Text('Email: ${manager.email}'),
-                        Text('Contact: ${manager.contactNumber}'),
-                        Text('Branch: ${manager.branchName}'),
-                      ],
-                    );
-                  },
-                ),
-        );
+              );
       }),
       floatingActionButton: FloatingActionButton(
         backgroundColor: primaryColor,
