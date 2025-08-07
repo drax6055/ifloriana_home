@@ -12,9 +12,12 @@ import '../../../../../utils/validation.dart';
 import '../../../../../wiget/Custome_button.dart';
 import '../../../../../wiget/Custome_textfield.dart';
 import '../../../../../wiget/custome_text.dart';
+import '../../../../wiget/appbar/commen_appbar.dart';
 import '../../../../wiget/custome_snackbar.dart';
 import '../../../../wiget/loading.dart';
 import '../../../../network/model/productSubCategory.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 
 class Subcategoryscreen extends StatelessWidget {
   Subcategoryscreen({super.key});
@@ -23,9 +26,8 @@ class Subcategoryscreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Product SubCategories'),
-        backgroundColor: primaryColor,
+      appBar: CustomAppBar(
+        title: 'Sub Categories',
       ),
       body: Container(
           child: Obx(
@@ -35,12 +37,7 @@ class Subcategoryscreen extends StatelessWidget {
                 itemCount: getController.subCategories.length,
                 itemBuilder: (context, index) {
                   final subCategory = getController.subCategories[index];
-                  return Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border(
-                            right:
-                                BorderSide(color: secondaryColor, width: 3))),
+                  return Card(
                     margin:
                         const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     child: ListTile(
@@ -48,7 +45,7 @@ class Subcategoryscreen extends StatelessWidget {
                           ? ClipRRect(
                               borderRadius: BorderRadius.circular(8),
                               child: Image.network(
-                                "${Apis.pdfUrl}${subCategory.image}",
+                                "${Apis.pdfUrl}${subCategory.image}?v=${DateTime.now().millisecondsSinceEpoch}",
                                 width: 50,
                                 height: 50,
                                 fit: BoxFit.cover,
@@ -86,35 +83,36 @@ class Subcategoryscreen extends StatelessWidget {
                               fontSize: 12,
                             ),
                           ),
-                          Text(
-                            'Branches: ${subCategory.branchId.length} • Brands: ${subCategory.brandId.length}',
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 12,
-                            ),
-                          ),
-                          Text(
-                            subCategory.status == 1 ? 'Active' : 'Inactive',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: subCategory.status == 1
-                                  ? Colors.green
-                                  : Colors.red,
-                            ),
-                          ),
+                          // Text(
+                          //   'Branches: ${subCategory.branchId.length} • Brands: ${subCategory.brandId.length}',
+                          //   style: TextStyle(
+                          //     color: Colors.grey[600],
+                          //     fontSize: 12,
+                          //   ),
+                          // ),
+                          // Text(
+                          //   subCategory.status == 1 ? 'Active' : 'Inactive',
+                          //   style: TextStyle(
+                          //     fontSize: 12,
+                          //     color: subCategory.status == 1
+                          //         ? Colors.green
+                          //         : Colors.red,
+                          //   ),
+                          // ),
                         ],
                       ),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
-                              icon: const Icon(Icons.edit, color: Colors.blue),
+                              icon: const Icon(Icons.edit_outlined,
+                                  color: primaryColor),
                               onPressed: () {
                                 showEditSubCategorySheet(context, subCategory);
                               }),
                           IconButton(
                               icon: const Icon(Icons.delete_outline),
-                              color: Colors.red,
+                              color: primaryColor,
                               onPressed: () => getController
                                   .deleteSubCategory(subCategory.id)),
                         ],
@@ -142,6 +140,8 @@ class Subcategoryscreen extends StatelessWidget {
     getController.selectedCategory.value = null;
     getController.branchController.clearAll();
     getController.brandController.clearAll();
+    getController.singleImage.value = null;
+    getController.editImageUrl.value = '';
     showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -219,6 +219,8 @@ class Subcategoryscreen extends StatelessWidget {
     getController.selectedCategory.value = selectedCategory;
     getController.branchController.clearAll();
     getController.brandController.clearAll();
+    getController.singleImage.value = null;
+    getController.editImageUrl.value = subCategory.image;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       getController.branchController
           .selectWhere((item) => selectedBranches.contains(item.value));
@@ -294,7 +296,42 @@ class Subcategoryscreen extends StatelessWidget {
   Widget Imagepicker() {
     return Obx(() {
       return GestureDetector(
-        onTap: () => pickImage(isMultiple: false),
+        onTap: () async {
+          Get.bottomSheet(
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.photo_library),
+                    title: const Text('Choose from Gallery'),
+                    onTap: () async {
+                      Get.back();
+                      await getController.pickImageFromGallery();
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.camera_alt),
+                    title: const Text('Take Photo'),
+                    onTap: () async {
+                      Get.back();
+                      await getController.pickImageFromCamera();
+                    },
+                  ),
+                ],
+              ),
+            ),
+            isScrollControlled: true,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+            ),
+          );
+        },
         child: Container(
           height: 51.h,
           decoration: BoxDecoration(
@@ -303,15 +340,24 @@ class Subcategoryscreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(10.r),
             color: secondaryColor.withOpacity(0.2),
           ),
-          child: singleImage.value != null
+          child: getController.singleImage.value != null
               ? ClipRRect(
                   borderRadius: BorderRadius.circular(10.r),
                   child: Image.file(
-                    singleImage.value!,
+                    getController.singleImage.value!,
                     fit: BoxFit.cover,
                   ),
                 )
-              : Icon(Icons.image_rounded, color: primaryColor, size: 30.sp),
+              : (getController.editImageUrl.value.isNotEmpty
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(10.r),
+                      child: Image.network(
+                        "${Apis.pdfUrl}${getController.editImageUrl.value}?v=${DateTime.now().millisecondsSinceEpoch}",
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : Icon(Icons.image_rounded,
+                      color: primaryColor, size: 30.sp)),
         ),
       );
     });

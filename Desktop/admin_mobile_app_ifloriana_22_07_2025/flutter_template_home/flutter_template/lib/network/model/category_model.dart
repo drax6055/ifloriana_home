@@ -114,6 +114,12 @@ class Branch {
   });
 
   factory Branch.fromJson(Map<String, dynamic> json) {
+    String imageUrl = '';
+    if (json['image'] is Map) {
+      imageUrl = json['image']['data'] ?? '';
+    } else if (json['image'] is String) {
+      imageUrl = json['image'] ?? '';
+    }
     return Branch(
       id: json['_id'] ?? '',
       name: json['name'] ?? '',
@@ -133,7 +139,7 @@ class Branch {
       latitude: (json['latitude'] ?? 0.0).toDouble(),
       longitude: (json['longitude'] ?? 0.0).toDouble(),
       description: json['description'] ?? '',
-      image: json['image'] ?? '',
+      image: imageUrl,
       ratingStar: json['rating_star'] ?? 0,
       totalReview: json['total_review'] ?? 0,
       createdAt: json['createdAt'] ?? '',
@@ -164,10 +170,16 @@ class Brand {
   });
 
   factory Brand.fromJson(Map<String, dynamic> json) {
+    String imageUrl = '';
+    if (json['image'] is Map) {
+      imageUrl = json['image']['data'] ?? '';
+    } else if (json['image'] is String) {
+      imageUrl = json['image'] ?? '';
+    }
     return Brand(
       id: json['_id'] ?? '',
       branchId: List<String>.from(json['branch_id'] ?? []),
-      image: json['image'] ?? '',
+      image: imageUrl,
       name: json['name'] ?? '',
       status: json['status'] ?? 0,
       salonId: json['salon_id'] ?? '',
