@@ -29,8 +29,9 @@ class Managerscreen extends StatelessWidget {
       getController.contactNumberController.text = manager!.contactNumber;
       getController.passwordController.text = manager!.password;
       getController.confirmPasswordController.text = manager!.password;
-      getController.selectedGender.value = manager!.gender?.capitalizeFirst ?? 'Male' ?? 'male';
-     
+      getController.selectedGender.value =
+          manager!.gender?.capitalizeFirst ?? 'Male' ?? 'male';
+
       // Set network image for edit mode
       getController.editImageUrl.value = manager!.image_url;
 
@@ -120,7 +121,7 @@ class Managerscreen extends StatelessWidget {
         },
         child: Container(
           height: 120.h,
-          width: double.infinity,
+          width: 120.w,
           decoration: BoxDecoration(
             border: Border.all(color: primaryColor),
             shape: BoxShape.rectangle,
