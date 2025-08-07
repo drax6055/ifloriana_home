@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../utils/colors.dart';
+import '../../../../utils/custom_text_styles.dart';
 import '../../../../utils/validation.dart';
 import '../../../../wiget/Custome_button.dart';
 import '../../../../wiget/Custome_textfield.dart';
+import '../../../../wiget/appbar/commen_appbar.dart';
 import 'upgradeFromExistingController.dart';
 
 class Upgradefromexistingscreen extends StatelessWidget {
@@ -14,8 +16,8 @@ class Upgradefromexistingscreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Upgrade from existing staff'),
+      appBar: CustomAppBar(
+        title: 'Upgrade from existing staff',
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -37,9 +39,14 @@ class Upgradefromexistingscreen extends StatelessWidget {
           value: getController.selectedStaffId.value.isEmpty
               ? null
               : getController.selectedStaffId.value,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Staff *',
-            border: OutlineInputBorder(),
+            labelStyle: CustomTextStyles.textFontMedium(size: 14, color: grey),
+            border: const OutlineInputBorder(),
+            focusedBorder: const OutlineInputBorder(
+              borderSide: BorderSide(
+                  color: primaryColor, width: 2.0), // Active/focused border
+            ),
           ),
           isExpanded: true,
           items: getController.staffList

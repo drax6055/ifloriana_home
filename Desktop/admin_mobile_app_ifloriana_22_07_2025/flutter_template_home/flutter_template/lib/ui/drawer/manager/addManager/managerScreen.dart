@@ -15,6 +15,7 @@ import 'dart:io';
 
 import '../../../../utils/colors.dart';
 import '../../../../network/network_const.dart';
+import '../../../../utils/custom_text_styles.dart';
 import '../../../../wiget/loading.dart';
 
 class Managerscreen extends StatelessWidget {
@@ -287,8 +288,16 @@ class Managerscreen extends StatelessWidget {
   Widget _buildBranchDropdown() {
     return Obx(() => DropdownButtonFormField<Branch>(
           value: getController.selectedBranch.value,
-          decoration: const InputDecoration(
-              labelText: 'Branch *', border: OutlineInputBorder()),
+          decoration: InputDecoration(
+            labelText: 'Branch *',
+            labelStyle: CustomTextStyles.textFontMedium(
+                size: 14, color: grey),
+            border: const OutlineInputBorder(),
+            focusedBorder: const OutlineInputBorder(
+              borderSide: BorderSide(
+                  color: primaryColor, width: 2.0), // Active/focused border
+            ),
+          ),
           items: getController.branchList
               .map((item) =>
                   DropdownMenuItem(value: item, child: Text(item.name ?? '')))

@@ -41,14 +41,32 @@ class Manager {
   }
 }
 
+class BranchFilter {
+  final String? id;
+  final String? name;
+
+  BranchFilter({this.id, this.name});
+
+  factory BranchFilter.fromJson(Map<String, dynamic> json) {
+    return BranchFilter(
+      id: json['_id'],
+      name: json['name'],
+    );
+  }
+}
+
 class Getmanagercontroller extends GetxController {
   RxList<Manager> managers = <Manager>[].obs;
+  RxList<Manager> filteredManagers = <Manager>[].obs;
+  RxList<BranchFilter> branchList = <BranchFilter>[].obs;
   var isLoading = false.obs;
+  var selectedBranchFilter = Rx<BranchFilter?>(null);
 
   @override
   void onInit() {
     super.onInit();
     getManagers();
+    getBranches();
   }
 
   Future<void> getManagers() async {
@@ -61,11 +79,50 @@ class Getmanagercontroller extends GetxController {
       );
       final data = response['data'] as List;
       managers.value = data.map((e) => Manager.fromJson(e)).toList();
+      applyFilter(); // Apply current filter after loading managers
     } catch (e) {
       CustomSnackbar.showError('Error', 'Failed to get data: $e');
     } finally {
       isLoading.value = false;
     }
+  }
+
+  Future<void> getBranches() async {
+    final loginUser = await prefs.getUser();
+    try {
+      final response = await dioClient.getData(
+        '${Apis.baseUrl}${Endpoints.getBranchName}${loginUser!.salonId}',
+        (json) => json,
+      );
+
+      final data = response['data'] as List;
+      branchList.value = data.map((e) => BranchFilter.fromJson(e)).toList();
+    } catch (e) {
+      CustomSnackbar.showError('Error', 'Failed to get branches: $e');
+    }
+  }
+
+  void applyFilter() {
+    if (selectedBranchFilter.value == null) {
+      // Show all managers if no filter is selected
+      filteredManagers.value = managers;
+    } else {
+      // Filter managers by selected branch
+      filteredManagers.value = managers
+          .where(
+              (manager) => manager.branchId == selectedBranchFilter.value!.id)
+          .toList();
+    }
+  }
+
+  void setBranchFilter(BranchFilter? branch) {
+    selectedBranchFilter.value = branch;
+    applyFilter();
+  }
+
+  void clearFilter() {
+    selectedBranchFilter.value = null;
+    applyFilter();
   }
 
   Future<void> deleteManager(String? managerId) async {
@@ -78,6 +135,7 @@ class Getmanagercontroller extends GetxController {
         (json) => json,
       );
       managers.removeWhere((m) => m.id == managerId);
+      applyFilter(); // Reapply filter after deletion
       CustomSnackbar.showSuccess('Deleted', 'Manager deleted successfully');
     } catch (e) {
       CustomSnackbar.showError('Error', 'Failed to delete manager: $e');

@@ -18,6 +18,56 @@ class Getmanagerscreen extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppBar(
         title: "Manager",
+        actions: [
+          PopupMenuButton<String>(
+            icon: Icon(Icons.filter_list, color: white),
+            onSelected: (value) {
+              if (value == 'all') {
+                getController.clearFilter();
+              } else {
+                // Find the branch by name
+                final branch = getController.branchList
+                    .firstWhereOrNull((b) => b.name == value);
+                if (branch != null) {
+                  getController.setBranchFilter(branch);
+                }
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              List<PopupMenuEntry<String>> items = [
+                PopupMenuItem<String>(
+                  value: 'all',
+                  child: Row(
+                    children: [
+                      Icon(Icons.clear_all, color: primaryColor),
+                      SizedBox(width: 8),
+                      Text('All Branches'),
+                    ],
+                  ),
+                ),
+                PopupMenuDivider(),
+              ];
+
+              // Add branch filter options
+              for (var branch in getController.branchList) {
+                items.add(
+                  PopupMenuItem<String>(
+                    value: branch.name ?? '',
+                    child: Row(
+                      children: [
+                        Icon(Icons.business, color: primaryColor),
+                        SizedBox(width: 8),
+                        Text(branch.name ?? ''),
+                      ],
+                    ),
+                  ),
+                );
+              }
+
+              return items;
+            },
+          ),
+        ],
       ),
       body: Obx(() {
         return getController.isLoading.value
@@ -27,17 +77,45 @@ class Getmanagerscreen extends StatelessWidget {
                 onRefresh: () async {
                   await getController.getManagers();
                 },
-                child: getController.managers.isEmpty
+                child: getController.filteredManagers.isEmpty
                     ? ListView(
                         children: [
                           SizedBox(height: 200),
-                          Center(child: Text("No managers found")),
+                          Center(
+                            child: Column(
+                              children: [
+                                Icon(Icons.people_outline,
+                                    size: 64, color: Colors.grey[400]),
+                                SizedBox(height: 16),
+                                Text(
+                                  getController.selectedBranchFilter.value !=
+                                          null
+                                      ? "No managers found in ${getController.selectedBranchFilter.value!.name}"
+                                      : "No managers found",
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                if (getController.selectedBranchFilter.value !=
+                                    null)
+                                  TextButton(
+                                    onPressed: () =>
+                                        getController.clearFilter(),
+                                    child: Text(
+                                      'Clear Filter',
+                                      style: TextStyle(color: primaryColor),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
                         ],
                       )
                     : ListView.builder(
-                        itemCount: getController.managers.length,
+                        itemCount: getController.filteredManagers.length,
                         itemBuilder: (context, index) {
-                          final manager = getController.managers[index];
+                          final manager = getController.filteredManagers[index];
                           return ExpansionTile(
                             leading: CircleAvatar(
                               backgroundColor: Colors.grey[300],
