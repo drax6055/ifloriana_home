@@ -73,14 +73,14 @@ class AddNewCategotyScreen extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.edit, color: primaryColor),
+                      icon: Icon(Icons.edit_outlined, color: primaryColor),
                       onPressed: () {
                         getController.startEditing(item);
                         showAddCategorySheet(context);
                       },
                     ),
                     IconButton(
-                      icon: Icon(Icons.delete, color: primaryColor),
+                      icon: Icon(Icons.delete_outline, color: primaryColor),
                       onPressed: () {
                         getController.deleteCategory(item.id ?? '');
                       },
