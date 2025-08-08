@@ -120,41 +120,41 @@ class Categoryscreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(height: 4),
+                        // Text(
+                        //   '${category.branchId.map((b) => b.name).join(', ')}',
+                        //   style: TextStyle(
+                        //     fontSize: 14,
+                        //     color: Colors.grey[600],
+                        //   ),
+                        // ),
                         Text(
-                          'Branches: ${category.branchId.length}',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        Text(
-                          'Brands: ${category.brandId.length}',
+                          '${category.brandId.firstOrNull?.name ?? 'None'}',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[600],
                           ),
                         ),
                         SizedBox(height: 4),
-                        Container(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: category.status == 1
-                                ? Colors.green[100]
-                                : Colors.red[100],
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            category.status == 1 ? 'Active' : 'Inactive',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: category.status == 1
-                                  ? Colors.green[700]
-                                  : Colors.red[700],
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
+                        // Container(
+                        //   padding:
+                        //       EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        //   decoration: BoxDecoration(
+                        //     color: category.status == 1
+                        //         ? Colors.green[100]
+                        //         : Colors.red[100],
+                        //     borderRadius: BorderRadius.circular(12),
+                        //   ),
+                        //   child: Text(
+                        //     category.status == 1 ? 'Active' : 'Inactive',
+                        //     style: TextStyle(
+                        //       fontSize: 12,
+                        //       color: category.status == 1
+                        //           ? Colors.green[700]
+                        //           : Colors.red[700],
+                        //       fontWeight: FontWeight.w500,
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
                     trailing: Row(
