@@ -26,7 +26,7 @@ class Categorycontroller extends GetxController {
   var branchList = <Branch1>[].obs;
   final branchController = MultiSelectController<Branch1>();
   final Rx<File?> singleImage = Rx<File?>(null);
-  final RxString editImageUrl = ''.obs; 
+  final RxString editImageUrl = ''.obs;
   @override
   void onInit() {
     super.onInit();
@@ -124,20 +124,21 @@ class Categorycontroller extends GetxController {
         contentType: MediaType(mimeParts[0], mimeParts[1]),
       );
     }
-      final formData = dio.FormData.fromMap(subCategoryData);
+    final formData = dio.FormData.fromMap(subCategoryData);
     try {
       await dioClient.dio.post(
         '${Apis.baseUrl}${Endpoints.postSubCategory}',
-       data:  formData,
+        data: formData,
         options: dio.Options(
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          ),
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        ),
       );
+      resetForm();
       getCategories();
       Get.back(); // Close the bottom sheet
-      resetForm();
+
       CustomSnackbar.showSuccess(
           'Success', 'SubCategory Added Successfully'); // Reset the form
     } catch (e) {
@@ -150,6 +151,9 @@ class Categorycontroller extends GetxController {
     nameController.clear();
     isActive.value = true;
     selectedBranches.clear();
+    selectedBrand.clear();
+    singleImage.value = null;
+    editImageUrl.value = ''; // Clear the network image URL
   }
 
   Future<void> deleteCategory(String categoryId) async {
@@ -175,6 +179,7 @@ class Categorycontroller extends GetxController {
       String categoryId, String categoryName) async {
     deleteCategory(categoryId);
   }
+
   Future<void> pickImageFromGallery() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -188,6 +193,7 @@ class Categorycontroller extends GetxController {
     editImageUrl.value = ''; // Clear network image when picking new
     await _handlePickedFile(pickedFile);
   }
+
   String? _getMimeType(String path) {
     final ext = path.toLowerCase();
     if (ext.endsWith('.jpg') || ext.endsWith('.jpeg')) {
@@ -215,8 +221,8 @@ class Categorycontroller extends GetxController {
       }
     }
   }
+
   Future<void> updateCategory(String categoryId) async {
-   
     final loginUser = await prefs.getUser();
     Map<String, dynamic> categoryData = {
       "image": null,
@@ -243,17 +249,18 @@ class Categorycontroller extends GetxController {
     }
     final formData = dio.FormData.fromMap(categoryData);
     try {
-      await  dioClient.dio.put(
+      await dioClient.dio.put(
         '${Apis.baseUrl}${Endpoints.postSubCategory}/$categoryId',
-       data:  formData,
-       options: dio.Options(
+        data: formData,
+        options: dio.Options(
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         ),
       );
-      await getCategories();
       resetForm();
+      await getCategories();
+
       CustomSnackbar.showSuccess('Success', 'Category updated successfully');
     } catch (e) {
       print('==> here Error: $e');

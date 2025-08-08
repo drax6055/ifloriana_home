@@ -25,6 +25,7 @@ class Categoryscreen extends StatelessWidget {
         ext.endsWith('.jpeg') ||
         ext.endsWith('.png');
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,7 +78,7 @@ class Categoryscreen extends StatelessWidget {
                   ),
                   child: ListTile(
                     contentPadding: EdgeInsets.all(16),
-                    leading:  category.image_url.isNotEmpty
+                    leading: category.image_url.isNotEmpty
                         ? ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: Image.network(
@@ -196,6 +197,8 @@ class Categoryscreen extends StatelessWidget {
     getController.selectedBrand.clear();
     getController.branchController.clearAll();
     getController.brandController.clearAll();
+    getController.singleImage.value = null; // Clear picked image for add
+    getController.editImageUrl.value = '';
     showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -260,7 +263,6 @@ class Categoryscreen extends StatelessWidget {
     getController.nameController.text = category.name;
     getController.isActive.value = category.status == 1;
 
-    
     // Reset image selection for editing
     getController.singleImage.value = null;
     getController.editImageUrl.value =
