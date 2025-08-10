@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter_template/main.dart';
+import 'package:flutter_template/ui/drawer/customers/customersScreen.dart'
+    show CustomersScreen;
 import 'package:get/get.dart';
 import '../../route/app_route.dart';
 import '../../wiget/custome_snackbar.dart';
@@ -24,7 +26,7 @@ class SplashController extends GetxController {
         String? managerAccessToken = managerUser?.token;
 
         if (accessToken != null && accessToken.isNotEmpty) {
-          Get.to(AddNewService());
+          Get.to(CustomersScreen());
           // Get.to(StaffServiceReportScreen());
           // Get.offNamed(Routes.drawerScreen); // Regular user
         } else if (managerAccessToken != null &&

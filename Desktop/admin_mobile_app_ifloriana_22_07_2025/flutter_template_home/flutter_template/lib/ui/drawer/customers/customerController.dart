@@ -58,7 +58,7 @@ class Customer {
       branchMembershipObj: json['branch_membership'] is Map<String, dynamic>
           ? json['branch_membership'] as Map<String, dynamic>
           : null,
-      image: json['image'], // Parse image field
+      image: json['image_url'], // Parse image field
     );
   }
 
