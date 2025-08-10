@@ -61,9 +61,6 @@ class Customer {
       image: json['image_url'], // Parse image field
     );
   }
-
-  // Helper method to get full image URL
-  String? get fullImageUrl => getFullImageUrl(image);
 }
 
 class CustomerController extends GetxController {
@@ -113,6 +110,9 @@ class CustomerController extends GetxController {
   final ImagePicker _picker = ImagePicker();
   var selectedImage = Rx<File?>(null);
   var existingImageUrl = Rx<String?>(null);
+
+  final Rx<File?> singleImage = Rx<File?>(null);
+  final RxString editImageUrl = ''.obs;
 
   RxList<Customer> customerList = <Customer>[].obs;
 
