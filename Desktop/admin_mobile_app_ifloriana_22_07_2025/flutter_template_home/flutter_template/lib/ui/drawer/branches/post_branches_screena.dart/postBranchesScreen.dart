@@ -11,11 +11,13 @@ import 'package:flutter_template/wiget/appbar/commen_appbar.dart';
 import 'package:flutter_template/wiget/custome_dropdown.dart';
 import 'package:flutter_template/wiget/custome_text.dart';
 import 'package:get/get.dart';
+import 'package:multi_dropdown/multi_dropdown.dart';
 
 class Postbranchesscreen extends StatelessWidget {
   Postbranchesscreen({super.key});
   final Postbranchescontroller getController =
       Get.put(Postbranchescontroller());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -166,68 +168,55 @@ class Postbranchesscreen extends StatelessWidget {
 
   Widget serviceDropdown() {
     return Obx(() {
-      final allSelected = getController.selectedServices.length ==
-              getController.serviceList.length &&
-          getController.serviceList.isNotEmpty;
-
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ConstrainedBox(
-            constraints:
-                BoxConstraints(maxHeight: 120, minWidth: double.infinity),
-            child: Container(
-              padding: EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: SingleChildScrollView(
-                child: Wrap(
-                  spacing: 8.0,
-                  runSpacing: 8.0,
-                  children: [
-                    // Select All / Deselect All Chip
-                    FilterChip(
-                      label: Text(allSelected ? 'Deselect All' : 'Select All'),
-                      selected: allSelected,
-                      onSelected: (selected) {
-                        if (selected) {
-                          getController.selectedServices
-                              .assignAll(getController.serviceList);
-                        } else {
-                          getController.selectedServices.clear();
-                        }
-                      },
-                      disabledColor: secondaryColor.withOpacity(0.2),
-                      selectedColor: primaryColor.withOpacity(0.2),
-                      checkmarkColor: primaryColor,
-                    ),
-
-                    // Service Chips
-                    ...getController.serviceList.map((service) {
-                      final isSelected =
-                          getController.selectedServices.contains(service);
-                      return FilterChip(
-                        label: Text(service.name ?? ''),
-                        selected: isSelected,
-                        onSelected: (selected) {
-                          if (selected) {
-                            getController.selectedServices.add(service);
-                          } else {
-                            getController.selectedServices.remove(service);
-                          }
-                        },
-                        selectedColor: primaryColor.withOpacity(0.2),
-                        checkmarkColor: primaryColor,
-                      );
-                    }).toList(),
-                  ],
-                ),
-              ),
+      return MultiDropdown<Service>(
+        items: getController.serviceList
+            .map((service) => DropdownItem(
+                  label: service.name ?? '',
+                  value: service,
+                ))
+            .toList(),
+        controller: getController.serviceController,
+        enabled: true,
+        searchEnabled: true,
+        chipDecoration: const ChipDecoration(
+          backgroundColor: secondaryColor,
+          wrap: true,
+          runSpacing: 2,
+          spacing: 10,
+        ),
+        fieldDecoration: FieldDecoration(
+          hintText: 'Select Services',
+          hintStyle: CustomTextStyles.textFontMedium(size: 14.sp, color: grey),
+          showClearIcon: true,
+          border: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+            borderSide: BorderSide(
+              color: grey,
+              width: 1.0,
             ),
           ),
-        ],
+          focusedBorder: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+            borderSide: BorderSide(
+              color: primaryColor,
+              width: 2.0,
+            ),
+          ),
+          errorBorder: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+            borderSide: BorderSide(
+              color: red,
+              width: 1.0,
+            ),
+          ),
+        ),
+        dropdownItemDecoration: DropdownItemDecoration(
+          selectedIcon: const Icon(Icons.check_box, color: primaryColor),
+          disabledIcon: Icon(Icons.lock, color: Colors.grey.shade300),
+        ),
+        onSelectionChange: (selectedItems) {
+          getController.selectedServices.value = selectedItems;
+        },
       );
     });
   }
@@ -243,68 +232,55 @@ class Postbranchesscreen extends StatelessWidget {
 
   Widget paymentMethodChipView() {
     return Obx(() {
-      final allSelected = getController.selectedPaymentMethod.length ==
-          getController.dropdownItemPaymentMethod.length;
-
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ConstrainedBox(
-            constraints:
-                BoxConstraints(maxHeight: 120, minWidth: double.infinity),
-            child: Container(
-              padding: EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: SingleChildScrollView(
-                child: Wrap(
-                  spacing: 8.0,
-                  runSpacing: 8.0,
-                  children: [
-                    // Select All chip
-                    FilterChip(
-                      label: Text(allSelected ? 'Deselect All' : 'Select All'),
-                      selected: allSelected,
-                      onSelected: (selected) {
-                        if (selected) {
-                          getController.selectedPaymentMethod.assignAll(
-                              getController.dropdownItemPaymentMethod);
-                        } else {
-                          getController.selectedPaymentMethod.clear();
-                        }
-                      },
-                      selectedColor: secondaryColor.withOpacity(0.2),
-                      disabledColor: Colors.grey[200],
-                      checkmarkColor: primaryColor,
-                    ),
-
-                    // Payment method chips
-                    ...getController.dropdownItemPaymentMethod.map((category) {
-                      final isSelected = getController.selectedPaymentMethod
-                          .contains(category);
-                      return FilterChip(
-                        label: Text(category),
-                        selected: isSelected,
-                        onSelected: (selected) {
-                          if (selected) {
-                            getController.selectedPaymentMethod.add(category);
-                          } else {
-                            getController.selectedPaymentMethod
-                                .remove(category);
-                          }
-                        },
-                        selectedColor: secondaryColor.withOpacity(0.2),
-                        checkmarkColor: primaryColor,
-                      );
-                    }).toList(),
-                  ],
-                ),
-              ),
+      return MultiDropdown<String>(
+        items: getController.dropdownItemPaymentMethod
+            .map((method) => DropdownItem(
+                  label: method,
+                  value: method,
+                ))
+            .toList(),
+        controller: getController.paymentMethodController,
+        enabled: true,
+        searchEnabled: true,
+        chipDecoration: const ChipDecoration(
+          backgroundColor: secondaryColor,
+          wrap: true,
+          runSpacing: 2,
+          spacing: 10,
+        ),
+        fieldDecoration: FieldDecoration(
+          hintText: 'Select Payment Methods',
+          hintStyle: CustomTextStyles.textFontMedium(size: 14.sp, color: grey),
+          showClearIcon: true,
+          border: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+            borderSide: BorderSide(
+              color: grey,
+              width: 1.0,
             ),
           ),
-        ],
+          focusedBorder: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+            borderSide: BorderSide(
+              color: primaryColor,
+              width: 2.0,
+            ),
+          ),
+          errorBorder: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+            borderSide: BorderSide(
+              color: red,
+              width: 1.0,
+            ),
+          ),
+        ),
+        dropdownItemDecoration: DropdownItemDecoration(
+          selectedIcon: const Icon(Icons.check_box, color: primaryColor),
+          disabledIcon: Icon(Icons.lock, color: Colors.grey.shade300),
+        ),
+        onSelectionChange: (selectedItems) {
+          getController.selectedPaymentMethod.value = selectedItems;
+        },
       );
     });
   }

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:http_parser/http_parser.dart';
+import 'package:multi_dropdown/multi_dropdown.dart';
 
 import '../../../../main.dart';
 import '../../../../network/network_const.dart';
@@ -13,10 +14,26 @@ class Getbranchescontroller extends GetxController {
   final RxList<BranchModel> branches = <BranchModel>[].obs;
   final RxBool isLoading = false.obs;
 
+  // Service-related variables
+  RxList<Service> serviceList = <Service>[].obs;
+  RxList<Service> selectedServices = <Service>[].obs;
+
+  // MultiSelect controllers
+  final paymentMethodController = MultiSelectController<String>();
+  final serviceController = MultiSelectController<Service>();
+
+  @override
+  void onClose() {
+    paymentMethodController.dispose();
+    serviceController.dispose();
+    super.onClose();
+  }
+
   @override
   void onInit() {
     super.onInit();
     getBranches();
+    getServices();
   }
 
   Future<void> getBranches() async {
@@ -76,6 +93,7 @@ class Getbranchescontroller extends GetxController {
     // required double latitude,
     // required double longitude,
     required List<String> paymentMethod,
+    required List<Service> services,
     File? imageFile,
   }) async {
     try {
@@ -94,6 +112,7 @@ class Getbranchescontroller extends GetxController {
         'description': description,
         'landmark': landmark,
         'payment_method': paymentMethod,
+        'service_id': services.map((s) => s.id).toList(),
         'salon_id': loginUser!.salonId,
       };
 
@@ -106,7 +125,8 @@ class Getbranchescontroller extends GetxController {
           mimeType = 'image/png';
         }
         if (mimeType == null) {
-          CustomSnackbar.showError('Invalid Image', 'Only JPG, JPEG, PNG images are allowed!');
+          CustomSnackbar.showError(
+              'Invalid Image', 'Only JPG, JPEG, PNG images are allowed!');
           isLoading.value = false;
           return;
         }
@@ -137,6 +157,21 @@ class Getbranchescontroller extends GetxController {
       CustomSnackbar.showError('Error', 'Failed to update branch: $e');
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> getServices() async {
+    final loginUser = await prefs.getUser();
+    try {
+      final response = await dioClient.getData(
+        '${Apis.baseUrl}${Endpoints.getServiceNames}${loginUser!.salonId}',
+        (json) => json,
+      );
+
+      final data = response['data'] as List;
+      serviceList.value = data.map((e) => Service.fromJson(e)).toList();
+    } catch (e) {
+      CustomSnackbar.showError('Error', 'Failed to get services: $e');
     }
   }
 }

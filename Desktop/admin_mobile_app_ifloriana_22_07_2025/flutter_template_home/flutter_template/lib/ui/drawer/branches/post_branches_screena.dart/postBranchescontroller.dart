@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:image_picker/image_picker.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:multi_dropdown/multi_dropdown.dart';
 import '../../../../main.dart';
 
 class Service {
@@ -55,6 +56,28 @@ class Postbranchescontroller extends GetxController {
 
   // Image state for branch add
   final Rx<File?> singleImage = Rx<File?>(null);
+
+  // MultiSelect controllers
+  final serviceController = MultiSelectController<Service>();
+  final paymentMethodController = MultiSelectController<String>();
+
+  @override
+  void onClose() {
+    nameController.dispose();
+    contactEmailController.dispose();
+    contactNumberController.dispose();
+    landmarkController.dispose();
+    cityController.dispose();
+    stateController.dispose();
+    countryController.dispose();
+    postalCodeController.dispose();
+    discriptionController.dispose();
+    addressController.dispose();
+    pincodeController.dispose();
+    serviceController.dispose();
+    paymentMethodController.dispose();
+    super.onClose();
+  }
 
   final List<String> dropdownItemSelectedCategory = [
     'Male',

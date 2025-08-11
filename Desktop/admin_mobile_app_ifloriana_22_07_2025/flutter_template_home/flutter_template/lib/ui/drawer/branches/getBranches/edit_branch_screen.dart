@@ -7,6 +7,9 @@ import '../../../../network/model/branch_model.dart';
 import 'getBranchesController.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../network/network_const.dart';
+import 'package:multi_dropdown/multi_dropdown.dart';
+import '../../../../utils/colors.dart';
+import '../../../../utils/custom_text_styles.dart';
 
 class EditBranchScreen extends StatefulWidget {
   final BranchModel branch;
@@ -36,7 +39,11 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
   // late TextEditingController _longitudeController;
   final List<String> _paymentMethods = ['cash', 'upi'];
   List<String> _selectedPaymentMethods = [];
+  List<Service> _selectedServices = [];
   File? _pickedImage;
+
+  // MultiSelect controller for payment methods
+  // final paymentMethodController = MultiSelectController<String>();
 
   @override
   void initState() {
@@ -60,6 +67,31 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
     // _longitudeController =
     //     TextEditingController(text: widget.branch.longitude.toString());
     _selectedPaymentMethods = List.from(widget.branch.paymentMethods);
+
+    // Initialize selected services from branch
+    _selectedServices = List.from(widget.branch.services);
+
+    // Initialize MultiSelect controllers with existing data
+    final controller = Get.find<Getbranchescontroller>();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Initialize payment methods
+      controller.paymentMethodController
+          .selectWhere((item) => _selectedPaymentMethods.contains(item.value));
+
+      // Initialize services - wait for serviceList to be loaded
+      if (controller.serviceList.isNotEmpty) {
+        controller.serviceController.selectWhere((item) =>
+            _selectedServices.any((service) => service.id == item.value.id));
+      } else {
+        // Listen for serviceList changes
+        ever(controller.serviceList, (services) {
+          if (services.isNotEmpty) {
+            controller.serviceController.selectWhere((item) => _selectedServices
+                .any((service) => service.id == item.value.id));
+          }
+        });
+      }
+    });
   }
 
   @override
@@ -97,6 +129,7 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
         // latitude: double.parse(_latitudeController.text),
         // longitude: double.parse(_longitudeController.text),
         paymentMethod: _selectedPaymentMethods,
+        services: _selectedServices,
         imageFile: _pickedImage,
       );
       Get.back();
@@ -120,9 +153,12 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
     if (pickedFile != null) {
       final file = File(pickedFile.path);
       final lower = pickedFile.path.toLowerCase();
-      final isAllowed = lower.endsWith('.jpg') || lower.endsWith('.jpeg') || lower.endsWith('.png');
+      final isAllowed = lower.endsWith('.jpg') ||
+          lower.endsWith('.jpeg') ||
+          lower.endsWith('.png');
       if (!isAllowed) {
-        Get.snackbar('Invalid Image', 'Only JPG, JPEG, PNG images are allowed!');
+        Get.snackbar(
+            'Invalid Image', 'Only JPG, JPEG, PNG images are allowed!');
         return;
       }
       if (await file.length() < maxSizeInBytes) {
@@ -235,40 +271,16 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
                 controller: _landmarkController,
                 label: 'Landmark',
               ),
-              // SizedBox(height: 16.h),
-              // Row(
-              //   children: [
-              //     Expanded(
-              //       child: _buildTextField(
-              //         controller: _latitudeController,
-              //         label: 'Latitude',
-              //         keyboardType: TextInputType.number,
-              //         validator: (value) {
-              //           if (value?.isEmpty ?? true)
-              //             return 'Please enter latitude';
-              //           if (double.tryParse(value!) == null)
-              //             return 'Please enter valid latitude';
-              //           return null;
-              //         },
-              //       ),
-              //     ),
-              //     SizedBox(width: 16.w),
-              //     Expanded(
-              //       child: _buildTextField(
-              //         controller: _longitudeController,
-              //         label: 'Longitude',
-              //         keyboardType: TextInputType.number,
-              //         validator: (value) {
-              //           if (value?.isEmpty ?? true)
-              //             return 'Please enter longitude';
-              //           if (double.tryParse(value!) == null)
-              //             return 'Please enter valid longitude';
-              //           return null;
-              //         },
-              //       ),
-              //     ),
-              //   ],
-              // ),
+              SizedBox(height: 24.h),
+              Text(
+                'Services',
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 8.h),
+              _buildServiceDropdown(),
               SizedBox(height: 24.h),
               Text(
                 'Payment Methods',
@@ -278,23 +290,60 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
                 ),
               ),
               SizedBox(height: 8.h),
-              Wrap(
-                spacing: 8.w,
-                children: _paymentMethods.map((method) {
-                  return FilterChip(
-                    label: Text(method.toUpperCase()),
-                    selected: _selectedPaymentMethods.contains(method),
-                    onSelected: (selected) {
-                      setState(() {
-                        if (selected) {
-                          _selectedPaymentMethods.add(method);
-                        } else {
-                          _selectedPaymentMethods.remove(method);
-                        }
-                      });
-                    },
-                  );
-                }).toList(),
+              MultiDropdown<String>(
+                items: _paymentMethods
+                    .map((method) => DropdownItem(
+                          label: method.toUpperCase(),
+                          value: method,
+                        ))
+                    .toList(),
+                controller:
+                    Get.find<Getbranchescontroller>().paymentMethodController,
+                enabled: true,
+                searchEnabled: true,
+                chipDecoration: const ChipDecoration(
+                  backgroundColor: secondaryColor,
+                  wrap: true,
+                  runSpacing: 2,
+                  spacing: 10,
+                ),
+                fieldDecoration: FieldDecoration(
+                  hintText: 'Select Payment Methods',
+                  hintStyle:
+                      CustomTextStyles.textFontMedium(size: 14.sp, color: grey),
+                  showClearIcon: true,
+                  border: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                    borderSide: BorderSide(
+                      color: grey,
+                      width: 1.0,
+                    ),
+                  ),
+                  focusedBorder: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                    borderSide: BorderSide(
+                      color: primaryColor,
+                      width: 2.0,
+                    ),
+                  ),
+                  errorBorder: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                    borderSide: BorderSide(
+                      color: red,
+                      width: 1.0,
+                    ),
+                  ),
+                ),
+                dropdownItemDecoration: DropdownItemDecoration(
+                  selectedIcon:
+                      const Icon(Icons.check_box, color: primaryColor),
+                  disabledIcon: Icon(Icons.lock, color: Colors.grey.shade300),
+                ),
+                onSelectionChange: (selectedItems) {
+                  setState(() {
+                    _selectedPaymentMethods = selectedItems;
+                  });
+                },
               ),
               SizedBox(height: 32.h),
               SizedBox(
@@ -336,6 +385,64 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
       keyboardType: keyboardType,
       validator: validator,
     );
+  }
+
+  Widget _buildServiceDropdown() {
+    final controller = Get.find<Getbranchescontroller>();
+    return Obx(() {
+      return MultiDropdown<Service>(
+        items: controller.serviceList
+            .map((service) => DropdownItem(
+                  label: service.name ?? '',
+                  value: service,
+                ))
+            .toList(),
+        controller: controller.serviceController,
+        enabled: true,
+        searchEnabled: true,
+        chipDecoration: const ChipDecoration(
+          backgroundColor: secondaryColor,
+          wrap: true,
+          runSpacing: 2,
+          spacing: 10,
+        ),
+        fieldDecoration: FieldDecoration(
+          hintText: 'Select Services',
+          hintStyle: CustomTextStyles.textFontMedium(size: 14.sp, color: grey),
+          showClearIcon: true,
+          border: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+            borderSide: BorderSide(
+              color: grey,
+              width: 1.0,
+            ),
+          ),
+          focusedBorder: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+            borderSide: BorderSide(
+              color: primaryColor,
+              width: 2.0,
+            ),
+          ),
+          errorBorder: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+            borderSide: BorderSide(
+              color: red,
+              width: 1.0,
+            ),
+          ),
+        ),
+        dropdownItemDecoration: DropdownItemDecoration(
+          selectedIcon: const Icon(Icons.check_box, color: primaryColor),
+          disabledIcon: Icon(Icons.lock, color: Colors.grey.shade300),
+        ),
+        onSelectionChange: (selectedItems) {
+          setState(() {
+            _selectedServices = selectedItems;
+          });
+        },
+      );
+    });
   }
 
   Widget _imagePickerTile() {
