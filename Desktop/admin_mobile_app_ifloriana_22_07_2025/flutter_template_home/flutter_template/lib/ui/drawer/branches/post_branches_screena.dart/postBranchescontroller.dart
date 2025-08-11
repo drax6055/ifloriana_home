@@ -63,6 +63,7 @@ class Postbranchescontroller extends GetxController {
 
   // MultiSelect controllers
   final serviceController = MultiSelectController<Service>();
+  final paymentMethodController = MultiSelectController<String>();
 
   @override
   void onClose() {
@@ -78,6 +79,7 @@ class Postbranchescontroller extends GetxController {
     addressController.dispose();
     pincodeController.dispose();
     serviceController.dispose();
+    paymentMethodController.dispose();
     super.onClose();
   }
 
@@ -85,11 +87,6 @@ class Postbranchescontroller extends GetxController {
     'Male',
     'Female',
     'Unisex',
-  ];
-
-  final List<String> dropdownItemPaymentMethod = [
-    'Cash',
-    'UPI',
   ];
 
   var isLoading = false.obs;
