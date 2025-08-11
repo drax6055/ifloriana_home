@@ -5,6 +5,7 @@ import 'package:flutter_template/ui/auth/register/register_screen.dart';
 import 'package:flutter_template/ui/drawer/Branchmembership/add/branchMembershipAddScreen.dart';
 import 'package:flutter_template/ui/drawer/Branchmembership/get/branchMembershipListScreen.dart';
 import 'package:flutter_template/ui/drawer/branches/post_branches_screena.dart/postBranchesScreen.dart';
+import 'package:flutter_template/ui/drawer/branches/post_branches_screena.dart/postBranchescontroller.dart';
 import 'package:flutter_template/ui/drawer/coupons/addNewCoupon/addCouponScreen.dart';
 import 'package:flutter_template/ui/drawer/coupons/couponsScreen.dart';
 import 'package:flutter_template/ui/drawer/customers/addCustomer/addCustomerScreen.dart';
@@ -107,6 +108,9 @@ class AppPages {
     GetPage(
         name: Routes.postBranchs,
         page: () => Postbranchesscreen(),
+        binding: BindingsBuilder(() {
+          Get.lazyPut<Postbranchescontroller>(() => Postbranchescontroller());
+        }),
         transition: Transition.rightToLeft),
     GetPage(
         name: Routes.getBranches,

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_template/network/model/addModel.dart';
 import 'package:flutter_template/network/network_const.dart';
 import 'package:flutter_template/wiget/custome_snackbar.dart';
 import 'package:geolocator/geolocator.dart';
@@ -12,6 +11,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:multi_dropdown/multi_dropdown.dart';
 import '../../../../main.dart';
 
+// Simple Service class for add branch functionality
 class Service {
   String? id;
   String? name;
@@ -25,12 +25,16 @@ class Service {
 }
 
 class Postbranchescontroller extends GetxController {
+  bool _isInitialized = false;
+
   @override
   void onInit() async {
     super.onInit();
-  
-    getServices();
 
+    if (!_isInitialized) {
+      _isInitialized = true;
+      await getServices();
+    }
   }
 
   var nameController = TextEditingController();
@@ -59,7 +63,6 @@ class Postbranchescontroller extends GetxController {
 
   // MultiSelect controllers
   final serviceController = MultiSelectController<Service>();
-  final paymentMethodController = MultiSelectController<String>();
 
   @override
   void onClose() {
@@ -75,7 +78,6 @@ class Postbranchescontroller extends GetxController {
     addressController.dispose();
     pincodeController.dispose();
     serviceController.dispose();
-    paymentMethodController.dispose();
     super.onClose();
   }
 
@@ -105,6 +107,9 @@ class Postbranchescontroller extends GetxController {
   var postalCode = ''.obs;
 
   Future<void> getServices() async {
+    if (isLoading.value) return; // Prevent multiple calls
+
+    isLoading.value = true;
     final loginUser = await prefs.getUser();
     try {
       final response = await dioClient.getData(
@@ -116,9 +121,10 @@ class Postbranchescontroller extends GetxController {
       serviceList.value = data.map((e) => Service.fromJson(e)).toList();
     } catch (e) {
       CustomSnackbar.showError('Error', 'Failed to get data: $e');
+    } finally {
+      isLoading.value = false;
     }
   }
-
 
   Future onBranchAdd() async {
     final loginUser = await prefs.getUser();
@@ -159,9 +165,7 @@ class Postbranchescontroller extends GetxController {
         final mimeParts = mimeType.split('/');
         branchData['image'] = await dio.MultipartFile.fromFile(
           singleImage.value!.path,
-          filename: singleImage.value!.path
-              .split(Platform.pathSeparator)
-              .last,
+          filename: singleImage.value!.path.split(Platform.pathSeparator).last,
           contentType: MediaType(mimeParts[0], mimeParts[1]),
         );
       }

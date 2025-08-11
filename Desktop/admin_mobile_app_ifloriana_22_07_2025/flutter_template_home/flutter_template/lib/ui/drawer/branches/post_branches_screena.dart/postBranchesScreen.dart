@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_template/ui/drawer/branches/post_branches_screena.dart/postBranchescontroller.dart';
 import 'package:flutter_template/utils/colors.dart';
@@ -16,7 +15,7 @@ import 'package:multi_dropdown/multi_dropdown.dart';
 class Postbranchesscreen extends StatelessWidget {
   Postbranchesscreen({super.key});
   final Postbranchescontroller getController =
-      Get.put(Postbranchescontroller());
+      Get.find<Postbranchescontroller>();
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +67,7 @@ class Postbranchesscreen extends StatelessWidget {
                 keyboardType: TextInputType.number,
                 validator: (value) => Validation.validatePhone(value),
               ),
-              paymentMethodChipView(),
+              paymentMethodDropdown(),
               serviceDropdown(),
               CustomTextFormField(
                 controller: getController.addressController,
@@ -168,6 +167,27 @@ class Postbranchesscreen extends StatelessWidget {
 
   Widget serviceDropdown() {
     return Obx(() {
+      if (getController.serviceList.isEmpty) {
+        return Container(
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey.shade400),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            children: [
+              SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2)),
+              SizedBox(width: 12),
+              Text('Loading services...',
+                  style: TextStyle(color: Colors.grey.shade600)),
+            ],
+          ),
+        );
+      }
+
       return MultiDropdown<Service>(
         items: getController.serviceList
             .map((service) => DropdownItem(
@@ -230,57 +250,97 @@ class Postbranchesscreen extends StatelessWidget {
     );
   }
 
-  Widget paymentMethodChipView() {
+  Widget paymentMethodDropdown() {
     return Obx(() {
-      return MultiDropdown<String>(
-        items: getController.dropdownItemPaymentMethod
-            .map((method) => DropdownItem(
-                  label: method,
-                  value: method,
-                ))
-            .toList(),
-        controller: getController.paymentMethodController,
-        enabled: true,
-        searchEnabled: true,
-        chipDecoration: const ChipDecoration(
-          backgroundColor: secondaryColor,
-          wrap: true,
-          runSpacing: 2,
-          spacing: 10,
-        ),
-        fieldDecoration: FieldDecoration(
-          hintText: 'Select Payment Methods',
-          hintStyle: CustomTextStyles.textFontMedium(size: 14.sp, color: grey),
-          showClearIcon: true,
-          border: const OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(8.0)),
-            borderSide: BorderSide(
-              color: grey,
-              width: 1.0,
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Payment Methods',
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          focusedBorder: const OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(8.0)),
-            borderSide: BorderSide(
-              color: primaryColor,
-              width: 2.0,
+          SizedBox(height: 8.h),
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.shade400),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: DropdownButtonFormField<String>(
+              value: null,
+              hint: Text(
+                'Select Payment Methods',
+                style:
+                    CustomTextStyles.textFontMedium(size: 14.sp, color: grey),
+              ),
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                suffixIcon: getController.selectedPaymentMethod.isNotEmpty
+                    ? IconButton(
+                        icon: Icon(Icons.clear, color: grey),
+                        onPressed: () {
+                          getController.selectedPaymentMethod.clear();
+                        },
+                      )
+                    : null,
+              ),
+              items: getController.dropdownItemPaymentMethod
+                  .map((method) => DropdownMenuItem<String>(
+                        value: method,
+                        child: Row(
+                          children: [
+                            Checkbox(
+                              value: getController.selectedPaymentMethod
+                                  .contains(method),
+                              onChanged: (bool? value) {
+                                if (value == true) {
+                                  getController.selectedPaymentMethod
+                                      .add(method);
+                                } else {
+                                  getController.selectedPaymentMethod
+                                      .remove(method);
+                                }
+                              },
+                              activeColor: primaryColor,
+                            ),
+                            Text(method),
+                          ],
+                        ),
+                      ))
+                  .toList(),
+              onChanged: (String? value) {
+                if (value != null) {
+                  if (getController.selectedPaymentMethod.contains(value)) {
+                    getController.selectedPaymentMethod.remove(value);
+                  } else {
+                    getController.selectedPaymentMethod.add(value);
+                  }
+                }
+              },
             ),
           ),
-          errorBorder: const OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(8.0)),
-            borderSide: BorderSide(
-              color: red,
-              width: 1.0,
+          if (getController.selectedPaymentMethod.isNotEmpty) ...[
+            SizedBox(height: 8.h),
+            Wrap(
+              spacing: 8.w,
+              children: getController.selectedPaymentMethod
+                  .map((method) => Chip(
+                        label: Text(method),
+                        deleteIcon: Icon(Icons.close, size: 18),
+                        onDeleted: () {
+                          getController.selectedPaymentMethod.remove(method);
+                        },
+                        backgroundColor: secondaryColor,
+                        deleteIconColor: primaryColor,
+                      ))
+                  .toList(),
             ),
-          ),
-        ),
-        dropdownItemDecoration: DropdownItemDecoration(
-          selectedIcon: const Icon(Icons.check_box, color: primaryColor),
-          disabledIcon: Icon(Icons.lock, color: Colors.grey.shade300),
-        ),
-        onSelectionChange: (selectedItems) {
-          getController.selectedPaymentMethod.value = selectedItems;
-        },
+          ],
+        ],
       );
     });
   }
@@ -288,7 +348,8 @@ class Postbranchesscreen extends StatelessWidget {
 
 class ImagePickerBranch extends StatelessWidget {
   ImagePickerBranch({super.key});
-  final Postbranchescontroller getController = Get.find<Postbranchescontroller>();
+  final Postbranchescontroller getController =
+      Get.find<Postbranchescontroller>();
 
   @override
   Widget build(BuildContext context) {
