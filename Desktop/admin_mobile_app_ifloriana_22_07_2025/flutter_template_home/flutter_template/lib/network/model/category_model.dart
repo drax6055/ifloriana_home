@@ -21,7 +21,7 @@ class CategoryResponse {
 class Category {
   final String id;
   final List<Branch> branchId;
-  final String image;
+  final String image_url;
   final String name;
   final List<Brand> brandId;
   final int status;
@@ -32,7 +32,7 @@ class Category {
   Category({
     required this.id,
     required this.branchId,
-    required this.image,
+    required this.image_url,
     required this.name,
     required this.brandId,
     required this.status,
@@ -48,7 +48,7 @@ class Category {
               ?.map((branch) => Branch.fromJson(branch))
               .toList() ??
           [],
-      image: json['image'] ?? '',
+      image_url: json['image_url'] ?? '',
       name: json['name'] ?? '',
       brandId: (json['brand_id'] as List<dynamic>?)
               ?.map((brand) => Brand.fromJson(brand))
@@ -81,7 +81,7 @@ class Branch {
   final double latitude;
   final double longitude;
   final String description;
-  final String image;
+  final String image_url;
   final int ratingStar;
   final int totalReview;
   final String createdAt;
@@ -106,7 +106,7 @@ class Branch {
     required this.latitude,
     required this.longitude,
     required this.description,
-    required this.image,
+    required this.image_url,
     required this.ratingStar,
     required this.totalReview,
     required this.createdAt,
@@ -115,10 +115,10 @@ class Branch {
 
   factory Branch.fromJson(Map<String, dynamic> json) {
     String imageUrl = '';
-    if (json['image'] is Map) {
-      imageUrl = json['image']['data'] ?? '';
-    } else if (json['image'] is String) {
-      imageUrl = json['image'] ?? '';
+    if (json['image_url'] is Map) {
+      imageUrl = json['image_url']['data'] ?? '';
+    } else if (json['image_url'] is String) {
+      imageUrl = json['image_url'] ?? '';
     }
     return Branch(
       id: json['_id'] ?? '',
@@ -139,7 +139,7 @@ class Branch {
       latitude: (json['latitude'] ?? 0.0).toDouble(),
       longitude: (json['longitude'] ?? 0.0).toDouble(),
       description: json['description'] ?? '',
-      image: imageUrl,
+      image_url: imageUrl,
       ratingStar: json['rating_star'] ?? 0,
       totalReview: json['total_review'] ?? 0,
       createdAt: json['createdAt'] ?? '',
@@ -151,7 +151,7 @@ class Branch {
 class Brand {
   final String id;
   final List<String> branchId;
-  final String image;
+  final String image_url;
   final String name;
   final int status;
   final String salonId;
@@ -161,7 +161,7 @@ class Brand {
   Brand({
     required this.id,
     required this.branchId,
-    required this.image,
+    required this.image_url,
     required this.name,
     required this.status,
     required this.salonId,
@@ -171,15 +171,15 @@ class Brand {
 
   factory Brand.fromJson(Map<String, dynamic> json) {
     String imageUrl = '';
-    if (json['image'] is Map) {
-      imageUrl = json['image']['data'] ?? '';
-    } else if (json['image'] is String) {
-      imageUrl = json['image'] ?? '';
+    if (json['image_url'] is Map) {
+      imageUrl = json['image_url']['data'] ?? '';
+    } else if (json['image_url'] is String) {
+      imageUrl = json['image_url'] ?? '';
     }
     return Brand(
       id: json['_id'] ?? '',
       branchId: List<String>.from(json['branch_id'] ?? []),
-      image: imageUrl,
+      image_url: imageUrl,
       name: json['name'] ?? '',
       status: json['status'] ?? 0,
       salonId: json['salon_id'] ?? '',
