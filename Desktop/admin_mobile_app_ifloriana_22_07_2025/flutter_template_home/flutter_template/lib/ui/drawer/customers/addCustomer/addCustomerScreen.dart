@@ -183,10 +183,10 @@ class Addcustomerscreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        CustomTextWidget(
-          text: 'Customer Photo',
-          textStyle: CustomTextStyles.textFontRegular(size: 14.sp),
-        ),
+        // CustomTextWidget(
+        //   text: 'Customer Photo',
+        //   textStyle: CustomTextStyles.textFontRegular(size: 14.sp),
+        // ),
         SizedBox(height: 8.h),
         Center(
           child: Obx(() => GestureDetector(

@@ -13,6 +13,7 @@ import 'package:multi_dropdown/multi_dropdown.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'dart:io';
 import '../../../../network/network_const.dart';
+import '../../../../wiget/loading.dart';
 import '../customerController.dart';
 
 class EditCustomerScreen extends StatelessWidget {
@@ -276,10 +277,10 @@ class EditCustomerScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        CustomTextWidget(
-          text: 'Customer Photo',
-          textStyle: CustomTextStyles.textFontRegular(size: 14.sp),
-        ),
+        // CustomTextWidget(
+        //   text: 'Customer Photo',
+        //   textStyle: CustomTextStyles.textFontRegular(size: 14.sp),
+        // ),
         SizedBox(height: 8.h),
         Center(
           child: Obx(() => GestureDetector(
@@ -339,7 +340,7 @@ class EditCustomerScreen extends StatelessWidget {
                                     width: double.infinity,
                                     height: double.infinity,
                                     placeholder: (context, url) => const Center(
-                                      child: CircularProgressIndicator(),
+                                      child: CustomLoadingAvatar(),
                                     ),
                                     errorWidget: (context, url, error) =>
                                         const Icon(
