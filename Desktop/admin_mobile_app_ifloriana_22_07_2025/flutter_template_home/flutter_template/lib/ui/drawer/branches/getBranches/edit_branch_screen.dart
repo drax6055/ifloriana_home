@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../../../network/model/branch_model.dart';
 import 'getBranchesController.dart';
+import 'package:image_picker/image_picker.dart';
+import '../../../../network/network_const.dart';
 
 class EditBranchScreen extends StatefulWidget {
   final BranchModel branch;
@@ -32,6 +36,7 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
   // late TextEditingController _longitudeController;
   final List<String> _paymentMethods = ['cash', 'upi'];
   List<String> _selectedPaymentMethods = [];
+  File? _pickedImage;
 
   @override
   void initState() {
@@ -92,8 +97,41 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
         // latitude: double.parse(_latitudeController.text),
         // longitude: double.parse(_longitudeController.text),
         paymentMethod: _selectedPaymentMethods,
+        imageFile: _pickedImage,
       );
       Get.back();
+    }
+  }
+
+  Future<void> _pickImageFromGallery() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+    await _handlePickedFile(picked);
+  }
+
+  Future<void> _pickImageFromCamera() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.camera);
+    await _handlePickedFile(picked);
+  }
+
+  Future<void> _handlePickedFile(XFile? pickedFile) async {
+    const maxSizeInBytes = 150 * 1024; // 150 KB
+    if (pickedFile != null) {
+      final file = File(pickedFile.path);
+      final lower = pickedFile.path.toLowerCase();
+      final isAllowed = lower.endsWith('.jpg') || lower.endsWith('.jpeg') || lower.endsWith('.png');
+      if (!isAllowed) {
+        Get.snackbar('Invalid Image', 'Only JPG, JPEG, PNG images are allowed!');
+        return;
+      }
+      if (await file.length() < maxSizeInBytes) {
+        setState(() {
+          _pickedImage = file;
+        });
+      } else {
+        Get.snackbar('Error', 'Image size must be less than 150KB');
+      }
     }
   }
 
@@ -107,6 +145,7 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              _imagePickerTile(),
               _buildTextField(
                 controller: _nameController,
                 label: 'Branch Name',
@@ -296,6 +335,77 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
       maxLines: maxLines,
       keyboardType: keyboardType,
       validator: validator,
+    );
+  }
+
+  Widget _imagePickerTile() {
+    return GestureDetector(
+      onTap: () {
+        Get.bottomSheet(
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.photo_library),
+                  title: const Text('Choose from Gallery'),
+                  onTap: () async {
+                    Get.back();
+                    await _pickImageFromGallery();
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.camera_alt),
+                  title: const Text('Take Photo'),
+                  onTap: () async {
+                    Get.back();
+                    await _pickImageFromCamera();
+                  },
+                ),
+              ],
+            ),
+          ),
+          isScrollControlled: true,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+          ),
+        );
+      },
+      child: Container(
+        height: 120,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade400),
+          borderRadius: BorderRadius.circular(10.r),
+        ),
+        alignment: Alignment.center,
+        child: _pickedImage != null
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(10.r),
+                child: Image.file(
+                  _pickedImage!,
+                  fit: BoxFit.cover,
+                  height: 120,
+                  width: double.infinity,
+                ),
+              )
+            : widget.branch.imageUrl.isNotEmpty
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(10.r),
+                    child: Image.network(
+                      '${Apis.pdfUrl}${widget.branch.imageUrl}?v=${DateTime.now().millisecondsSinceEpoch}',
+                      fit: BoxFit.cover,
+                      height: 120,
+                      width: double.infinity,
+                    ),
+                  )
+                : const Icon(Icons.image, size: 40),
+      ),
     );
   }
 }

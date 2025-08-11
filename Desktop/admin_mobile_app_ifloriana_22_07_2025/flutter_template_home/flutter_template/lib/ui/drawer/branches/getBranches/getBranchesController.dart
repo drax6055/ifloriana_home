@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:get/get.dart';
+import 'package:dio/dio.dart' as dio;
+import 'package:http_parser/http_parser.dart';
 
 import '../../../../main.dart';
 import '../../../../network/network_const.dart';
@@ -72,6 +76,7 @@ class Getbranchescontroller extends GetxController {
     // required double latitude,
     // required double longitude,
     required List<String> paymentMethod,
+    File? imageFile,
   }) async {
     try {
       final loginUser = await prefs.getUser();
@@ -88,16 +93,39 @@ class Getbranchescontroller extends GetxController {
         'contact_email': contactEmail,
         'description': description,
         'landmark': landmark,
-        // 'latitude': latitude,
-        // 'longitude': longitude,
         'payment_method': paymentMethod,
         'salon_id': loginUser!.salonId,
       };
 
-      final response = await dioClient.putData(
-        '${Apis.baseUrl}${Endpoints.postBranchs}/$branchId',
-        data,
-        (json) => json,
+      if (imageFile != null) {
+        final String path = imageFile.path.toLowerCase();
+        String? mimeType;
+        if (path.endsWith('.jpg') || path.endsWith('.jpeg')) {
+          mimeType = 'image/jpeg';
+        } else if (path.endsWith('.png')) {
+          mimeType = 'image/png';
+        }
+        if (mimeType == null) {
+          CustomSnackbar.showError('Invalid Image', 'Only JPG, JPEG, PNG images are allowed!');
+          isLoading.value = false;
+          return;
+        }
+        final parts = mimeType.split('/');
+        data['image'] = await dio.MultipartFile.fromFile(
+          imageFile.path,
+          filename: imageFile.path.split(Platform.pathSeparator).last,
+          contentType: MediaType(parts[0], parts[1]),
+        );
+      }
+
+      final formData = dio.FormData.fromMap(data);
+
+      final response = await dioClient.dio.put(
+        '${Apis.baseUrl}${Endpoints.postBranchs}/$branchId?salon_id=${loginUser!.salonId}',
+        data: formData,
+        options: dio.Options(headers: {
+          'Content-Type': 'multipart/form-data',
+        }),
       );
 
       if (response != null) {

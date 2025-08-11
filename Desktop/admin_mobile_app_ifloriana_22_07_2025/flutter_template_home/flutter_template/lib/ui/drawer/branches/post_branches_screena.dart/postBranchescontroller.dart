@@ -1,11 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_template/network/model/addModel.dart';
 import 'package:flutter_template/network/network_const.dart';
 import 'package:flutter_template/wiget/custome_snackbar.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:geocoding/geocoding.dart';
-
+import 'package:dio/dio.dart' as dio;
+import 'package:image_picker/image_picker.dart';
+import 'package:http_parser/http_parser.dart';
 import '../../../../main.dart';
 
 class Service {
@@ -26,13 +29,7 @@ class Postbranchescontroller extends GetxController {
     super.onInit();
   
     getServices();
-    final locationDetails = await getUserLocationDetails();
-    landmarkController.text = locationDetails['landmark'] ?? '';
-    countryController.text = locationDetails['country'] ?? '';
-    stateController.text = locationDetails['state'] ?? '';
-    cityController.text = locationDetails['city'] ?? '';
-    postalCodeController.text = locationDetails['postal_code'] ?? '';
-    print(locationDetails); // You will get landmark, country, etc.
+
   }
 
   var nameController = TextEditingController();
@@ -55,6 +52,9 @@ class Postbranchescontroller extends GetxController {
 
   // var latController = TextEditingController();
   // var lngController = TextEditingController();
+
+  // Image state for branch add
+  final Rx<File?> singleImage = Rx<File?>(null);
 
   final List<String> dropdownItemSelectedCategory = [
     'Male',
@@ -96,114 +96,109 @@ class Postbranchescontroller extends GetxController {
     }
   }
 
-  Future<void> fetchLocation() async {
-    isLoading.value = true;
-    CustomSnackbar.showSuccess('Location Fetching:',
-        "Wait for a while, we're fetching your location.");
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      await Geolocator.openLocationSettings();
-      isLoading.value = false;
-      return;
-    }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
-      permission = await Geolocator.requestPermission();
-      if (permission != LocationPermission.always &&
-          permission != LocationPermission.whileInUse) {
-        isLoading.value = false;
-        return;
-      }
-    }
-
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-
-    latitude.value = position.latitude.toString();
-    longitude.value = position.longitude.toString();
-    isLoading.value = false;
-  }
-
-  Future<Map<String, String>> getUserLocationDetails() async {
-    // 1. Check location permission
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      throw Exception('Location services are disabled.');
-    }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        throw Exception('Location permissions are denied');
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      throw Exception('Location permissions are permanently denied');
-    }
-
-    // 2. Get current position
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-
-    // 3. Reverse geocode the coordinates
-    List<Placemark> placemarks = await placemarkFromCoordinates(
-      position.latitude,
-      position.longitude,
-    );
-
-    if (placemarks.isNotEmpty) {
-      final placemark = placemarks.first;
-
-      return {
-        "landmark": placemark.street ?? "",
-        "country": placemark.country ?? "",
-        "state": placemark.administrativeArea ?? "",
-        "city": placemark.locality ?? placemark.subAdministrativeArea ?? "",
-        "postal_code": placemark.postalCode ?? "",
-      };
-    } else {
-      throw Exception('Failed to get placemark data');
-    }
-  }
 
   Future onBranchAdd() async {
     final loginUser = await prefs.getUser();
-    Map<String, dynamic> branchData = {
-      "name": nameController.text,
-      "salon_id": loginUser!.salonId,
-      'category': selectedCategory.value.toLowerCase(),
-      'status': isActive.value ? 1 : 0,
-      "contact_email": contactEmailController.text,
-      "contact_number": contactNumberController.text,
-      "payment_method":
-          selectedPaymentMethod.map((e) => e.toLowerCase()).toList(),
-      'service_id': selectedServices.map((s) => s.id).toList(),
-      "landmark": landmarkController.text,
-      "country": countryController.text,
-      "state": stateController.text,
-      "city": cityController.text,
-      "postal_code": postalCodeController.text,
-      // "latitude": latitude.value,
-      // "longitude": longitude.value,
-      "description": discriptionController.text,
-      "image": null,
-      "address": addressController.text
-    };
-    print("===> $branchData");
     try {
-      await dioClient.postData<AddBranch>(
+      isLoading.value = true;
+
+      // Build map with all non-file fields
+      Map<String, dynamic> branchData = {
+        "name": nameController.text,
+        "salon_id": loginUser!.salonId,
+        'category': selectedCategory.value.toLowerCase(),
+        'status': isActive.value ? 1 : 0,
+        "contact_email": contactEmailController.text,
+        "contact_number": contactNumberController.text,
+        "payment_method":
+            selectedPaymentMethod.map((e) => e.toLowerCase()).toList(),
+        'service_id': selectedServices.map((s) => s.id).toList(),
+        "landmark": landmarkController.text,
+        "country": countryController.text,
+        "state": stateController.text,
+        "city": cityController.text,
+        "postal_code": postalCodeController.text,
+        // "latitude": latitude.value,
+        // "longitude": longitude.value,
+        "description": discriptionController.text,
+        "address": addressController.text,
+      };
+
+      // Attach image if selected
+      if (singleImage.value != null) {
+        final mimeType = _getMimeType(singleImage.value!.path);
+        if (mimeType == null) {
+          CustomSnackbar.showError(
+              'Invalid Image', 'Only JPG, JPEG, PNG images are allowed!');
+          isLoading.value = false;
+          return;
+        }
+        final mimeParts = mimeType.split('/');
+        branchData['image'] = await dio.MultipartFile.fromFile(
+          singleImage.value!.path,
+          filename: singleImage.value!.path
+              .split(Platform.pathSeparator)
+              .last,
+          contentType: MediaType(mimeParts[0], mimeParts[1]),
+        );
+      }
+
+      final formData = dio.FormData.fromMap(branchData);
+
+      await dioClient.dio.post(
         '${Apis.baseUrl}${Endpoints.postBranchs}',
-        branchData,
-        (json) => AddBranch.fromJson(json),
+        data: formData,
+        options: dio.Options(headers: {
+          'Content-Type': 'multipart/form-data',
+        }),
       );
       CustomSnackbar.showSuccess('Success', 'Branch added successfully');
     } catch (e) {
       print('==> here Error: $e');
       CustomSnackbar.showError('Error', e.toString());
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // Image helpers
+  String? _getMimeType(String path) {
+    final ext = path.toLowerCase();
+    if (ext.endsWith('.jpg') || ext.endsWith('.jpeg')) {
+      return 'image/jpeg';
+    } else if (ext.endsWith('.png')) {
+      return 'image/png';
+    }
+    return null;
+  }
+
+  Future<void> pickImageFromGallery() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    await _handlePickedFile(pickedFile);
+  }
+
+  Future<void> pickImageFromCamera() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+    await _handlePickedFile(pickedFile);
+  }
+
+  Future<void> _handlePickedFile(XFile? pickedFile) async {
+    const maxSizeInBytes = 150 * 1024; // 150 KB
+    if (pickedFile != null) {
+      final file = File(pickedFile.path);
+      final mimeType = _getMimeType(pickedFile.path);
+      if (mimeType == null) {
+        CustomSnackbar.showError(
+            'Invalid Image', 'Only JPG, JPEG, PNG images are allowed!');
+        return;
+      }
+      if (await file.length() < maxSizeInBytes) {
+        singleImage.value = file;
+      } else {
+        CustomSnackbar.showError('Error', 'Image size must be less than 150KB');
+      }
     }
   }
 }

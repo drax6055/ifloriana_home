@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_template/ui/splash/splash_controller.dart';
 import 'package:flutter_template/utils/colors.dart';
 import 'package:get/get.dart';
 import 'edit_branch_screen.dart';
 import 'getBranchesController.dart';
 import 'package:flutter_template/wiget/loading.dart';
 import 'package:flutter_template/route/app_route.dart';
+import 'package:flutter_template/network/network_const.dart';
 
 
 class GetBranchesScreen extends StatelessWidget {
@@ -51,6 +51,23 @@ class GetBranchesScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    if (branch.imageUrl.isNotEmpty)
+                      ClipRRect(
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
+                        child: Image.network(
+                          '${Apis.pdfUrl}${branch.imageUrl}?v=${DateTime.now().millisecondsSinceEpoch}',
+                          height: 160,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Container(
+                            height: 160,
+                            width: double.infinity,
+                            color: Colors.grey[200],
+                            alignment: Alignment.center,
+                            child: const Icon(Icons.image_not_supported),
+                          ),
+                        ),
+                      ),
                     Padding(
                       padding: EdgeInsets.all(16.r),
                       child: Column(

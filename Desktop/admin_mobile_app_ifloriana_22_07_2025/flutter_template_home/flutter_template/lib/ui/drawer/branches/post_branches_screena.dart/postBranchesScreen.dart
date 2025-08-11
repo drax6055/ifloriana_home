@@ -19,7 +19,7 @@ class Postbranchesscreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: "title"),
+      appBar: CustomAppBar(title: "Add Branch"),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -29,6 +29,7 @@ class Postbranchesscreen extends StatelessWidget {
               SizedBox(
                 height: 1.h,
               ),
+              ImagePickerBranch(),
               CustomTextFormField(
                 controller: getController.nameController,
                 labelText: 'Name',
@@ -304,6 +305,76 @@ class Postbranchesscreen extends StatelessWidget {
             ),
           ),
         ],
+      );
+    });
+  }
+}
+
+class ImagePickerBranch extends StatelessWidget {
+  ImagePickerBranch({super.key});
+  final Postbranchescontroller getController = Get.find<Postbranchescontroller>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      return GestureDetector(
+        onTap: () async {
+          Get.bottomSheet(
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.photo_library),
+                    title: const Text('Choose from Gallery'),
+                    onTap: () async {
+                      Get.back();
+                      await getController.pickImageFromGallery();
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.camera_alt),
+                    title: const Text('Take Photo'),
+                    onTap: () async {
+                      Get.back();
+                      await getController.pickImageFromCamera();
+                    },
+                  ),
+                ],
+              ),
+            ),
+            isScrollControlled: true,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+            ),
+          );
+        },
+        child: Container(
+          height: 120,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            border: Border.all(color: primaryColor),
+            borderRadius: BorderRadius.circular(10.r),
+            color: secondaryColor.withOpacity(0.2),
+          ),
+          alignment: Alignment.center,
+          child: getController.singleImage.value != null
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(10.r),
+                  child: Image.file(
+                    getController.singleImage.value!,
+                    fit: BoxFit.cover,
+                    height: 120,
+                    width: double.infinity,
+                  ),
+                )
+              : Icon(Icons.image_rounded, color: primaryColor, size: 30.sp),
+        ),
       );
     });
   }
