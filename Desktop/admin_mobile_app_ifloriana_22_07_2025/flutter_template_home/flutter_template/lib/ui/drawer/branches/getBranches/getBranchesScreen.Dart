@@ -8,6 +8,7 @@ import 'getBranchesController.dart';
 import 'package:flutter_template/wiget/loading.dart';
 import 'package:flutter_template/route/app_route.dart';
 
+
 class GetBranchesScreen extends StatelessWidget {
   const GetBranchesScreen({super.key});
 
@@ -21,6 +22,7 @@ class GetBranchesScreen extends StatelessWidget {
 
     return SafeArea(
       child: Scaffold(
+    
         body: Obx(() {
           if (getController.isLoading.value) {
             return const Center(child: CustomLoadingAvatar());
@@ -108,19 +110,19 @@ class GetBranchesScreen extends StatelessWidget {
                               ),
                             ],
                           ),
-                          Row(
-                            children: [
-                              Icon(Icons.star, size: 16.sp, color: Colors.amber),
-                              SizedBox(width: 4.w),
-                              Text(
-                                "${branch.ratingStar} (${branch.totalReview} reviews)",
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
-                          ),
+                          // Row(
+                          //   children: [
+                          //     Icon(Icons.star, size: 16.sp, color: Colors.amber),
+                          //     SizedBox(width: 4.w),
+                          //     Text(
+                          //       "${branch.ratingStar} (${branch.totalReview} reviews)",
+                          //       style: TextStyle(
+                          //         fontSize: 14.sp,
+                          //         color: Colors.grey[600],
+                          //       ),
+                          //     ),
+                          //   ],
+                          // ),
                             Row(
                             children: [
                               Icon(Icons.location_on, size: 16.sp, color: Colors.grey),

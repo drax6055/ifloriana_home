@@ -54,7 +54,7 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
     //     TextEditingController(text: widget.branch.latitude.toString());
     // _longitudeController =
     //     TextEditingController(text: widget.branch.longitude.toString());
-    _selectedPaymentMethods = List.from(widget.branch.paymentMethod);
+    _selectedPaymentMethods = List.from(widget.branch.paymentMethods);
   }
 
   @override

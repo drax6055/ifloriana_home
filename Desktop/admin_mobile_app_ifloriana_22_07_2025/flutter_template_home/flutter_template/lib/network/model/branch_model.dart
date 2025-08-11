@@ -1,34 +1,34 @@
 class BranchModel {
   final String id;
   final String name;
+  final Salon? salon;
   final String category;
   final int status;
   final String contactEmail;
   final String contactNumber;
-  final List<String> paymentMethod;
-  final List<ServiceModel> services;
+  final List<String> paymentMethods;
+  final List<Service> services;
   final String address;
   final String landmark;
   final String country;
   final String state;
   final String city;
   final String postalCode;
-  final double latitude;
-  final double longitude;
   final String description;
-  final String image;
-  final double ratingStar;
+  final int ratingStar;
   final int totalReview;
   final int staffCount;
+  final String imageUrl;
 
   BranchModel({
     required this.id,
     required this.name,
+    required this.salon,
     required this.category,
     required this.status,
     required this.contactEmail,
     required this.contactNumber,
-    required this.paymentMethod,
+    required this.paymentMethods,
     required this.services,
     required this.address,
     required this.landmark,
@@ -36,26 +36,30 @@ class BranchModel {
     required this.state,
     required this.city,
     required this.postalCode,
-    required this.latitude,
-    required this.longitude,
     required this.description,
-    required this.image,
     required this.ratingStar,
     required this.totalReview,
     required this.staffCount,
+    required this.imageUrl,
   });
 
   factory BranchModel.fromJson(Map<String, dynamic> json) {
     return BranchModel(
       id: json['_id'] ?? '',
       name: json['name'] ?? '',
+      salon: json['salon_id'] != null && json['salon_id'] is Map
+          ? Salon.fromJson(json['salon_id'])
+          : null,
       category: json['category'] ?? '',
       status: json['status'] ?? 0,
       contactEmail: json['contact_email'] ?? '',
       contactNumber: json['contact_number'] ?? '',
-      paymentMethod: List<String>.from(json['payment_method'] ?? []),
-      services: (json['service_id'] as List?)
-              ?.map((service) => ServiceModel.fromJson(service))
+      paymentMethods: (json['payment_method'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
+      services: (json['service_id'] as List<dynamic>?)
+              ?.map((e) => Service.fromJson(e))
               .toList() ??
           [],
       address: json['address'] ?? '',
@@ -64,51 +68,65 @@ class BranchModel {
       state: json['state'] ?? '',
       city: json['city'] ?? '',
       postalCode: json['postal_code'] ?? '',
-      latitude: (json['latitude'] ?? 0.0).toDouble(),
-      longitude: (json['longitude'] ?? 0.0).toDouble(),
       description: json['description'] ?? '',
-      image: json['image'] ?? '',
-      ratingStar: (json['rating_star'] ?? 0.0).toDouble(),
+      ratingStar: json['rating_star'] ?? 0,
       totalReview: json['total_review'] ?? 0,
       staffCount: json['staff_count'] ?? 0,
+      imageUrl: json['image_url'] ?? '',
     );
   }
 }
 
-class ServiceModel {
+class Salon {
+  final String id;
+  final String salonName;
+  final String imageName;
+
+  Salon({
+    required this.id,
+    required this.salonName,
+    required this.imageName,
+  });
+
+  factory Salon.fromJson(Map<String, dynamic> json) {
+    String imageName = '';
+    if (json['image'] != null &&
+        json['image'] is Map &&
+        json['image']['originalName'] != null) {
+      imageName = json['image']['originalName'];
+    }
+    return Salon(
+      id: json['_id'] ?? '',
+      salonName: json['salon_name'] ?? '',
+      imageName: imageName,
+    );
+  }
+}
+
+class Service {
   final String id;
   final String name;
   final int serviceDuration;
-  final double regularPrice;
-  final String categoryId;
-  final String description;
-  final int status;
-  final String salonId;
-  final String image;
+  final int regularPrice;
+  final String? categoryName;
 
-  ServiceModel({
+  Service({
     required this.id,
     required this.name,
     required this.serviceDuration,
     required this.regularPrice,
-    required this.categoryId,
-    required this.description,
-    required this.status,
-    required this.salonId,
-    required this.image,
+    this.categoryName,
   });
 
-  factory ServiceModel.fromJson(Map<String, dynamic> json) {
-    return ServiceModel(
+  factory Service.fromJson(Map<String, dynamic> json) {
+    return Service(
       id: json['_id'] ?? '',
       name: json['name'] ?? '',
       serviceDuration: json['service_duration'] ?? 0,
-      regularPrice: (json['regular_price'] ?? 0.0).toDouble(),
-      categoryId: json['category_id'] ?? '',
-      description: json['description'] ?? '',
-      status: json['status'] ?? 0,
-      salonId: json['salon_id'] ?? '',
-      image: json['image'] ?? '',
+      regularPrice: json['regular_price'] ?? 0,
+      categoryName: json['category_id'] != null && json['category_id'] is Map
+          ? json['category_id']['name']
+          : null,
     );
   }
 }

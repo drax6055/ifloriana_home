@@ -5,6 +5,8 @@ import 'package:flutter_template/ui/drawer/customers/customersScreen.dart'
 import 'package:get/get.dart';
 import '../../route/app_route.dart';
 import '../../wiget/custome_snackbar.dart';
+import '../drawer/branches/getBranches/getBranchesScreen.Dart';
+import '../drawer/branches/post_branches_screena.dart/postBranchesScreen.dart';
 import '../drawer/services/addServices/addservicesScreen.dart';
 
 class SplashController extends GetxController {
@@ -26,9 +28,7 @@ class SplashController extends GetxController {
         String? managerAccessToken = managerUser?.token;
 
         if (accessToken != null && accessToken.isNotEmpty) {
-          Get.to(CustomersScreen());
-          // Get.to(AddNewCategotyScreen());
-          // Get.to(StaffServiceReportScreen());
+          Get.to(GetBranchesScreen());
           // Get.offNamed(Routes.drawerScreen); // Regular user
         } else if (managerAccessToken != null &&
             managerAccessToken.isNotEmpty) {
