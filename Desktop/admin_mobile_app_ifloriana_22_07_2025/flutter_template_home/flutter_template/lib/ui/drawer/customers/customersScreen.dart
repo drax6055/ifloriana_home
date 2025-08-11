@@ -6,6 +6,7 @@ import 'package:flutter_template/wiget/appbar/commen_appbar.dart';
 import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'dart:io';
+import '../../../network/network_const.dart';
 import 'customerController.dart';
 
 class CustomersScreen extends StatelessWidget {
@@ -31,7 +32,36 @@ class CustomersScreen extends StatelessWidget {
                 return Card(
                   margin: EdgeInsets.symmetric(vertical: 4.h, horizontal: 8.w),
                   child: ListTile(
-                    leading: _buildCustomerAvatar(customer),
+                    leading: customer.image != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              '${Apis.pdfUrl}${customer.image}?v=${DateTime.now().millisecondsSinceEpoch}',
+                              width: 50,
+                              height: 50,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  width: 50,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[300],
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Icon(Icons.image_not_supported),
+                                );
+                              },
+                            ),
+                          )
+                        : Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(Icons.image_not_supported),
+                          ),
                     title: Text(customer.fullName),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,26 +107,26 @@ class CustomersScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCustomerAvatar(Customer customer) {
-    final imageUrl = customer.fullImageUrl;
+  // Widget _buildCustomerAvatar(Customer customer) {
+  //   final imageUrl = customer.fullImageUrl;
 
-    if (imageUrl != null && imageUrl.isNotEmpty) {
-      // Network image
-      return CircleAvatar(
-        radius: 25.r,
-        backgroundImage: CachedNetworkImageProvider(imageUrl),
-        onBackgroundImageError: (exception, stackTrace) {
-          // Handle error - fallback to default avatar
-        },
-        child: null,
-      );
-    } else {
-      // Default avatar
-      return CircleAvatar(
-        radius: 25.r,
-        backgroundColor: primaryColor,
-        child: Icon(Icons.person, color: Colors.white),
-      );
-    }
-  }
+  //   if (imageUrl != null && imageUrl.isNotEmpty) {
+  //     // Network image
+  //     return CircleAvatar(
+  //       radius: 25.r,
+  //       backgroundImage: CachedNetworkImageProvider(imageUrl),
+  //       onBackgroundImageError: (exception, stackTrace) {
+  //         // Handle error - fallback to default avatar
+  //       },
+  //       child: null,
+  //     );
+  //   } else {
+  //     // Default avatar
+  //     return CircleAvatar(
+  //       radius: 25.r,
+  //       backgroundColor: primaryColor,
+  //       child: Icon(Icons.person, color: Colors.white),
+  //     );
+  //   }
+  // }
 }

@@ -12,6 +12,7 @@ import 'package:get/get.dart';
 import 'package:multi_dropdown/multi_dropdown.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'dart:io';
+import '../../../../network/network_const.dart';
 import '../customerController.dart';
 
 class EditCustomerScreen extends StatelessWidget {
@@ -36,6 +37,13 @@ class EditCustomerScreen extends StatelessWidget {
     customerController.fullNameController.text = customer.fullName;
     customerController.emailController.text = customer.email;
     customerController.phoneController.text = customer.phoneNumber;
+    if (customer.image != null && customer.image!.isNotEmpty) {
+      customerController.existingImageUrl.value =
+          '${Apis.pdfUrl}${customer.image}?v=${DateTime.now().millisecondsSinceEpoch}';
+    } else {
+      customerController.existingImageUrl.value = null;
+    }
+    //  customerController.   customer.image;   pre selected image
 
     // Prefill gender
     final genderValue = customer.gender.capitalizeFirst ?? 'Male';
@@ -47,11 +55,7 @@ class EditCustomerScreen extends StatelessWidget {
     // Prefill status
     customerController.isActive.value = customer.status == 1;
 
-    // Prefill image - use the full URL
-    if (customer.fullImageUrl != null) {
-      customerController.existingImageUrl.value = customer.fullImageUrl;
-    }
-
+    customerController.singleImage.value = null;
     // Prefill package/membership fields
     final hasPackages = customer.branchPackage.isNotEmpty;
     final hasMembership = (customer.branchMembershipId.isNotEmpty) ||
@@ -300,25 +304,25 @@ class EditCustomerScreen extends StatelessWidget {
                                 height: double.infinity,
                               ),
                             ),
-                            Positioned(
-                              top: 4,
-                              right: 4,
-                              child: GestureDetector(
-                                onTap: customerController.removeSelectedImage,
-                                child: Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: const BoxDecoration(
-                                    color: Colors.red,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(
-                                    Icons.close,
-                                    color: Colors.white,
-                                    size: 16,
-                                  ),
-                                ),
-                              ),
-                            ),
+                            // Positioned(
+                            //   top: 4,
+                            //   right: 4,
+                            //   child: GestureDetector(
+                            //     onTap: customerController.removeSelectedImage,
+                            //     child: Container(
+                            //       padding: const EdgeInsets.all(4),
+                            //       decoration: const BoxDecoration(
+                            //         color: Colors.red,
+                            //         shape: BoxShape.circle,
+                            //       ),
+                            //       child: const Icon(
+                            //         Icons.close,
+                            //         color: Colors.white,
+                            //         size: 16,
+                            //       ),
+                            //     ),
+                            //   ),
+                            // ),
                           ],
                         )
                       : customerController.existingImageUrl.value != null &&
@@ -344,28 +348,28 @@ class EditCustomerScreen extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                Positioned(
-                                  top: 4,
-                                  right: 4,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      customerController
-                                          .existingImageUrl.value = null;
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.all(4),
-                                      decoration: const BoxDecoration(
-                                        color: Colors.red,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(
-                                        Icons.close,
-                                        color: Colors.white,
-                                        size: 16,
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                                // Positioned(
+                                //   top: 4,
+                                //   right: 4,
+                                //   child: GestureDetector(
+                                //     onTap: () {
+                                //       customerController
+                                //           .existingImageUrl.value = null;
+                                //     },
+                                //     child: Container(
+                                //       padding: const EdgeInsets.all(4),
+                                //       decoration: const BoxDecoration(
+                                //         color: Colors.red,
+                                //         shape: BoxShape.circle,
+                                //       ),
+                                //       child: const Icon(
+                                //         Icons.close,
+                                //         color: Colors.white,
+                                //         size: 16,
+                                //       ),
+                                //     ),
+                                //   ),
+                                // ),
                               ],
                             )
                           : Column(
@@ -389,6 +393,7 @@ class EditCustomerScreen extends StatelessWidget {
                 ),
               )),
         ),
+
         SizedBox(height: 8.h),
         // Row(
         //   mainAxisAlignment: MainAxisAlignment.center,

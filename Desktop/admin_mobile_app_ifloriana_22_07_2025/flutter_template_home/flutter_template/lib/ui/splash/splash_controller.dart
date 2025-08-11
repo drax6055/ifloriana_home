@@ -1,25 +1,11 @@
 import 'dart:async';
 import 'package:flutter_template/main.dart';
-import 'package:flutter_template/ui/drawer/manager/getManager/getmanagerScreen.dart'
-    show Getmanagerscreen;
-import 'package:flutter_template/ui/drawer/staff/addNewStaffScreen.dart'
-    show Addnewstaffscreen;
-import 'package:flutter_template/ui/inhouse/get/inhouseProduct_screen.dart'
-    show InhouseproductScreen;
+import 'package:flutter_template/ui/drawer/customers/customersScreen.dart'
+    show CustomersScreen;
 import 'package:get/get.dart';
 import '../../route/app_route.dart';
 import '../../wiget/custome_snackbar.dart';
-import '../buy_product/buy_product_screen.dart';
-import '../buy_product/getOrderList/getOrderListScreen.dart';
-import '../drawer/branches/getBranches/getBranchesScreen.Dart';
-import '../drawer/coupons/couponsScreen.dart';
-import '../drawer/customers/addCustomer/addCustomerScreen.dart';
-import '../drawer/customers/customersScreen.dart';
-import '../drawer/products/brand/getBrandsScreen.dart';
-import '../drawer/products/category/CategoryScreen.dart';
-import '../drawer/products/subcategory/subcategoryScreen.dart';
-import '../drawer/services/categotys/addNewServicesScreen.dart';
-import '../inhouse/post/addInhouseProduct_screen.dart';
+import '../drawer/services/addServices/addservicesScreen.dart';
 
 class SplashController extends GetxController {
   @override
@@ -40,7 +26,8 @@ class SplashController extends GetxController {
         String? managerAccessToken = managerUser?.token;
 
         if (accessToken != null && accessToken.isNotEmpty) {
-          Get.to(AddNewCategotyScreen());
+          Get.to(CustomersScreen());
+          // Get.to(AddNewCategotyScreen());
           // Get.to(StaffServiceReportScreen());
           // Get.offNamed(Routes.drawerScreen); // Regular user
         } else if (managerAccessToken != null &&
