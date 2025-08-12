@@ -485,25 +485,36 @@ class AddProductController extends GetxController {
         variationGroups.clear();
 
         // Create variation groups based on product data
-        for (var variation in product.variationId) {
-          final variationGroup = VariationGroup();
-          variationGroup.selectedType.value = variationList.firstWhereOrNull(
-            (v) => v.id == variation.id,
-          );
+        for (var variationData in product.variationId) {
+          // Check if variationData is a Map and has the required fields
+          if (variationData is Map<String, dynamic>) {
+            final variationId = variationData['_id'] ?? variationData['id'];
+            final variationValues =
+                variationData['value'] ?? variationData['values'] ?? <String>[];
 
-          // Add the variation group first
-          variationGroups.add(variationGroup);
-
-          // Populate the values after the group is added
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (variation.values.isNotEmpty) {
-              variationGroup.selectedValues.value = variation.values;
-              variationGroup.valuesController.clearAll();
-              variationGroup.valuesController.selectWhere(
-                (item) => variation.values.contains(item.value),
+            if (variationId != null) {
+              final variationGroup = VariationGroup();
+              variationGroup.selectedType.value =
+                  variationList.firstWhereOrNull(
+                (v) => v.id == variationId,
               );
+
+              // Add the variation group first
+              variationGroups.add(variationGroup);
+
+              // Populate the values after the group is added
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (variationValues.isNotEmpty) {
+                  variationGroup.selectedValues.value =
+                      List<String>.from(variationValues);
+                  variationGroup.valuesController.clearAll();
+                  variationGroup.valuesController.selectWhere(
+                    (item) => variationValues.contains(item.value),
+                  );
+                }
+              });
             }
-          });
+          }
         }
       }
 
