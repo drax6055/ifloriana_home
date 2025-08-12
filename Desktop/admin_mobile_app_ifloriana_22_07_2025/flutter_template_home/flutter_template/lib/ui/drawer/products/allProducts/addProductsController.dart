@@ -380,9 +380,12 @@ class AddProductController extends GetxController {
     variationGroups[groupIndex].selectedValues.value = values;
     // Update the MultiSelectController to reflect the selected values
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      variationGroups[groupIndex].valuesController.selectWhere(
-            (item) => values.contains(item.value),
-          );
+      variationGroups[groupIndex].valuesController.clearAll();
+      if (values.isNotEmpty) {
+        variationGroups[groupIndex].valuesController.selectWhere(
+              (item) => values.contains(item.value),
+            );
+      }
     });
     _generateVariants();
   }
@@ -495,6 +498,7 @@ class AddProductController extends GetxController {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (variation.values.isNotEmpty) {
               variationGroup.selectedValues.value = variation.values;
+              variationGroup.valuesController.clearAll();
               variationGroup.valuesController.selectWhere(
                 (item) => variation.values.contains(item.value),
               );
