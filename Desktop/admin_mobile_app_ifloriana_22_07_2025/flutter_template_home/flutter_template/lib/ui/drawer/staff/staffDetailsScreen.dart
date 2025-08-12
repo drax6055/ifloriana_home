@@ -115,17 +115,36 @@ class Staffdetailsscreen extends StatelessWidget {
                 child: ListTile(
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  leading: CircleAvatar(
-                    radius: 30,
-                    backgroundImage: staff.image != null &&
-                            staff.image!.isNotEmpty
-                        ? NetworkImage(
-                            '${Apis.pdfUrl}${staff.image}?v=${DateTime.now().millisecondsSinceEpoch}')
-                        : AssetImage(AppImages.applogo) as ImageProvider,
-                    onBackgroundImageError: (exception, stackTrace) {
-                      // Handle image loading error
-                    },
-                  ),
+                  leading: staff.image != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.network(
+                            '${Apis.pdfUrl}${staff.image}?v=${DateTime.now().millisecondsSinceEpoch}',
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[300],
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(Icons.image_not_supported),
+                              );
+                            },
+                          ),
+                        )
+                      : Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(Icons.image_not_supported),
+                        ),
                   title: Text(
                     staff.fullName ?? "Unknown",
                     style: const TextStyle(
