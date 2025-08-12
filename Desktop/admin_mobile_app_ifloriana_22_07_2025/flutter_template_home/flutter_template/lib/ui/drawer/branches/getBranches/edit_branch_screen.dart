@@ -179,24 +179,26 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
         child: Form(
           key: _formKey,
           child: Column(
+            spacing: 10,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _imagePickerTile(),
+              SizedBox(width: 70.w, child: _imagePickerTile()),
               _buildTextField(
                 controller: _nameController,
                 label: 'Branch Name',
                 validator: (value) =>
                     value?.isEmpty ?? true ? 'Please enter branch name' : null,
               ),
-              SizedBox(height: 16.h),
+              // SizedBox(height: 16.h),
               _buildTextField(
                 controller: _addressController,
                 label: 'Address',
                 validator: (value) =>
                     value?.isEmpty ?? true ? 'Please enter address' : null,
               ),
-              SizedBox(height: 16.h),
+              // SizedBox(height: 16.h),
               Row(
+                spacing: 5.w,
                 children: [
                   Expanded(
                     child: _buildTextField(
@@ -206,7 +208,7 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
                           value?.isEmpty ?? true ? 'Please enter city' : null,
                     ),
                   ),
-                  SizedBox(width: 16.w),
+                  // SizedBox(width: 16.w),
                   Expanded(
                     child: _buildTextField(
                       controller: _stateController,
@@ -217,8 +219,9 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: 16.h),
+              // SizedBox(height: 16.h),
               Row(
+                spacing: 5.w,
                 children: [
                   Expanded(
                     child: _buildTextField(
@@ -229,7 +232,7 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
                           : null,
                     ),
                   ),
-                  SizedBox(width: 16.w),
+                  // SizedBox(width: 16.w),
                   Expanded(
                     child: _buildTextField(
                       controller: _postalCodeController,
@@ -241,7 +244,7 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: 16.h),
+              // SizedBox(height: 16.h),
               _buildTextField(
                 controller: _contactNumberController,
                 label: 'Contact Number',
@@ -249,7 +252,7 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
                     ? 'Please enter contact number'
                     : null,
               ),
-              SizedBox(height: 16.h),
+              // SizedBox(height: 16.h),
               _buildTextField(
                 controller: _contactEmailController,
                 label: 'Contact Email',
@@ -260,36 +263,36 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 16.h),
+              // SizedBox(height: 16.h),
               _buildTextField(
                 controller: _descriptionController,
                 label: 'Description',
                 maxLines: 3,
               ),
-              SizedBox(height: 16.h),
+              // SizedBox(height: 16.h),
               _buildTextField(
                 controller: _landmarkController,
                 label: 'Landmark',
               ),
-              SizedBox(height: 24.h),
-              Text(
-                'Services',
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 8.h),
+              // SizedBox(height: 24.h),
+              // Text(
+              //   'Services',
+              //   style: TextStyle(
+              //     fontSize: 16.sp,
+              //     fontWeight: FontWeight.bold,
+              //   ),
+              // ),
+              // SizedBox(height: 8.h),
               _buildServiceDropdown(),
-              SizedBox(height: 24.h),
-              Text(
-                'Payment Methods',
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 8.h),
+              // SizedBox(height: 24.h),
+              // Text(
+              //   'Payment Methods',
+              //   style: TextStyle(
+              //     fontSize: 16.sp,
+              //     fontWeight: FontWeight.bold,
+              //   ),
+              // ),
+              // SizedBox(height: 8.h),
               MultiDropdown<String>(
                 items: _paymentMethods
                     .map((method) => DropdownItem(
@@ -345,7 +348,7 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
                   });
                 },
               ),
-              SizedBox(height: 32.h),
+              // SizedBox(height: 32.h),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(

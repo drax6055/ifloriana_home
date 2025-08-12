@@ -30,7 +30,11 @@ class Postbranchesscreen extends StatelessWidget {
               SizedBox(
                 height: 1.h,
               ),
-              ImagePickerBranch(),
+              SizedBox(
+                width: 80.h,
+                child: ImagePickerBranch(),
+              ),
+
               CustomTextFormField(
                 controller: getController.nameController,
                 labelText: 'Name',
@@ -38,23 +42,7 @@ class Postbranchesscreen extends StatelessWidget {
                 validator: (value) => Validation.validatename(value),
               ),
               Category(),
-              Obx(() => Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      CustomTextWidget(
-                        text: 'Status',
-                        textStyle:
-                            CustomTextStyles.textFontRegular(size: 14.sp),
-                      ),
-                      Switch(
-                        value: getController.isActive.value,
-                        onChanged: (value) {
-                          getController.isActive.value = value;
-                        },
-                        activeColor: primaryColor,
-                      ),
-                    ],
-                  )),
+
               CustomTextFormField(
                 controller: getController.contactEmailController,
                 labelText: 'Email',
@@ -83,31 +71,64 @@ class Postbranchesscreen extends StatelessWidget {
                 keyboardType: TextInputType.text,
                 validator: (value) => Validation.validatedisscription(value),
               ),
-              CustomTextFormField(
-                controller: getController.landmarkController,
-                labelText: 'Landmark',
-                keyboardType: TextInputType.text,
+              Row(spacing: 5.w, children: [
+                Expanded(
+                    child: CustomTextFormField(
+                  controller: getController.landmarkController,
+                  labelText: 'Landmark',
+                  keyboardType: TextInputType.text,
+                )),
+                Expanded(
+                    child: CustomTextFormField(
+                  controller: getController.countryController,
+                  labelText: 'Country',
+                  keyboardType: TextInputType.text,
+                )),
+              ]),
+              Row(
+                spacing: 5.w,
+                children: [
+                  Expanded(
+                    child: CustomTextFormField(
+                      controller: getController.stateController,
+                      labelText: 'State',
+                      keyboardType: TextInputType.text,
+                    ),
+                  ),
+                  Expanded(
+                    child: CustomTextFormField(
+                      controller: getController.cityController,
+                      labelText: 'City',
+                      keyboardType: TextInputType.text,
+                    ),
+                  )
+                ],
               ),
-              CustomTextFormField(
-                controller: getController.countryController,
-                labelText: 'Country',
-                keyboardType: TextInputType.text,
-              ),
-              CustomTextFormField(
-                controller: getController.stateController,
-                labelText: 'State',
-                keyboardType: TextInputType.text,
-              ),
-              CustomTextFormField(
-                controller: getController.cityController,
-                labelText: 'City',
-                keyboardType: TextInputType.text,
-              ),
+
               CustomTextFormField(
                 controller: getController.postalCodeController,
                 labelText: 'Postal Code',
                 keyboardType: TextInputType.text,
               ),
+
+              Obx(() => Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      CustomTextWidget(
+                        text: 'Status',
+                        textStyle:
+                            CustomTextStyles.textFontRegular(size: 14.sp),
+                      ),
+                      Switch(
+                        value: getController.isActive.value,
+                        onChanged: (value) {
+                          getController.isActive.value = value;
+                        },
+                        activeColor: primaryColor,
+                      ),
+                    ],
+                  )),
+
               // Row(
               //   children: [
               //     Expanded(
@@ -255,14 +276,14 @@ class Postbranchesscreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Payment Methods',
-          style: TextStyle(
-            fontSize: 16.sp,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        SizedBox(height: 8.h),
+        // Text(
+        //   'Payment Methods',
+        //   style: TextStyle(
+        //     fontSize: 16.sp,
+        //     fontWeight: FontWeight.bold,
+        //   ),
+        // ),
+        // SizedBox(height: 8.h),
         MultiDropdown<String>(
           items: _paymentMethods
               .map((method) => DropdownItem(
