@@ -151,6 +151,7 @@ class Getbranchescontroller extends GetxController {
       if (response != null) {
         // Refresh the branches list after successful update
         await getBranches();
+        // Get.back();
         CustomSnackbar.showSuccess('Success', 'Branch updated successfully');
       }
     } catch (e) {

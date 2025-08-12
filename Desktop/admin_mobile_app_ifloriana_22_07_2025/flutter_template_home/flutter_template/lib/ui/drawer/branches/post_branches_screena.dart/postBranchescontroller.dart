@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:multi_dropdown/multi_dropdown.dart';
 import '../../../../main.dart';
+import '../getBranches/getBranchesController.dart';
 
 // Simple Service class for add branch functionality
 class Service {
@@ -176,6 +177,8 @@ class Postbranchescontroller extends GetxController {
           'Content-Type': 'multipart/form-data',
         }),
       );
+      Get.find<Getbranchescontroller>().getBranches();
+      Get.back();
       CustomSnackbar.showSuccess('Success', 'Branch added successfully');
     } catch (e) {
       print('==> here Error: $e');
