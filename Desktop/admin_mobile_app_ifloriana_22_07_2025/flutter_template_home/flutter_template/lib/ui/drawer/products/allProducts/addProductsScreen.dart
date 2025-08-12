@@ -225,7 +225,14 @@ class AddProductScreen extends StatelessWidget {
     return Obx(() => DropdownButtonFormField<Brand>(
           value: controller.selectedBrand.value,
           decoration: const InputDecoration(
-              labelText: 'Brand *', border: OutlineInputBorder()),
+            labelText: 'Brand *',
+            labelStyle: TextStyle(color: grey),
+            border: OutlineInputBorder(),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(8.0)),
+              borderSide: BorderSide(color: primaryColor, width: 2.0),
+            ),
+          ),
           items: controller.brandList
               .map((item) =>
                   DropdownMenuItem(value: item, child: Text(item.name ?? '')))
@@ -239,7 +246,14 @@ class AddProductScreen extends StatelessWidget {
     return Obx(() => DropdownButtonFormField<Category>(
           value: controller.selectedCategory.value,
           decoration: const InputDecoration(
-              labelText: 'Category *', border: OutlineInputBorder()),
+            labelText: 'Category *',
+            labelStyle: TextStyle(color: grey),
+            border: OutlineInputBorder(),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(8.0)),
+              borderSide: BorderSide(color: primaryColor, width: 2.0),
+            ),
+          ),
           items: controller.categoryList
               .map((item) =>
                   DropdownMenuItem(value: item, child: Text(item.name ?? '')))
@@ -253,7 +267,14 @@ class AddProductScreen extends StatelessWidget {
     return Obx(() => DropdownButtonFormField<Tag>(
           value: controller.selectedTag.value,
           decoration: const InputDecoration(
-              labelText: 'Tag *', border: OutlineInputBorder()),
+            labelText: 'Tag *',
+            labelStyle: TextStyle(color: grey),
+            border: OutlineInputBorder(),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(8.0)),
+              borderSide: BorderSide(color: primaryColor, width: 2.0),
+            ),
+          ),
           items: controller.tagList
               .map((item) =>
                   DropdownMenuItem(value: item, child: Text(item.name ?? '')))
@@ -267,7 +288,14 @@ class AddProductScreen extends StatelessWidget {
     return Obx(() => DropdownButtonFormField<Unit>(
           value: controller.selectedUnit.value,
           decoration: const InputDecoration(
-              labelText: 'Unit *', border: OutlineInputBorder()),
+            labelText: 'Unit *',
+            labelStyle: TextStyle(color: grey),
+            border: OutlineInputBorder(),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(8.0)),
+              borderSide: BorderSide(color: primaryColor, width: 2.0),
+            ),
+          ),
           items: controller.unitList
               .map((item) =>
                   DropdownMenuItem(value: item, child: Text(item.name ?? '')))
@@ -451,8 +479,14 @@ class AddProductScreen extends StatelessWidget {
             child: Obx(() => DropdownButtonFormField<Variation>(
                   value: group.selectedType.value,
                   decoration: const InputDecoration(
-                      labelText: 'Variation Type',
-                      border: OutlineInputBorder()),
+                    labelText: 'Variation Type',
+                    labelStyle: TextStyle(color: grey),
+                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                      borderSide: BorderSide(color: primaryColor, width: 2.0),
+                    ),
+                  ),
                   items: controller.variationList
                       .map((item) =>
                           DropdownMenuItem(value: item, child: Text(item.name)))
