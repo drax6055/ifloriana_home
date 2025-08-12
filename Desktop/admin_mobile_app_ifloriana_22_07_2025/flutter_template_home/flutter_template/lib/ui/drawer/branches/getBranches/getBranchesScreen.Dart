@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_template/ui/splash/splash_controller.dart';
 import 'package:flutter_template/utils/colors.dart';
+import 'package:flutter_template/network/network_const.dart';
 import 'package:get/get.dart';
 import 'edit_branch_screen.dart';
 import 'getBranchesController.dart';
@@ -49,6 +50,36 @@ class GetBranchesScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Branch Image
+                    if (branch.imageUrl.isNotEmpty)
+                      Container(
+                        height: 200.h,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(12.r),
+                          ),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(12.r),
+                          ),
+                          child: Image.network(
+                            '${Apis.pdfUrl}${branch.imageUrl}?v=${DateTime.now().millisecondsSinceEpoch}',
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                color: Colors.grey[300],
+                                child: Icon(
+                                  Icons.image_not_supported,
+                                  size: 50.sp,
+                                  color: Colors.grey[600],
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
                     Padding(
                       padding: EdgeInsets.all(16.r),
                       child: Column(

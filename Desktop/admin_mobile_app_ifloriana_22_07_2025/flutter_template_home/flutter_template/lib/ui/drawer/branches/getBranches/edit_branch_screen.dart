@@ -10,6 +10,7 @@ import '../../../../network/network_const.dart';
 import 'package:multi_dropdown/multi_dropdown.dart';
 import '../../../../utils/colors.dart';
 import '../../../../utils/custom_text_styles.dart';
+import '../../../../wiget/Custome_textfield.dart';
 
 class EditBranchScreen extends StatefulWidget {
   final BranchModel branch;
@@ -162,9 +163,11 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
         return;
       }
       if (await file.length() < maxSizeInBytes) {
-        setState(() {
-          _pickedImage = file;
-        });
+        if (mounted) {
+          setState(() {
+            _pickedImage = file;
+          });
+        }
       } else {
         Get.snackbar('Error', 'Image size must be less than 150KB');
       }
@@ -183,16 +186,16 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(width: 70.w, child: _imagePickerTile()),
-              _buildTextField(
+              CustomTextFormField(
                 controller: _nameController,
-                label: 'Branch Name',
+                labelText: 'Branch Name',
                 validator: (value) =>
                     value?.isEmpty ?? true ? 'Please enter branch name' : null,
               ),
               // SizedBox(height: 16.h),
-              _buildTextField(
+              CustomTextFormField(
                 controller: _addressController,
-                label: 'Address',
+                labelText: 'Address',
                 validator: (value) =>
                     value?.isEmpty ?? true ? 'Please enter address' : null,
               ),
@@ -201,18 +204,18 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
                 spacing: 5.w,
                 children: [
                   Expanded(
-                    child: _buildTextField(
+                    child: CustomTextFormField(
                       controller: _cityController,
-                      label: 'City',
+                      labelText: 'City',
                       validator: (value) =>
                           value?.isEmpty ?? true ? 'Please enter city' : null,
                     ),
                   ),
                   // SizedBox(width: 16.w),
                   Expanded(
-                    child: _buildTextField(
+                    child: CustomTextFormField(
                       controller: _stateController,
-                      label: 'State',
+                      labelText: 'State',
                       validator: (value) =>
                           value?.isEmpty ?? true ? 'Please enter state' : null,
                     ),
@@ -224,9 +227,9 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
                 spacing: 5.w,
                 children: [
                   Expanded(
-                    child: _buildTextField(
+                    child: CustomTextFormField(
                       controller: _countryController,
-                      label: 'Country',
+                      labelText: 'Country',
                       validator: (value) => value?.isEmpty ?? true
                           ? 'Please enter country'
                           : null,
@@ -234,9 +237,9 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
                   ),
                   // SizedBox(width: 16.w),
                   Expanded(
-                    child: _buildTextField(
+                    child: CustomTextFormField(
                       controller: _postalCodeController,
-                      label: 'Postal Code',
+                      labelText: 'Postal Code',
                       validator: (value) => value?.isEmpty ?? true
                           ? 'Please enter postal code'
                           : null,
@@ -245,17 +248,17 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
                 ],
               ),
               // SizedBox(height: 16.h),
-              _buildTextField(
+              CustomTextFormField(
                 controller: _contactNumberController,
-                label: 'Contact Number',
+                labelText: 'Contact Number',
                 validator: (value) => value?.isEmpty ?? true
                     ? 'Please enter contact number'
                     : null,
               ),
               // SizedBox(height: 16.h),
-              _buildTextField(
+              CustomTextFormField(
                 controller: _contactEmailController,
-                label: 'Contact Email',
+                labelText: 'Contact Email',
                 validator: (value) {
                   if (value?.isEmpty ?? true) return 'Please enter email';
                   if (!GetUtils.isEmail(value!))
@@ -264,15 +267,15 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
                 },
               ),
               // SizedBox(height: 16.h),
-              _buildTextField(
+              CustomTextFormField(
                 controller: _descriptionController,
-                label: 'Description',
+                labelText: 'Description',
                 maxLines: 3,
               ),
               // SizedBox(height: 16.h),
-              _buildTextField(
+              CustomTextFormField(
                 controller: _landmarkController,
-                label: 'Landmark',
+                labelText: 'Landmark',
               ),
               // SizedBox(height: 24.h),
               // Text(
@@ -343,9 +346,11 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
                   disabledIcon: Icon(Icons.lock, color: Colors.grey.shade300),
                 ),
                 onSelectionChange: (selectedItems) {
-                  setState(() {
-                    _selectedPaymentMethods = selectedItems;
-                  });
+                  if (mounted) {
+                    setState(() {
+                      _selectedPaymentMethods = selectedItems;
+                    });
+                  }
                 },
               ),
               // SizedBox(height: 32.h),
@@ -366,27 +371,6 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    int maxLines = 1,
-    TextInputType? keyboardType,
-    String? Function(String?)? validator,
-  }) {
-    return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: label,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.r),
-        ),
-      ),
-      maxLines: maxLines,
-      keyboardType: keyboardType,
-      validator: validator,
     );
   }
 
@@ -440,9 +424,11 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
           disabledIcon: Icon(Icons.lock, color: Colors.grey.shade300),
         ),
         onSelectionChange: (selectedItems) {
-          setState(() {
-            _selectedServices = selectedItems;
-          });
+          if (mounted) {
+            setState(() {
+              _selectedServices = selectedItems;
+            });
+          }
         },
       );
     });
