@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'dart:math';
 
 import '../../../../wiget/appbar/commen_appbar.dart';
+import '../../../../wiget/loading.dart';
 import 'product_list_controller.dart';
 import 'product_list_model.dart';
 import 'update_stock_sheet.dart';
@@ -53,7 +54,7 @@ class ProductListScreen extends StatelessWidget {
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return Center(child: CircularProgressIndicator());
+          return Center(child: CustomLoadingAvatar());
         } else {
           return SingleChildScrollView(
             scrollDirection: Axis.horizontal,
