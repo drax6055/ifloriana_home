@@ -4,10 +4,13 @@ import 'package:flutter_template/ui/drawer/products/allProducts/addProductsContr
 import 'package:flutter_template/utils/colors.dart';
 import 'package:get/get.dart';
 import 'package:multi_dropdown/multi_dropdown.dart';
+import '../../../../wiget/Custome_button.dart';
 import '../../../../wiget/appbar/commen_appbar.dart';
 import '../../../../wiget/custome_snackbar.dart';
 import '../../../../network/network_const.dart';
 import '../../../../wiget/Custome_textfield.dart';
+import '../../../../wiget/custome_text.dart';
+import '../../../../utils/custom_text_styles.dart';
 
 class AddProductScreen extends StatelessWidget {
   const AddProductScreen({super.key});
@@ -68,11 +71,12 @@ class AddProductScreen extends StatelessWidget {
               // Removed _buildSectionTitle(textTheme, 'Product Discount'),
               // Removed _buildDiscountSection(controller),
               // const SizedBox(height: 24),
-              _buildSectionTitle(textTheme, 'Status'),
+              // _buildSectionTitle(textTheme, 'Status'),
+              _buildBranchDropdown(controller),
               _buildStatusSelector(controller),
               // const SizedBox(height: 24),
               // _buildSectionTitle(textTheme, 'Branch *'),
-              _buildBranchDropdown(controller),
+
               // const SizedBox(height: 32),
               _buildActionButtons(controller, isEditMode),
             ],
@@ -686,45 +690,54 @@ class AddProductScreen extends StatelessWidget {
 
   Widget _buildStatusSelector(AddProductController controller) {
     return Obx(() => Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Radio<String>(
-                value: 'active',
-                groupValue: controller.status.value,
-                onChanged: (v) => controller.status.value = v!),
-            const Text('Active'),
-            const SizedBox(width: 16),
-            Radio<String>(
-                value: 'inactive',
-                groupValue: controller.status.value,
-                onChanged: (v) => controller.status.value = v!),
-            const Text('Inactive'),
+            CustomTextWidget(
+              text: 'Status',
+              textStyle: CustomTextStyles.textFontRegular(size: 14.sp),
+            ),
+            Switch(
+              value: controller.status.value == 'active',
+              onChanged: (value) {
+                controller.status.value = value ? 'active' : 'inactive';
+              },
+              activeColor: primaryColor,
+            ),
           ],
         ));
   }
 
   Widget _buildActionButtons(AddProductController controller, bool isEditMode) {
-    return Obx(() => controller.isLoading.value
-        ? const Center(child: CircularProgressIndicator())
-        : Row(
-            children: [
-              Expanded(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16)),
-                  onPressed: controller.saveProduct,
-                  child: Text(isEditMode ? 'Update Product' : 'Add Product'),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16)),
-                  onPressed: () => Get.back(),
-                  child: const Text('Cancel'),
-                ),
-              ),
-            ],
-          ));
+    return ElevatedButtonExample(
+        text: isEditMode ? 'Update Product' : 'Add Product',
+        onPressed: controller.saveProduct);
+
+    // ElevatedButton(
+    //   onPressed: controller.saveProduct,
+    //   child: Text(isEditMode ? 'Update Product' : 'Add Product'),
+    // );
+    // Obx(() => controller.isLoading.value
+    //     ? const Center(child: CircularProgressIndicator())
+    //     : Row(
+    //         children: [
+    //           Expanded(
+    //             child: ElevatedButton(
+    //               style: ElevatedButton.styleFrom(
+    //                   padding: const EdgeInsets.symmetric(vertical: 16)),
+    //               onPressed: controller.saveProduct,
+    //               child: Text(isEditMode ? 'Update Product' : 'Add Product'),
+    //             ),
+    //           ),
+    //           const SizedBox(width: 8),
+    //           Expanded(
+    //             child: OutlinedButton(
+    //               style: OutlinedButton.styleFrom(
+    //                   padding: const EdgeInsets.symmetric(vertical: 16)),
+    //               onPressed: () => Get.back(),
+    //               child: const Text('Cancel'),
+    //             ),
+    //           ),
+    //         ],
+    //       ));
   }
 }
