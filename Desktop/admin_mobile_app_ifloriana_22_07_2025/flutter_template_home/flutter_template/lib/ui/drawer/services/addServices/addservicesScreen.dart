@@ -25,6 +25,7 @@ class AddNewService extends StatelessWidget {
         appBar: CustomAppBar(
           title: "Services",
         ),
+
         body: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Obx(() {

@@ -349,6 +349,8 @@ class Addnewstaffcontroller extends GetxController {
           'Content-Type': 'multipart/form-data',
         }),
       );
+      Get.find<Staffdetailscontroller>().getCustomerDetails();
+      Get.back();
       CustomSnackbar.showSuccess('Success', 'Staff updated successfully');
     } catch (e) {
       CustomSnackbar.showError('Error', e.toString());
@@ -405,6 +407,8 @@ class Addnewstaffcontroller extends GetxController {
           'Content-Type': 'multipart/form-data',
         }),
       );
+       Get.find<Staffdetailscontroller>().getCustomerDetails();
+      Get.back();
       CustomSnackbar.showSuccess('Success', 'Staff added successfully');
     } catch (e) {
       print('==> Add Staff Error: $e');

@@ -12,9 +12,10 @@ import 'package:flutter_template/wiget/custome_dropdown.dart';
 import 'package:flutter_template/wiget/custome_snackbar.dart';
 import 'package:get/get.dart';
 import 'package:multi_dropdown/multi_dropdown.dart';
-import 'package:step_progress/step_progress.dart';
 import 'package:flutter_template/ui/drawer/staff/staffDetailsController.dart';
 import 'package:flutter_template/network/network_const.dart';
+
+import '../../../wiget/appbar/commen_appbar.dart';
 
 class Addnewstaffscreen extends StatelessWidget {
   final bool showAppBar;
@@ -50,8 +51,16 @@ class Addnewstaffscreen extends StatelessWidget {
       });
     }
     return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(75),
+        child: Obx(() => CustomAppBar(
+              title: getController.isEditMode.value
+                  ? "Update Staff"
+                  : "Add New Staff",
+            )),
+      ),
       body: Form(
-        key: _formKey,
+        key: _formKey, 
         child: SingleChildScrollView(
           child: Column(
             children: [
@@ -60,36 +69,36 @@ class Addnewstaffscreen extends StatelessWidget {
                 child: Column(
                   spacing: 30.h,
                   children: [
-                    Obx(() => StepProgress(
-                          totalSteps: 2,
-                          currentStep: getController.currentStep.value,
-                          stepSize: 24,
-                          nodeTitles: const [
-                            "Owner's Info",
-                            "Salon's Info",
-                          ],
-                          padding: const EdgeInsets.all(18),
-                          theme: const StepProgressThemeData(
-                            shape: StepNodeShape.diamond,
-                            activeForegroundColor: primaryColor,
-                            defaultForegroundColor: secondaryColor,
-                            stepLineSpacing: 18,
-                            stepLineStyle: StepLineStyle(
-                              borderRadius: Radius.circular(4),
-                            ),
-                            nodeLabelStyle: StepLabelStyle(
-                              margin: EdgeInsets.only(bottom: 6),
-                            ),
-                            stepNodeStyle: StepNodeStyle(
-                              activeIcon: null,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(6),
-                                ),
-                              ),
-                            ),
-                          ),
-                        )),
+                    // Obx(() => StepProgress(
+                    //       totalSteps: 2,
+                    //       currentStep: getController.currentStep.value,
+                    //       stepSize: 24,
+                    //       nodeTitles: const [
+                    //         "Owner's Info",
+                    //         "Salon's Info",
+                    //       ],
+                    //       padding: const EdgeInsets.all(18),
+                    //       theme: const StepProgressThemeData(
+                    //         shape: StepNodeShape.diamond,
+                    //         activeForegroundColor: primaryColor,
+                    //         defaultForegroundColor: secondaryColor,
+                    //         stepLineSpacing: 18,
+                    //         stepLineStyle: StepLineStyle(
+                    //           borderRadius: Radius.circular(4),
+                    //         ),
+                    //         nodeLabelStyle: StepLabelStyle(
+                    //           margin: EdgeInsets.only(bottom: 6),
+                    //         ),
+                    //         stepNodeStyle: StepNodeStyle(
+                    //           activeIcon: null,
+                    //           decoration: BoxDecoration(
+                    //             borderRadius: BorderRadius.all(
+                    //               Radius.circular(6),
+                    //             ),
+                    //           ),
+                    //         ),
+                    //       ),
+                    //     )),
                     Obx(() =>
                         _stepForm(getController.currentStep.value, context)),
                     Obx(() => Row(
@@ -141,7 +150,7 @@ class Addnewstaffscreen extends StatelessWidget {
 
   Widget Case1() {
     return Column(
-      spacing: 15.h,
+      spacing: 10.h,
       children: [
         Imagepicker(),
         InputTxtfield_fullName(),
@@ -149,13 +158,15 @@ class Addnewstaffscreen extends StatelessWidget {
         // InputTxtfield_Pass(),
         // InputTxtfield_confirmPass(),
         CommitionDropdown(),
+        Gender(),
+        InputTxtfield_Specialization(),
       ],
     );
   }
 
   Widget Case2(BuildContext context) {
     return Column(
-      spacing: 15.h,
+      spacing: 10.h,
       children: [
         serviceDropdown(),
         branchDropdown(),
@@ -167,8 +178,7 @@ class Addnewstaffscreen extends StatelessWidget {
             Expanded(child: shiftEnd_time(context)),
           ],
         ),
-        Gender(),
-        InputTxtfield_Specialization(),
+
         // InputTxtfield_Salary(),
         Row(
           children: [
@@ -536,7 +546,16 @@ class Addnewstaffscreen extends StatelessWidget {
         value: getController.selectedBranch.value,
         decoration: InputDecoration(
           labelText: "Select Branch",
-          border: OutlineInputBorder(),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: Colors.grey),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(
+              color: primaryColor,
+            ),
+          ),
         ),
         items: getController.branchList.map((Branch branch) {
           return DropdownMenuItem<Branch>(
