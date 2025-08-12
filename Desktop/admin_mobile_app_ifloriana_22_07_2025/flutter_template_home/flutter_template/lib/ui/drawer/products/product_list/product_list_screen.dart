@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_template/route/app_route.dart';
+import 'package:flutter_template/utils/colors.dart';
 import 'package:get/get.dart';
 import 'dart:math';
 
+import '../../../../wiget/appbar/commen_appbar.dart';
 import 'product_list_controller.dart';
 import 'product_list_model.dart';
 import 'update_stock_sheet.dart';
@@ -14,20 +16,38 @@ class ProductListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Products", style: TextStyle(color: Colors.black)),
-        backgroundColor: Colors.white,
-        elevation: 1,
+      appBar: CustomAppBar(
+        title: "Products",
         actions: [
-          IconButton(
-            icon: Icon(Icons.filter_alt, color: Colors.black),
-            tooltip: 'Filter by Barcode',
-            onPressed: () => controller.filterByBarcode(),
-          ),
-          IconButton(
-            icon: Icon(Icons.clear, color: Colors.black),
-            tooltip: 'Clear Filter',
-            onPressed: () => controller.resetFilter(),
+          PopupMenuButton<String>(
+            onSelected: (value) async {
+              if (value == 'barcode_filter') {
+                controller.filterByBarcode();
+              } else if (value == 'clear') {
+                controller.resetFilter();
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'barcode_filter',
+                child: Row(
+                  children: [
+                    Icon(Icons.filter_alt, color: Colors.grey, size: 16),
+                    SizedBox(width: 8),
+                    Text('Sort Newest First'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem<String>(
+                  value: 'clear',
+                  child: Row(
+                    children: [
+                      Icon(Icons.cancel, color: Colors.grey, size: 16),
+                      SizedBox(width: 8),
+                      Text('Clear Filters'),
+                    ],
+                  )),
+            ],
           ),
         ],
       ),
@@ -50,10 +70,14 @@ class ProductListScreen extends StatelessWidget {
         }
       }),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: primaryColor,
         onPressed: () {
           Get.toNamed(Routes.addProductScreen);
         },
-        child: Icon(Icons.add),
+        child: Icon(
+          Icons.add,
+          color: white,
+        ),
       ),
     );
   }
@@ -132,13 +156,13 @@ class ProductListScreen extends StatelessWidget {
           ),
         ),
         IconButton(
-          icon: Icon(Icons.edit, color: Colors.blue),
+          icon: Icon(Icons.edit_outlined, color: primaryColor),
           onPressed: () {
             Get.toNamed(Routes.addProductScreen, arguments: product);
           },
         ),
         IconButton(
-            icon: Icon(Icons.delete, color: Colors.red),
+            icon: Icon(Icons.delete_outline, color: primaryColor),
             onPressed: () {
               controller.deleteProduct(product.id);
             }),
