@@ -25,9 +25,18 @@ class ProductListController extends GetxController {
       var response = await dioClient.dio
           .get('${Apis.baseUrl}/products?salon_id=${loginUser!.salonId}');
       if (response.statusCode == 200) {
-        var products = productFromJson(jsonEncode(response.data));
-        productList.assignAll(products);
-        _allProducts = products;
+        // The response has structure: {"message": "...", "data": [...]}
+        var responseData = response.data;
+        if (responseData is Map && responseData.containsKey('data')) {
+          var products = productFromJson(jsonEncode(responseData['data']));
+          productList.assignAll(products);
+          _allProducts = products;
+        } else {
+          // Fallback: try to parse as direct array
+          var products = productFromJson(jsonEncode(responseData));
+          productList.assignAll(products);
+          _allProducts = products;
+        }
       }
     } finally {
       isLoading(false);

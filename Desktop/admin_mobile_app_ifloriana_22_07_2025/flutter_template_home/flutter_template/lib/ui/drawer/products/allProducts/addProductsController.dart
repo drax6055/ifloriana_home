@@ -1,12 +1,14 @@
 import 'dart:io';
 
-// import 'package:dio/dio.dart' as dio;
+import 'package:dio/dio.dart' as dio;
 import 'package:flutter/material.dart';
 import 'package:flutter_template/main.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:barcode_scan2/barcode_scan2.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:multi_dropdown/multi_dropdown.dart';
 
 import 'package:flutter_template/ui/drawer/products/product_list/product_list_controller.dart';
 import 'package:flutter_template/ui/drawer/products/product_list/product_list_model.dart';
@@ -26,6 +28,18 @@ class Branch {
       name: json['name'],
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Branch && other.id == id;
+  }
+
+  @override
+  int get hashCode => id.hashCode;
+
+  @override
+  String toString() => 'Branch(id: $id, name: $name)';
 }
 
 class Brand {
@@ -118,7 +132,8 @@ class AddProductController extends GetxController {
   String? productId;
 
   var branchList = <Branch>[].obs;
-  var selectedBranch = Rx<Branch?>(null);
+  var selectedBranches = <Branch>[].obs;
+  final branchController = MultiSelectController<Branch>();
   var selectedCategory = Rx<Category?>(null);
   var categoryList = <Category>[].obs;
   var tagList = <Tag>[].obs;
@@ -135,6 +150,8 @@ class AddProductController extends GetxController {
   final productNameController = TextEditingController();
   final descriptionController = TextEditingController();
   final Rx<File?> imageFile = Rx(null);
+  // Holds existing image url when editing
+  final RxString editImageUrl = ''.obs;
 
   final selectedBrand = Rx<Brand?>(null);
 
@@ -178,6 +195,12 @@ class AddProductController extends GetxController {
     });
   }
 
+  @override
+  void onClose() {
+    branchController.dispose();
+    super.onClose();
+  }
+
   void _initialize() async {
     await _fetchAllDropdownData();
     if (isEditMode.value) {
@@ -212,11 +235,34 @@ class AddProductController extends GetxController {
 
   Future<void> getBranches(String salonId) async {
     try {
+      print('Fetching branches for salon: $salonId');
       final response = await dioClient.getData(
-          '${Apis.baseUrl}${Endpoints.getBranchName}$salonId', (json) => json);
+          '${Apis.baseUrl}${Endpoints.getBranches}$salonId', (json) => json);
+      print('Branches response: $response');
       final data = response['data'] as List;
+      print('Branches data: $data');
       branchList.value = data.map((e) => Branch.fromJson(e)).toList();
+      print('Branch list length: ${branchList.length}');
+      print(
+          'First branch: ${branchList.isNotEmpty ? branchList.first.name : 'No branches'}');
+
+      // Debug controller state
+      print('Branch controller items count: ${branchController.items.length}');
+      print(
+          'Branch controller selected items: ${branchController.selectedItems.length}');
+
+      // Try to set items in controller
+      try {
+        branchController.setItems(branchList.value
+            .map((branch) =>
+                DropdownItem(label: branch.name ?? 'Unknown', value: branch))
+            .toList());
+        print('Successfully set items in branch controller');
+      } catch (e) {
+        print('Error setting items in branch controller: $e');
+      }
     } catch (e) {
+      print('Error fetching branches: $e');
       CustomSnackbar.showError('Error', 'Failed to get branches: $e');
     }
   }
@@ -265,12 +311,54 @@ class AddProductController extends GetxController {
     }
   }
 
-  void pickImage() async {
+  Future<void> pickImage() async {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      imageFile.value = File(pickedFile.path);
+      final file = File(pickedFile.path);
+      final mimeType = _getMimeType(file.path);
+      if (mimeType == null) {
+        CustomSnackbar.showError(
+            'Invalid Image', 'Only JPG, JPEG, PNG images are allowed!');
+        return;
+      }
+      // 150 KB size limit to keep parity with other modules
+      const maxSizeInBytes = 150 * 1024;
+      if (await file.length() > maxSizeInBytes) {
+        CustomSnackbar.showError('Error', 'Image size must be < 150KB');
+        return;
+      }
+      editImageUrl.value = '';
+      imageFile.value = file;
     }
+  }
+
+  Future<void> pickImageFromCamera() async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      final file = File(pickedFile.path);
+      final mimeType = _getMimeType(file.path);
+      if (mimeType == null) {
+        CustomSnackbar.showError(
+            'Invalid Image', 'Only JPG, JPEG, PNG images are allowed!');
+        return;
+      }
+      const maxSizeInBytes = 150 * 1024;
+      if (await file.length() > maxSizeInBytes) {
+        CustomSnackbar.showError('Error', 'Image size must be < 150KB');
+        return;
+      }
+      editImageUrl.value = '';
+      imageFile.value = file;
+    }
+  }
+
+  String? _getMimeType(String path) {
+    final lower = path.toLowerCase();
+    if (lower.endsWith('.jpg') || lower.endsWith('.jpeg')) return 'image/jpeg';
+    if (lower.endsWith('.png')) return 'image/png';
+    return null;
   }
 
   void addVariationGroup() {
@@ -357,8 +445,15 @@ class AddProductController extends GetxController {
         unitList.firstWhereOrNull((u) => u.id == product.unitId?.id);
 
     if (product.branchId.isNotEmpty) {
-      selectedBranch.value =
-          branchList.firstWhereOrNull((b) => b.id == product.branchId.first.id);
+      final branches = branchList
+          .where((b) => product.branchId.any((branch) => branch.id == b.id))
+          .toList();
+      selectedBranches.value = branches;
+      // Initialize branch controller with selected branches
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        branchController.selectWhere((item) =>
+            selectedBranches.any((branch) => branch.id == item.value.id));
+      });
     }
 
     hasVariations.value = product.hasVariations == 1;
@@ -380,6 +475,8 @@ class AddProductController extends GetxController {
     //   startDate.value = discount.startDate;
     //   endDate.value = discount.endDate;
     // }
+    // Image: keep existing network image
+    editImageUrl.value = product.imageUrl ?? '';
   }
 
   void saveProduct() async {
@@ -399,8 +496,8 @@ class AddProductController extends GetxController {
     isLoading.value = true;
     try {
       final loginUser = await prefs.getUser();
-      final Map<String, dynamic> payload = {
-        'branch_id': [selectedBranch.value!.id],
+      final Map<String, dynamic> fields = {
+        'branch_id': selectedBranches.map((branch) => branch.id).toList(),
         'product_name': productNameController.text,
         'description': descriptionController.text,
         'brand_id': selectedBrand.value!.id,
@@ -413,11 +510,11 @@ class AddProductController extends GetxController {
       };
 
       if (hasVariations.value) {
-        payload['variation_id'] = variationGroups
+        fields['variation_id'] = variationGroups
             .where((g) => g.selectedType.value != null)
             .map((g) => g.selectedType.value!.id)
             .toList();
-        payload['variants'] = generatedVariants.map((variant) {
+        fields['variants'] = generatedVariants.map((variant) {
           return {
             'combination': variant.combination.entries
                 .map((e) => {
@@ -432,28 +529,32 @@ class AddProductController extends GetxController {
           };
         }).toList();
       } else {
-        payload['price'] = double.tryParse(priceController.text) ?? 0;
-        payload['stock'] = int.tryParse(stockController.text) ?? 0;
-        payload['sku'] = skuController.text;
-        payload['code'] = codeController.text;
+        fields['price'] = double.tryParse(priceController.text) ?? 0;
+        fields['stock'] = int.tryParse(stockController.text) ?? 0;
+        fields['sku'] = skuController.text;
+        fields['code'] = codeController.text;
       }
 
-      // Removed product_discount from payload
-      // if (discountAmountController.text.isNotEmpty) {
-      //   payload['product_discount'] = {
-      //     'type': discountType.value,
-      //     'start_date': startDate.value?.toIso8601String(),
-      //     'end_date': endDate.value?.toIso8601String(),
-      //     'discount_amount':
-      //         double.tryParse(discountAmountController.text) ?? 0,
-      //   };
-      // }
+      // Prepare FormData for multipart
+      final Map<String, dynamic> formMap = Map<String, dynamic>.from(fields);
+      if (imageFile.value != null) {
+        final mimeType = _getMimeType(imageFile.value!.path) ?? 'image/jpeg';
+        final parts = mimeType.split('/');
+        formMap['image'] = await dio.MultipartFile.fromFile(
+          imageFile.value!.path,
+          filename: imageFile.value!.path.split(Platform.pathSeparator).last,
+          contentType: MediaType(parts[0], parts[1]),
+        );
+      }
 
-      // Sending data as raw JSON using patchData
-      await dioClient.putData(
+      final formData = dio.FormData.fromMap(formMap);
+
+      await dioClient.dio.put(
         '${Apis.baseUrl}${Endpoints.uploadProducts}/$productId',
-        payload,
-        (json) => json,
+        data: formData,
+        options: dio.Options(headers: {
+          'Content-Type': 'multipart/form-data',
+        }),
       );
 
       CustomSnackbar.showSuccess("Success", "Product updated successfully!");
@@ -478,7 +579,7 @@ class AddProductController extends GetxController {
       final loginUser = await prefs.getUser();
 
       // Ensure all required fields are present
-      if (selectedBranch.value == null ||
+      if (selectedBranches.isEmpty ||
           selectedBrand.value == null ||
           selectedCategory.value == null ||
           selectedUnit.value == null ||
@@ -492,8 +593,8 @@ class AddProductController extends GetxController {
         return;
       }
 
-      final Map<String, dynamic> payload = {
-        'branch_id': [selectedBranch.value!.id],
+      final Map<String, dynamic> fields = {
+        'branch_id': selectedBranches.map((branch) => branch.id).toList(),
         'product_name': productNameController.text,
         'description': descriptionController.text,
         'brand_id': selectedBrand.value!.id,
@@ -517,12 +618,12 @@ class AddProductController extends GetxController {
       // }
 
       if (hasVariations.value) {
-        payload['variation_id'] = variationGroups
+        fields['variation_id'] = variationGroups
             .where((g) => g.selectedType.value != null)
             .map((g) => g.selectedType.value!.id)
             .toList();
 
-        payload['variants'] = generatedVariants.map((variant) {
+        fields['variants'] = generatedVariants.map((variant) {
           return {
             'combination': variant.combination.entries
                 .map((e) => {
@@ -537,18 +638,32 @@ class AddProductController extends GetxController {
           };
         }).toList();
       } else {
-        payload['price'] = double.tryParse(priceController.text) ?? 0;
-        payload['stock'] = int.tryParse(stockController.text) ?? 0;
-        payload['sku'] = skuController.text;
-        payload['code'] = codeController.text;
+        fields['price'] = double.tryParse(priceController.text) ?? 0;
+        fields['stock'] = int.tryParse(stockController.text) ?? 0;
+        fields['sku'] = skuController.text;
+        fields['code'] = codeController.text;
       }
 
-      print('Payload: ' + payload.toString());
+      // Build multipart
+      final Map<String, dynamic> formMap = Map<String, dynamic>.from(fields);
+      if (imageFile.value != null) {
+        final mimeType = _getMimeType(imageFile.value!.path) ?? 'image/jpeg';
+        final parts = mimeType.split('/');
+        formMap['image'] = await dio.MultipartFile.fromFile(
+          imageFile.value!.path,
+          filename: imageFile.value!.path.split(Platform.pathSeparator).last,
+          contentType: MediaType(parts[0], parts[1]),
+        );
+      }
 
-      await dioClient.postData(
+      final formData = dio.FormData.fromMap(formMap);
+
+      await dioClient.dio.post(
         '${Apis.baseUrl}${Endpoints.uploadProducts}',
-        payload,
-        (json) => json,
+        data: formData,
+        options: dio.Options(headers: {
+          'Content-Type': 'multipart/form-data',
+        }),
       );
 
       // Clear all controllers and reset fields
@@ -563,7 +678,8 @@ class AddProductController extends GetxController {
       selectedCategory.value = null;
       selectedUnit.value = null;
       selectedTag.value = null;
-      selectedBranch.value = null;
+      selectedBranches.clear();
+      branchController.clearAll();
       hasVariations.value = false;
       status.value = 'active';
       variationGroups.clear();

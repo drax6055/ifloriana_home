@@ -6,6 +6,7 @@ import 'dart:math';
 import 'product_list_controller.dart';
 import 'product_list_model.dart';
 import 'update_stock_sheet.dart';
+import '../../../../network/network_const.dart';
 
 class ProductListScreen extends StatelessWidget {
   final ProductListController controller = Get.put(ProductListController());
@@ -209,10 +210,25 @@ class _ProductListItem extends StatelessWidget {
   Widget _buildProductInfo() {
     return Row(
       children: [
-        CircleAvatar(
-          backgroundColor: Colors.amberAccent,
-          // backgroundImage: NetworkImage(product.image),
-          radius: 20,
+        ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: SizedBox(
+            width: 40,
+            height: 40,
+            child: product.imageUrl != null && product.imageUrl!.isNotEmpty
+                ? Image.network(
+                    '${Apis.pdfUrl}${product.imageUrl}?v=${DateTime.now().millisecondsSinceEpoch}',
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stack) => Container(
+                      color: Colors.grey.shade300,
+                      child: const Icon(Icons.image_not_supported, size: 20),
+                    ),
+                  )
+                : Container(
+                    color: Colors.grey.shade200,
+                    child: const Icon(Icons.image, size: 20),
+                  ),
+          ),
         ),
         SizedBox(width: 8),
         Expanded(

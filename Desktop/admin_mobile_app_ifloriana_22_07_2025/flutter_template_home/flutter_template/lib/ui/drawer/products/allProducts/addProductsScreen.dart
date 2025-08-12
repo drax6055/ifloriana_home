@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_template/ui/drawer/products/allProducts/addProductsController.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
+import 'package:multi_dropdown/multi_dropdown.dart';
 import '../../../../wiget/custome_snackbar.dart';
+import '../../../../network/network_const.dart';
+import '../../../../wiget/Custome_textfield.dart';
 
 class AddProductScreen extends StatelessWidget {
   const AddProductScreen({super.key});
@@ -16,6 +18,13 @@ class AddProductScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(isEditMode ? 'Update Product' : 'Add Product'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.image),
+            tooltip: 'Pick Image',
+            onPressed: () => controller.pickImage(),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -24,19 +33,17 @@ class AddProductScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // _buildImagePicker(controller),
+              _buildImagePicker(controller),
               const SizedBox(height: 16),
-              TextFormField(
+              CustomTextFormField(
                 controller: controller.productNameController,
-                decoration: const InputDecoration(
-                    labelText: 'Product Name *', border: OutlineInputBorder()),
-                validator: (v) => v!.isEmpty ? 'Required' : null,
+                labelText: 'Product Name *',
+                validator: (v) => v == null || v.isEmpty ? 'Required' : null,
               ),
               const SizedBox(height: 12),
-              TextFormField(
+              CustomTextFormField(
                 controller: controller.descriptionController,
-                decoration: const InputDecoration(
-                    labelText: 'Description', border: OutlineInputBorder()),
+                labelText: 'Description',
                 maxLines: 3,
               ),
               const SizedBox(height: 16),
@@ -80,29 +87,124 @@ class AddProductScreen extends StatelessWidget {
     return Center(
       child: Column(
         children: [
-          Obx(() => Container(
+          Obx(() {
+            final hasPicked = controller.imageFile.value != null;
+            final hasNetwork = controller.editImageUrl.value.isNotEmpty;
+            return GestureDetector(
+              onTap: () {
+                Get.bottomSheet(
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(16)),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          leading: const Icon(Icons.photo_library),
+                          title: const Text('Choose from Gallery'),
+                          onTap: () async {
+                            Get.back();
+                            await controller.pickImage();
+                          },
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.camera_alt),
+                          title: const Text('Take Photo'),
+                          onTap: () async {
+                            Get.back();
+                            await controller.pickImageFromCamera();
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  isScrollControlled: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(16)),
+                  ),
+                );
+              },
+              child: Container(
                 height: 120,
                 width: 120,
                 decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey),
                     borderRadius: BorderRadius.circular(8),
                     color: Colors.grey.shade200),
-                child: controller.imageFile.value != null
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.file(controller.imageFile.value!,
-                            fit: BoxFit.cover))
-                    : const Icon(Icons.image, size: 50, color: Colors.grey),
-              )),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: hasPicked
+                      ? Image.file(controller.imageFile.value!,
+                          fit: BoxFit.cover)
+                      : hasNetwork
+                          ? Image.network(
+                              '${Apis.pdfUrl}${controller.editImageUrl.value}?v=${DateTime.now().millisecondsSinceEpoch}',
+                              fit: BoxFit.cover,
+                              errorBuilder: (c, e, s) => const Icon(Icons.image,
+                                  size: 50, color: Colors.grey),
+                            )
+                          : const Icon(Icons.image,
+                              size: 50, color: Colors.grey),
+                ),
+              ),
+            );
+          }),
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton(
-                  onPressed: controller.pickImage, child: const Text('Upload')),
+                onPressed: () {
+                  Get.bottomSheet(
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(16)),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ListTile(
+                            leading: const Icon(Icons.photo_library),
+                            title: const Text('Choose from Gallery'),
+                            onTap: () async {
+                              Get.back();
+                              await controller.pickImage();
+                            },
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.camera_alt),
+                            title: const Text('Take Photo'),
+                            onTap: () async {
+                              Get.back();
+                              await controller.pickImageFromCamera();
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    isScrollControlled: true,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(16)),
+                    ),
+                  );
+                },
+                child: const Text('Upload'),
+              ),
               const SizedBox(width: 8),
               TextButton(
-                onPressed: () => controller.imageFile.value = null,
+                onPressed: () {
+                  controller.imageFile.value = null;
+                  controller.editImageUrl.value = '';
+                },
                 child:
                     const Text('Remove', style: TextStyle(color: Colors.red)),
               ),
@@ -171,17 +273,48 @@ class AddProductScreen extends StatelessWidget {
   }
 
   Widget _buildBranchDropdown(AddProductController controller) {
-    return Obx(() => DropdownButtonFormField<Branch>(
-          value: controller.selectedBranch.value,
-          decoration: const InputDecoration(
-              labelText: 'Branch *', border: OutlineInputBorder()),
-          items: controller.branchList
-              .map((item) =>
-                  DropdownMenuItem(value: item, child: Text(item.name ?? '')))
-              .toList(),
-          onChanged: (v) => controller.selectedBranch.value = v,
-          validator: (v) => v == null ? 'Required' : null,
-        ));
+    return Obx(() {
+      return MultiDropdown<Branch>(
+        items: controller.branchList
+            .map((branch) => DropdownItem(
+                  label: branch.name ?? 'Unknown',
+                  value: branch,
+                ))
+            .toList(),
+        controller: controller.branchController,
+        enabled: true,
+        searchEnabled: true,
+        chipDecoration: const ChipDecoration(
+          backgroundColor: Colors.blue,
+          wrap: true,
+          runSpacing: 2,
+          spacing: 10,
+        ),
+        fieldDecoration: const FieldDecoration(
+          hintText: 'Select Branches *',
+          showClearIcon: true,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+            borderSide: BorderSide(color: Colors.grey, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+            borderSide: BorderSide(color: Colors.blue, width: 2.0),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+            borderSide: BorderSide(color: Colors.red, width: 1.0),
+          ),
+        ),
+        dropdownItemDecoration: DropdownItemDecoration(
+          selectedIcon: const Icon(Icons.check_box, color: Colors.blue),
+          disabledIcon: Icon(Icons.lock, color: Colors.grey.shade300),
+        ),
+        onSelectionChange: (selectedItems) {
+          controller.selectedBranches.value = selectedItems;
+        },
+      );
+    });
   }
 
   Widget _buildSectionTitle(TextTheme theme, String title) {
@@ -231,38 +364,35 @@ class AddProductScreen extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-              child: TextFormField(
+              child: CustomTextFormField(
                   controller: controller.priceController,
-                  decoration: const InputDecoration(
-                      labelText: 'Price *', border: OutlineInputBorder()),
+                  labelText: 'Price *',
                   keyboardType: TextInputType.number,
-                  validator: (v) => v!.isEmpty ? 'Required' : null)),
+                  validator: (v) =>
+                      v == null || v.isEmpty ? 'Required' : null)),
           const SizedBox(width: 8),
           Expanded(
-              child: TextFormField(
+              child: CustomTextFormField(
                   controller: controller.stockController,
-                  decoration: const InputDecoration(
-                      labelText: 'Stock *', border: OutlineInputBorder()),
+                  labelText: 'Stock *',
                   keyboardType: TextInputType.number,
-                  validator: (v) => v!.isEmpty ? 'Required' : null)),
+                  validator: (v) =>
+                      v == null || v.isEmpty ? 'Required' : null)),
           const SizedBox(width: 8),
           Expanded(
-              child: TextFormField(
+              child: CustomTextFormField(
             controller: controller.skuController,
-            decoration: const InputDecoration(
-              labelText: 'SKU',
-              border: OutlineInputBorder(),
-              suffixIcon: Icon(Icons.qr_code_scanner),
+            labelText: 'SKU',
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.qr_code_scanner),
+              onPressed: () => controller.scanBarcodeForSku(),
+              tooltip: 'Scan barcode',
             ),
-            readOnly: true,
-            onTap: () => controller.scanBarcodeForSku(),
           )),
           const SizedBox(width: 8),
           Expanded(
-              child: TextFormField(
-                  controller: controller.codeController,
-                  decoration: const InputDecoration(
-                      labelText: 'Code', border: OutlineInputBorder()))),
+              child: CustomTextFormField(
+                  controller: controller.codeController, labelText: 'Code')),
         ],
       ),
     );

@@ -1,7 +1,16 @@
 import 'dart:convert';
 
-List<Product> productFromJson(String str) =>
-    List<Product>.from(json.decode(str).map((x) => Product.fromJson(x)));
+List<Product> productFromJson(String str) {
+  final decoded = json.decode(str);
+  if (decoded is List) {
+    return List<Product>.from(decoded.map((x) => Product.fromJson(x)));
+  }
+  if (decoded is Map && decoded['data'] is List) {
+    final data = decoded['data'] as List;
+    return List<Product>.from(data.map((x) => Product.fromJson(x)));
+  }
+  return [];
+}
 
 String productToJson(List<Product> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
@@ -9,7 +18,7 @@ String productToJson(List<Product> data) =>
 class Product {
   String id;
   List<BranchId> branchId;
-  // String image;
+  ProductImage? image;
   String productName;
   String description;
   Brand? brandId;
@@ -26,11 +35,12 @@ class Product {
   String? sku;
   String? code;
   ProductDiscount? productDiscount;
+  String? imageUrl;
 
   Product({
     required this.id,
     required this.branchId,
-    // required this.image,
+    this.image,
     required this.productName,
     required this.description,
     this.brandId,
@@ -47,13 +57,15 @@ class Product {
     this.sku,
     this.code,
     this.productDiscount,
+    this.imageUrl,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) => Product(
         id: json["_id"],
         branchId: List<BranchId>.from(
             json["branch_id"].map((x) => BranchId.fromJson(x))),
-        // image: json["image"],
+        image:
+            json["image"] == null ? null : ProductImage.fromJson(json["image"]),
         productName: json["product_name"],
         description: json["description"],
         brandId:
@@ -77,12 +89,13 @@ class Product {
         productDiscount: json["product_discount"] == null
             ? null
             : ProductDiscount.fromJson(json["product_discount"]),
+        imageUrl: json["image_url"],
       );
 
   Map<String, dynamic> toJson() => {
         "_id": id,
         "branch_id": List<dynamic>.from(branchId.map((x) => x.toJson())),
-        // "image": image,
+        "image": image?.toJson(),
         "product_name": productName,
         "description": description,
         "brand_id": brandId?.toJson(),
@@ -99,17 +112,46 @@ class Product {
         "sku": sku,
         "code": code,
         "product_discount": productDiscount?.toJson(),
+        "image_url": imageUrl,
+      };
+}
+
+class ProductImage {
+  String data;
+  String contentType;
+  String originalName;
+  String extension;
+
+  ProductImage({
+    required this.data,
+    required this.contentType,
+    required this.originalName,
+    required this.extension,
+  });
+
+  factory ProductImage.fromJson(Map<String, dynamic> json) => ProductImage(
+        data: json["data"],
+        contentType: json["contentType"],
+        originalName: json["originalName"],
+        extension: json["extension"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "data": data,
+        "contentType": contentType,
+        "originalName": originalName,
+        "extension": extension,
       };
 }
 
 class ProductDiscount {
-  String type;
+  String discountType;
   DateTime? startDate;
   DateTime? endDate;
-  double discountAmount;
+  String discountAmount;
 
   ProductDiscount({
-    required this.type,
+    required this.discountType,
     this.startDate,
     this.endDate,
     required this.discountAmount,
@@ -117,17 +159,17 @@ class ProductDiscount {
 
   factory ProductDiscount.fromJson(Map<String, dynamic> json) =>
       ProductDiscount(
-        type: json["type"],
+        discountType: json["discount_type"],
         startDate: json["start_date"] == null
             ? null
             : DateTime.parse(json["start_date"]),
         endDate:
             json["end_date"] == null ? null : DateTime.parse(json["end_date"]),
-        discountAmount: json["discount_amount"]?.toDouble(),
+        discountAmount: json["discount_amount"],
       );
 
   Map<String, dynamic> toJson() => {
-        "type": type,
+        "discount_type": discountType,
         "start_date": startDate?.toIso8601String(),
         "end_date": endDate?.toIso8601String(),
         "discount_amount": discountAmount,
@@ -159,6 +201,7 @@ class BranchId {
   DateTime createdAt;
   DateTime updatedAt;
   int v;
+  String? imageUrl;
 
   BranchId({
     required this.id,
@@ -185,6 +228,7 @@ class BranchId {
     required this.createdAt,
     required this.updatedAt,
     required this.v,
+    this.imageUrl,
   });
 
   factory BranchId.fromJson(Map<String, dynamic> json) => BranchId(
@@ -212,6 +256,7 @@ class BranchId {
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
         v: json["__v"],
+        imageUrl: json["image_url"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -239,6 +284,7 @@ class BranchId {
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),
         "__v": v,
+        "image_url": imageUrl,
       };
 }
 
@@ -252,6 +298,7 @@ class Brand {
   DateTime createdAt;
   DateTime updatedAt;
   int v;
+  String? imageUrl;
 
   Brand({
     required this.id,
@@ -263,6 +310,7 @@ class Brand {
     required this.createdAt,
     required this.updatedAt,
     required this.v,
+    this.imageUrl,
   });
 
   factory Brand.fromJson(Map<String, dynamic> json) => Brand(
