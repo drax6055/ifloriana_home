@@ -162,7 +162,10 @@ class Postbranchesscreen extends StatelessWidget {
               //     ),
               //   ],
               // ),
-              Btn_addBranch()
+              Btn_addBranch(),
+              SizedBox(
+                height: 10.h,
+              )
             ],
           ),
         ),

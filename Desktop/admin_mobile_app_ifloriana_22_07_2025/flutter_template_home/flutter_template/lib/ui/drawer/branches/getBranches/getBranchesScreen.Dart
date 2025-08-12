@@ -8,6 +8,7 @@ import 'edit_branch_screen.dart';
 import 'getBranchesController.dart';
 import 'package:flutter_template/wiget/loading.dart';
 import 'package:flutter_template/route/app_route.dart';
+import 'package:flutter_template/wiget/appbar/commen_appbar.dart';
 
 class GetBranchesScreen extends StatelessWidget {
   const GetBranchesScreen({super.key});
@@ -20,8 +21,8 @@ class GetBranchesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final Getbranchescontroller getController = Get.put(Getbranchescontroller());
 
-    return SafeArea(
-      child: Scaffold(
+    return  Scaffold(
+      appBar: CustomAppBar(title: 'Branches'),
         body: Obx(() {
           if (getController.isLoading.value) {
             return const Center(child: CustomLoadingAvatar());
@@ -184,7 +185,6 @@ class GetBranchesScreen extends StatelessWidget {
         child: Icon(Icons.add ,color: white),
         backgroundColor: primaryColor,
       ),
-      ),
-    );
+      );
   }
 }

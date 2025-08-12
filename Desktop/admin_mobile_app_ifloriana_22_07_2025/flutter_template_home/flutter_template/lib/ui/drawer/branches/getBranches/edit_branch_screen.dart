@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../../../network/model/branch_model.dart';
+import '../../../../wiget/Custome_button.dart';
+import '../../../../wiget/appbar/commen_appbar.dart';
 import 'getBranchesController.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../network/network_const.dart';
@@ -177,15 +179,16 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: CustomAppBar(title: 'Edit Branch'),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.r),
         child: Form(
           key: _formKey,
           child: Column(
             spacing: 10,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(width: 70.w, child: _imagePickerTile()),
+              SizedBox(width: 80.w, child: _imagePickerTile()),
               CustomTextFormField(
                 controller: _nameController,
                 labelText: 'Branch Name',
@@ -354,19 +357,25 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
                 },
               ),
               // SizedBox(height: 32.h),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _updateBranch,
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 16.h),
-                  ),
-                  child: Text(
-                    'Update Branch',
-                    style: TextStyle(fontSize: 16.sp),
-                  ),
-                ),
+              ElevatedButtonExample(
+                text: "Update Branch",
+                onPressed: () {
+                  _updateBranch();
+                },
               ),
+              // SizedBox(
+              //   width: double.infinity,
+              //   child: ElevatedButton(
+              //     onPressed: _updateBranch,
+              //     style: ElevatedButton.styleFrom(
+              //       padding: EdgeInsets.symmetric(vertical: 16.h),
+              //     ),
+              //     child: Text(
+              //       'Update Branch',
+              //       style: TextStyle(fontSize: 16.sp),
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         ),
@@ -476,8 +485,9 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
         height: 120,
         width: double.infinity,
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade400),
+          border: Border.all(color: primaryColor),
           borderRadius: BorderRadius.circular(10.r),
+          color: secondaryColor.withOpacity(0.2),
         ),
         alignment: Alignment.center,
         child: _pickedImage != null
@@ -500,7 +510,8 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
                       width: double.infinity,
                     ),
                   )
-                : const Icon(Icons.image, size: 40),
+                : const Icon(Icons.image_rounded,
+                    color: primaryColor, size: 30),
       ),
     );
   }
