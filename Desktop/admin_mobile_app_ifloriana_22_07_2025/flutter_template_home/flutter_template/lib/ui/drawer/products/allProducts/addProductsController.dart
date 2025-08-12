@@ -114,6 +114,8 @@ class Variation {
 class VariationGroup {
   Rx<Variation?> selectedType = Rx(null);
   RxList<String> selectedValues = <String>[].obs;
+  final MultiSelectController<String> valuesController =
+      MultiSelectController<String>();
 }
 
 class GeneratedVariant {
@@ -198,6 +200,10 @@ class AddProductController extends GetxController {
   @override
   void onClose() {
     branchController.dispose();
+    // Dispose variation group controllers
+    for (var group in variationGroups) {
+      group.valuesController.dispose();
+    }
     super.onClose();
   }
 
@@ -372,6 +378,12 @@ class AddProductController extends GetxController {
 
   void onVariationValuesChanged(int groupIndex, List<String> values) {
     variationGroups[groupIndex].selectedValues.value = values;
+    // Update the MultiSelectController to reflect the selected values
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      variationGroups[groupIndex].valuesController.selectWhere(
+            (item) => values.contains(item.value),
+          );
+    });
     _generateVariants();
   }
 
@@ -464,7 +476,60 @@ class AddProductController extends GetxController {
       skuController.text = product.sku ?? '';
       codeController.text = product.code ?? '';
     } else {
-      // TODO: Handle population of variation fields
+      // Handle population of variation fields
+      if (product.variationId.isNotEmpty) {
+        // Clear existing variation groups
+        variationGroups.clear();
+
+        // Create variation groups based on product data
+        for (var variation in product.variationId) {
+          final variationGroup = VariationGroup();
+          variationGroup.selectedType.value = variationList.firstWhereOrNull(
+            (v) => v.id == variation.id,
+          );
+
+          // Add the variation group first
+          variationGroups.add(variationGroup);
+
+          // Populate the values after the group is added
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (variation.values.isNotEmpty) {
+              variationGroup.selectedValues.value = variation.values;
+              variationGroup.valuesController.selectWhere(
+                (item) => variation.values.contains(item.value),
+              );
+            }
+          });
+        }
+      }
+
+      // Populate variant data if available
+      if (product.variants.isNotEmpty) {
+        generatedVariants.clear();
+        for (var variant in product.variants) {
+          final generatedVariant = GeneratedVariant(
+            combination: Map.fromEntries(
+              variant.combination
+                  .map((c) => MapEntry(c.variationType, c.variationValue)),
+            ),
+          );
+
+          if (variant.price != null) {
+            generatedVariant.priceController.text = variant.price.toString();
+          }
+          if (variant.stock != null) {
+            generatedVariant.stockController.text = variant.stock.toString();
+          }
+          if (variant.sku != null) {
+            generatedVariant.skuController.text = variant.sku;
+          }
+          if (variant.code != null) {
+            generatedVariant.codeController.text = variant.code;
+          }
+
+          generatedVariants.add(generatedVariant);
+        }
+      }
     }
 
     // Removed discount population logic
