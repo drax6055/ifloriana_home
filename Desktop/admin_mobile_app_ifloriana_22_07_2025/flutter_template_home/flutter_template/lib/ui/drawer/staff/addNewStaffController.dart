@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_template/main.dart';
 import 'package:flutter_template/network/network_const.dart';
@@ -5,6 +6,9 @@ import 'package:flutter_template/wiget/custome_snackbar.dart';
 import 'package:get/get.dart';
 import 'package:multi_dropdown/multi_dropdown.dart';
 import 'package:flutter_template/ui/drawer/staff/staffDetailsController.dart';
+import 'package:dio/dio.dart' as dio;
+import 'package:http_parser/http_parser.dart';
+import 'package:image_picker/image_picker.dart';
 
 class Service {
   String? id;
@@ -207,6 +211,12 @@ class Addnewstaffcontroller extends GetxController {
           .toList(),
     );
 
+    // Initialize service controller with selected services
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      serviceController.selectWhere((item) =>
+          selectedServices.any((service) => service.id == item.value.id));
+    });
+
     if (commitionList.isNotEmpty) {
       final commiison = commitionList.firstWhere(
         (b) => b.id == staff.commissionId?.sId,
@@ -221,34 +231,54 @@ class Addnewstaffcontroller extends GetxController {
   }
 
   Future onUpdateStaffPress() async {
-    final Map<String, dynamic> updateStaffData = {
-      'full_name': fullnameController.text,
-      'email': emailController.text,
-      'phone_number': phoneController.text,
-      'gender': selectedGender.value.toLowerCase(),
-      'branch_id': selectedBranch.value?.id,
-      'service_id': selectedServices.map((s) => s.id).toList(),
-      'status': 1,
-      'specialization': specializationController.text,
-      'assigned_commission_id': selectedCommitionId.value?.id,
-      'salon_id': (await prefs.getUser())?.salonId,
-      'assign_time': {
-        'start_shift': shiftStarttimeController.text,
-        'end_shift': shiftEndtimeController.text,
-      },
-      'lunch_time': {
-        'duration': int.tryParse(durationController.text) ?? 0,
-        'timing': LunchStarttimeController.text,
-      },
-    };
-    if (singleImage.value != null) {
-      updateStaffData['image'] = singleImage.value;
-    }
+    final loginUser = await prefs.getUser();
     try {
-      await dioClient.putData(
+      // Build map with all non-file fields
+      Map<String, dynamic> staffData = {
+        'full_name': fullnameController.text,
+        'email': emailController.text,
+        'phone_number': phoneController.text,
+        'gender': selectedGender.value.toLowerCase(),
+        'branch_id': selectedBranch.value?.id,
+        'service_id': selectedServices.map((s) => s.id).toList(),
+        'status': 1,
+        'specialization': specializationController.text,
+        'assigned_commission_id': selectedCommitionId.value?.id,
+        'salon_id': loginUser!.salonId,
+        'assign_time': {
+          'start_shift': shiftStarttimeController.text,
+          'end_shift': shiftEndtimeController.text,
+        },
+        'lunch_time': {
+          'duration': int.tryParse(durationController.text) ?? 0,
+          'timing': LunchStarttimeController.text,
+        },
+      };
+
+      // Attach image if selected and it's a File
+      if (singleImage.value != null && singleImage.value is File) {
+        final mimeType = _getMimeType(singleImage.value!.path);
+        if (mimeType == null) {
+          CustomSnackbar.showError(
+              'Invalid Image', 'Only JPG, JPEG, PNG images are allowed!');
+          return;
+        }
+        final mimeParts = mimeType.split('/');
+        staffData['image'] = await dio.MultipartFile.fromFile(
+          singleImage.value!.path,
+          filename: singleImage.value!.path.split(Platform.pathSeparator).last,
+          contentType: MediaType(mimeParts[0], mimeParts[1]),
+        );
+      }
+
+      final formData = dio.FormData.fromMap(staffData);
+
+      await dioClient.dio.put(
         '${Apis.baseUrl}${Endpoints.postStaffDetails}/$editingStaffId',
-        updateStaffData,
-        (json) => json,
+        data: formData,
+        options: dio.Options(headers: {
+          'Content-Type': 'multipart/form-data',
+        }),
       );
       CustomSnackbar.showSuccess('Success', 'Staff updated successfully');
     } catch (e) {
@@ -257,38 +287,100 @@ class Addnewstaffcontroller extends GetxController {
   }
 
   Future onAddStaffPress() async {
-    Map<String, dynamic> staffData = {
-      'full_name': fullnameController.text,
-      'email': emailController.text,
-      'phone_number': phoneController.text,
-      'gender': selectedGender.value.toLowerCase(),
-      'branch_id': selectedBranch.value?.id,
-      'service_id': selectedServices.map((s) => s.id).toList(),
-      'status': 1,
-      'assigned_commission_id': selectedCommitionId.value!.id,
-      'salon_id': (await prefs.getUser())?.salonId,
-      'image': null,
-      'specialization': specializationController.text,
-      'assign_time': {
-        'start_shift': shiftStarttimeController.text,
-        'end_shift': shiftEndtimeController.text,
-      },
-      'lunch_time': {
-        'duration': int.tryParse(durationController.text) ?? 0,
-        'timing': LunchStarttimeController.text,
-      },
-    };
+    final loginUser = await prefs.getUser();
     try {
-      await dioClient.postData(
+      // Build map with all non-file fields
+      Map<String, dynamic> staffData = {
+        'full_name': fullnameController.text,
+        'email': emailController.text,
+        'phone_number': phoneController.text,
+        'gender': selectedGender.value.toLowerCase(),
+        'branch_id': selectedBranch.value?.id,
+        'service_id': selectedServices.map((s) => s.id).toList(),
+        'status': 1,
+        'assigned_commission_id': selectedCommitionId.value!.id,
+        'salon_id': loginUser!.salonId,
+        'specialization': specializationController.text,
+        'assign_time': {
+          'start_shift': shiftStarttimeController.text,
+          'end_shift': shiftEndtimeController.text,
+        },
+        'lunch_time': {
+          'duration': int.tryParse(durationController.text) ?? 0,
+          'timing': LunchStarttimeController.text,
+        },
+      };
+
+      // Attach image if selected
+      if (singleImage.value != null && singleImage.value is File) {
+        final mimeType = _getMimeType(singleImage.value!.path);
+        if (mimeType == null) {
+          CustomSnackbar.showError(
+              'Invalid Image', 'Only JPG, JPEG, PNG images are allowed!');
+          return;
+        }
+        final mimeParts = mimeType.split('/');
+        staffData['image'] = await dio.MultipartFile.fromFile(
+          singleImage.value!.path,
+          filename: singleImage.value!.path.split(Platform.pathSeparator).last,
+          contentType: MediaType(mimeParts[0], mimeParts[1]),
+        );
+      }
+
+      final formData = dio.FormData.fromMap(staffData);
+
+      await dioClient.dio.post(
         '${Apis.baseUrl}${Endpoints.postStaffDetails}',
-        staffData,
-        (json) => json,
+        data: formData,
+        options: dio.Options(headers: {
+          'Content-Type': 'multipart/form-data',
+        }),
       );
-      print("===> ${staffData.toString()}");
       CustomSnackbar.showSuccess('Success', 'Staff added successfully');
     } catch (e) {
       print('==> Add Staff Error: $e');
       CustomSnackbar.showError('Error', e.toString());
+    }
+  }
+
+  // Image helpers
+  String? _getMimeType(String path) {
+    final ext = path.toLowerCase();
+    if (ext.endsWith('.jpg') || ext.endsWith('.jpeg')) {
+      return 'image/jpeg';
+    } else if (ext.endsWith('.png')) {
+      return 'image/png';
+    }
+    return null;
+  }
+
+  Future<void> pickImageFromGallery() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    await _handlePickedFile(pickedFile);
+  }
+
+  Future<void> pickImageFromCamera() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+    await _handlePickedFile(pickedFile);
+  }
+
+  Future<void> _handlePickedFile(XFile? pickedFile) async {
+    const maxSizeInBytes = 150 * 1024; // 150 KB
+    if (pickedFile != null) {
+      final file = File(pickedFile.path);
+      final mimeType = _getMimeType(pickedFile.path);
+      if (mimeType == null) {
+        CustomSnackbar.showError(
+            'Invalid Image', 'Only JPG, JPEG, PNG images are allowed!');
+        return;
+      }
+      if (await file.length() < maxSizeInBytes) {
+        singleImage.value = file;
+      } else {
+        CustomSnackbar.showError('Error', 'Image size must be less than 150KB');
+      }
     }
   }
 }

@@ -87,7 +87,7 @@ class Data {
       });
     }
     status = json['status'];
-    image = json['image'];
+    image = json['image_url'];
     salary = json['salary'];
     showInCalendar = json['show_in_calendar'];
     createdAt = json['createdAt'];

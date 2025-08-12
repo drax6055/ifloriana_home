@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -13,6 +14,7 @@ import 'package:get/get.dart';
 import 'package:multi_dropdown/multi_dropdown.dart';
 import 'package:step_progress/step_progress.dart';
 import 'package:flutter_template/ui/drawer/staff/staffDetailsController.dart';
+import 'package:flutter_template/network/network_const.dart';
 
 class Addnewstaffscreen extends StatelessWidget {
   final bool showAppBar;
@@ -137,7 +139,7 @@ class Addnewstaffscreen extends StatelessWidget {
     return Column(
       spacing: 15.h,
       children: [
-        // Imagepicker(),
+        Imagepicker(),
         InputTxtfield_fullName(),
         InputTxtfield_Email(),
         // InputTxtfield_Pass(),
@@ -178,7 +180,42 @@ class Addnewstaffscreen extends StatelessWidget {
   Widget Imagepicker() {
     return Obx(() {
       return GestureDetector(
-        onTap: () => pickImage(isMultiple: false),
+        onTap: () async {
+          Get.bottomSheet(
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.photo_library),
+                    title: const Text('Choose from Gallery'),
+                    onTap: () async {
+                      Get.back();
+                      await getController.pickImageFromGallery();
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.camera_alt),
+                    title: const Text('Take Photo'),
+                    onTap: () async {
+                      Get.back();
+                      await getController.pickImageFromCamera();
+                    },
+                  ),
+                ],
+              ),
+            ),
+            isScrollControlled: true,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+            ),
+          );
+        },
         child: Container(
           height: 120.h,
           width: 120.w,
@@ -191,13 +228,32 @@ class Addnewstaffscreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(10.r),
             color: secondaryColor.withOpacity(0.2),
           ),
-          child: singleImage.value != null
+          child: getController.singleImage.value != null
               ? ClipRRect(
                   borderRadius: BorderRadius.circular(10.r),
-                  child: Image.file(
-                    singleImage.value!,
-                    fit: BoxFit.cover,
-                  ),
+                  child: getController.singleImage.value is File
+                      ? Image.file(
+                          getController.singleImage.value!,
+                          fit: BoxFit.cover,
+                        )
+                      : getController.singleImage.value is String &&
+                              getController.singleImage.value!.isNotEmpty
+                          ? Image.network(
+                              '${Apis.pdfUrl}${getController.singleImage.value}?v=${DateTime.now().millisecondsSinceEpoch}',
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Icon(
+                                  Icons.image_not_supported,
+                                  color: primaryColor,
+                                  size: 30.sp,
+                                );
+                              },
+                            )
+                          : Icon(
+                              Icons.image_rounded,
+                              color: primaryColor,
+                              size: 30.sp,
+                            ),
                 )
               : Icon(
                   Icons.image_rounded,

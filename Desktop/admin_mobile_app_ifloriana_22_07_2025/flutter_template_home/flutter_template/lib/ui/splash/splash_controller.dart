@@ -8,6 +8,7 @@ import '../../wiget/custome_snackbar.dart';
 import '../drawer/branches/getBranches/getBranchesScreen.Dart';
 import '../drawer/branches/post_branches_screena.dart/postBranchesScreen.dart';
 import '../drawer/services/addServices/addservicesScreen.dart';
+import '../drawer/staff/staffDetailsScreen.dart';
 
 class SplashController extends GetxController {
   @override
@@ -28,7 +29,7 @@ class SplashController extends GetxController {
         String? managerAccessToken = managerUser?.token;
 
         if (accessToken != null && accessToken.isNotEmpty) {
-          Get.to(GetBranchesScreen());
+          Get.to(Staffdetailsscreen());
           // Get.offNamed(Routes.drawerScreen); // Regular user
         } else if (managerAccessToken != null &&
             managerAccessToken.isNotEmpty) {

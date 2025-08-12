@@ -3,6 +3,7 @@ import 'package:flutter_template/route/app_route.dart';
 import 'package:flutter_template/ui/drawer/staff/staffDetailsController.dart';
 import 'package:flutter_template/utils/app_images.dart';
 import 'package:flutter_template/utils/colors.dart';
+import 'package:flutter_template/network/network_const.dart';
 import 'package:get/get.dart';
 import 'package:flutter_template/wiget/appbar/commen_appbar.dart';
 
@@ -115,12 +116,16 @@ class Staffdetailsscreen extends StatelessWidget {
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   leading: CircleAvatar(
-                      radius: 30, backgroundImage: AssetImage(AppImages.applogo)
-                      // backgroundImage: staff.image != null &&
-                      //         staff.image!.isNotEmpty
-                      //     ? NetworkImage(staff.image!)
-                      //     : const AssetImage("assets/default.png") as ImageProvider,
-                      ),
+                    radius: 30,
+                    backgroundImage: staff.image != null &&
+                            staff.image!.isNotEmpty
+                        ? NetworkImage(
+                            '${Apis.pdfUrl}${staff.image}?v=${DateTime.now().millisecondsSinceEpoch}')
+                        : AssetImage(AppImages.applogo) as ImageProvider,
+                    onBackgroundImageError: (exception, stackTrace) {
+                      // Handle image loading error
+                    },
+                  ),
                   title: Text(
                     staff.fullName ?? "Unknown",
                     style: const TextStyle(
