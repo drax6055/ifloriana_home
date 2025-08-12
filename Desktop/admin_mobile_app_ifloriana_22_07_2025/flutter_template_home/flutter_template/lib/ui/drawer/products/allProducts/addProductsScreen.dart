@@ -452,8 +452,15 @@ class AddProductScreen extends StatelessWidget {
             Align(
               alignment: Alignment.centerLeft,
               child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor, // background color
+                  foregroundColor: white, // text (foreground) color
+                ),
                 onPressed: controller.addVariationGroup,
-                icon: const Icon(Icons.add),
+                icon: const Icon(
+                  Icons.add,
+                  color: white,
+                ),
                 label: const Text('Add More Variation'),
               ),
             ),
@@ -574,46 +581,98 @@ class AddProductScreen extends StatelessWidget {
   Widget _buildVariantInputRow(GeneratedVariant variant) {
     final label = variant.combination.entries.map((e) => e.value).join(' / ');
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Expanded(
-              flex: 2,
-              child: Text(label,
-                  style: const TextStyle(fontWeight: FontWeight.bold))),
-          const SizedBox(width: 8),
-          Expanded(
-              flex: 2,
-              child: TextFormField(
-                  controller: variant.priceController,
-                  decoration: const InputDecoration(
-                      labelText: 'Price', border: OutlineInputBorder()),
-                  keyboardType: TextInputType.number)),
-          const SizedBox(width: 8),
-          Expanded(
-              flex: 1,
-              child: TextFormField(
-                  controller: variant.stockController,
-                  decoration: const InputDecoration(
-                      labelText: 'Stock', border: OutlineInputBorder()),
-                  keyboardType: TextInputType.number)),
-          const SizedBox(width: 8),
-          Expanded(
-              flex: 2,
-              child: TextFormField(
-                  controller: variant.skuController,
-                  decoration: const InputDecoration(
-                      labelText: 'SKU', border: OutlineInputBorder()))),
-          const SizedBox(width: 8),
-          Expanded(
-              flex: 2,
-              child: TextFormField(
-                  controller: variant.codeController,
-                  decoration: const InputDecoration(
-                      labelText: 'Code', border: OutlineInputBorder()))),
-        ],
-      ),
-    );
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Column(
+          spacing: 5,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+            Row(
+              spacing: 5,
+              children: [
+                Expanded(
+                    child: TextFormField(
+                        controller: variant.priceController,
+                        decoration: const InputDecoration(
+                          labelText: 'Price',
+                          labelStyle: TextStyle(color: grey),
+                          border: OutlineInputBorder(),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(8.0)),
+                            borderSide:
+                                BorderSide(color: primaryColor, width: 2.0),
+                          ),
+                        ),
+                        keyboardType: TextInputType.number)),
+                Expanded(
+                    child: TextFormField(
+                        controller: variant.stockController,
+                        decoration: const InputDecoration(
+                          labelText: 'Stock',
+                          labelStyle: TextStyle(color: grey),
+                          border: OutlineInputBorder(),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(8.0)),
+                            borderSide:
+                                BorderSide(color: primaryColor, width: 2.0),
+                          ),
+                        ),
+                        keyboardType: TextInputType.number)),
+              ],
+            ),
+            Row(
+              spacing: 5,
+              children: [
+                Expanded(
+                    child: TextFormField(
+                        controller: variant.skuController,
+                        decoration: const InputDecoration(
+                          labelText: 'SKU',
+                          labelStyle: TextStyle(color: grey),
+                          border: OutlineInputBorder(),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(8.0)),
+                            borderSide:
+                                BorderSide(color: primaryColor, width: 2.0),
+                          ),
+                        ))),
+                Expanded(
+                    child: TextFormField(
+                        controller: variant.codeController,
+                        decoration: const InputDecoration(
+                          labelText: 'Code',
+                          labelStyle: TextStyle(color: grey),
+                          border: OutlineInputBorder(),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(8.0)),
+                            borderSide:
+                                BorderSide(color: primaryColor, width: 2.0),
+                          ),
+                        )))
+              ],
+            )
+          ],
+        )
+        // Row(
+        //   children: [
+        //     Expanded(
+        //         flex: 2,
+        //         child:
+        //     const SizedBox(width: 8),
+
+        //     const SizedBox(width: 8),
+
+        //     const SizedBox(width: 8),
+
+        //     const SizedBox(width: 8),
+        //    ,
+        //   ],
+        // ),
+        );
   }
 
   // Removed _buildDiscountSection and _buildDateField as they are no longer needed
