@@ -41,9 +41,13 @@ class Addnewstaffscreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // If editing, populate fields and set edit mode
     if (staff != null && !getController.isEditMode.value) {
-      getController.isEditMode.value = true;
-      getController.editingStaffId = staff!.sId;
-      getController.populateFromStaff(staff!);
+      getController.resetForm(); // Reset form first
+      // Add a small delay to ensure form reset is complete
+      Future.delayed(Duration(milliseconds: 200), () {
+        getController.isEditMode.value = true;
+        getController.editingStaffId = staff!.sId;
+        getController.populateFromStaff(staff!);
+      });
     }
     return Scaffold(
       body: Form(
@@ -450,6 +454,16 @@ class Addnewstaffscreen extends StatelessWidget {
 
   Widget serviceDropdown() {
     return Obx(() {
+      // Trigger service initialization when dropdown is built in edit mode
+      if (getController.isEditMode.value &&
+          getController.serviceList.isNotEmpty &&
+          getController.selectedServices.isNotEmpty &&
+          getController.serviceController.selectedItems.isEmpty) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          getController.initializeServiceController();
+        });
+      }
+
       return MultiDropdown<Service>(
         items: getController.serviceList
             .map((service) => DropdownItem(

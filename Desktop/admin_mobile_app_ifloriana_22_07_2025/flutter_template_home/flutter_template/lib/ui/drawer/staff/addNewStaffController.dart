@@ -85,6 +85,32 @@ class Addnewstaffcontroller extends GetxController {
     showPass2.value = !showPass2.value;
   }
 
+  void resetForm() {
+    fullnameController.clear();
+    emailController.clear();
+    phoneController.clear();
+    shiftStarttimeController.clear();
+    shiftEndtimeController.clear();
+    specializationController.clear();
+    durationController.clear();
+    LunchStarttimeController.clear();
+    selectedGender.value = "Male";
+    selectedServices.clear();
+    selectedBranch.value = null;
+    selectedCommitionId.value = null;
+    singleImage.value = null;
+    isEditMode.value = false;
+    editingStaffId = null;
+    currentStep.value = 0;
+
+    // Reset service controller when form is reset
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (serviceController.selectedItems.isNotEmpty) {
+        serviceController.selectedItems.clear();
+      }
+    });
+  }
+
   var singleImage = Rxn<dynamic>();
 
   @override
@@ -93,6 +119,20 @@ class Addnewstaffcontroller extends GetxController {
     getBranches();
     getCommition();
     getServices();
+  }
+
+  @override
+  void onClose() {
+    fullnameController.dispose();
+    emailController.dispose();
+    phoneController.dispose();
+    shiftStarttimeController.dispose();
+    shiftEndtimeController.dispose();
+    specializationController.dispose();
+    durationController.dispose();
+    LunchStarttimeController.dispose();
+    serviceController.dispose();
+    super.onClose();
   }
 
   final List<String> dropdownItems = [
@@ -172,8 +212,11 @@ class Addnewstaffcontroller extends GetxController {
         branchList.isNotEmpty &&
         commitionList.isNotEmpty &&
         serviceList.isNotEmpty) {
-      populateFromStaff(_pendingStaffToPopulate!);
-      _pendingStaffToPopulate = null;
+      // Use a small delay to ensure the UI is ready
+      Future.delayed(Duration(milliseconds: 100), () {
+        populateFromStaff(_pendingStaffToPopulate!);
+        _pendingStaffToPopulate = null;
+      });
     }
   }
 
@@ -212,10 +255,7 @@ class Addnewstaffcontroller extends GetxController {
     );
 
     // Initialize service controller with selected services
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      serviceController.selectWhere((item) =>
-          selectedServices.any((service) => service.id == item.value.id));
-    });
+    initializeServiceController();
 
     if (commitionList.isNotEmpty) {
       final commiison = commitionList.firstWhere(
@@ -228,6 +268,35 @@ class Addnewstaffcontroller extends GetxController {
     }
     // Set image
     singleImage.value = staff.image;
+  }
+
+  void initializeServiceController() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (serviceList.isNotEmpty && selectedServices.isNotEmpty) {
+        print(
+            'Initializing services with ${selectedServices.length} selected services');
+        print(
+            'Selected service IDs: ${selectedServices.map((s) => s.id).toList()}');
+        print(
+            'Available service IDs: ${serviceList.map((s) => s.id).toList()}');
+
+        // Force refresh the service list to trigger UI update
+        serviceList.refresh();
+
+        // Select the services using selectWhere
+        serviceController.selectWhere((item) =>
+            selectedServices.any((service) => service.id == item.value.id));
+      } else if (serviceList.isEmpty) {
+        // Listen for serviceList changes
+        ever(serviceList, (services) {
+          if (services.isNotEmpty && selectedServices.isNotEmpty) {
+            print(
+                'Service list loaded, initializing with ${selectedServices.length} selected services');
+            initializeServiceController();
+          }
+        });
+      }
+    });
   }
 
   Future onUpdateStaffPress() async {
