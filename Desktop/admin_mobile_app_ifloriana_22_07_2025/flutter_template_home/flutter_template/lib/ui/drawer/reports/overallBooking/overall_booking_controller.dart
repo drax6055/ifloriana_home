@@ -13,7 +13,6 @@ import '../../../../network/network_const.dart';
 import '../../../../wiget/custome_snackbar.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
-
 class OverallBookingController extends GetxController {
   final payments = <PaymentData>[].obs;
   final filteredPayments = <PaymentData>[].obs;
@@ -73,12 +72,12 @@ class OverallBookingController extends GetxController {
 
   Future<void> deletePayment(String paymentId) async {
     try {
-      final response = await dioClient.deleteData(
+      await dioClient.deleteData(
         '${Apis.baseUrl}/payments/$paymentId',
         (json) => json,
       );
 
-      if (response != null) {
+      {
         CustomSnackbar.showSuccess('Success', 'Payment deleted successfully');
         // Refresh the payments list
         await getPayments();
@@ -108,13 +107,15 @@ class OverallBookingController extends GetxController {
         if (payment.createdAt == null) return false;
         final paymentDate = DateTime.tryParse(payment.createdAt!);
         final filterDate = selectedDate.value!;
-        
+
         if (paymentDate == null) return false;
-        
+
         // Normalize dates to start of day for comparison
-        final paymentDateNormalized = DateTime(paymentDate.year, paymentDate.month, paymentDate.day);
-        final filterDateNormalized = DateTime(filterDate.year, filterDate.month, filterDate.day);
-        
+        final paymentDateNormalized =
+            DateTime(paymentDate.year, paymentDate.month, paymentDate.day);
+        final filterDateNormalized =
+            DateTime(filterDate.year, filterDate.month, filterDate.day);
+
         return paymentDateNormalized.isAtSameMomentAs(filterDateNormalized);
       }).toList();
     }
@@ -124,16 +125,21 @@ class OverallBookingController extends GetxController {
         if (payment.createdAt == null) return false;
         final paymentDate = DateTime.tryParse(payment.createdAt!);
         final filterRange = selectedDateRange.value!;
-        
+
         if (paymentDate == null) return false;
-        
+
         // Normalize dates to start of day for comparison
-        final paymentDateNormalized = DateTime(paymentDate.year, paymentDate.month, paymentDate.day);
-        final startDateNormalized = DateTime(filterRange.start.year, filterRange.start.month, filterRange.start.day);
-        final endDateNormalized = DateTime(filterRange.end.year, filterRange.end.month, filterRange.end.day);
-        
-        return (paymentDateNormalized.isAtSameMomentAs(startDateNormalized) || paymentDateNormalized.isAfter(startDateNormalized)) &&
-               (paymentDateNormalized.isAtSameMomentAs(endDateNormalized) || paymentDateNormalized.isBefore(endDateNormalized));
+        final paymentDateNormalized =
+            DateTime(paymentDate.year, paymentDate.month, paymentDate.day);
+        final startDateNormalized = DateTime(filterRange.start.year,
+            filterRange.start.month, filterRange.start.day);
+        final endDateNormalized = DateTime(
+            filterRange.end.year, filterRange.end.month, filterRange.end.day);
+
+        return (paymentDateNormalized.isAtSameMomentAs(startDateNormalized) ||
+                paymentDateNormalized.isAfter(startDateNormalized)) &&
+            (paymentDateNormalized.isAtSameMomentAs(endDateNormalized) ||
+                paymentDateNormalized.isBefore(endDateNormalized));
       }).toList();
     }
 
@@ -176,8 +182,8 @@ class OverallBookingController extends GetxController {
           return model;
         },
       );
-      print("${Apis.baseUrl}/payments?salon_id=${loginUser!.salonId}");
-      if (response != null && response.data != null) {
+      print("${Apis.baseUrl}/payments?salon_id=${loginUser.salonId}");
+      if (response.data != null) {
         payments.value = response.data!;
         filteredPayments.value = response.data!;
         calculateGrandTotal();
@@ -231,6 +237,7 @@ class OverallBookingController extends GetxController {
         'Staff Name',
         'Total Service',
         'Total Service Amount',
+        'Membership Discount',
         'Additional Charges',
         'Taxes',
         'Tip',
@@ -270,16 +277,18 @@ class OverallBookingController extends GetxController {
         sheet.cell(CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: row))
           ..value = '₹${payment.serviceAmount?.toString() ?? '0'}';
         sheet.cell(CellIndex.indexByColumnRow(columnIndex: 5, rowIndex: row))
-          ..value = '₹${payment.additionalCharges?.toString() ?? '0'}';
+          ..value = '₹${payment.membershipDiscount?.toString() ?? '0'}';
         sheet.cell(CellIndex.indexByColumnRow(columnIndex: 6, rowIndex: row))
-          ..value = '₹${payment.taxAmount?.toString() ?? '0'}';
+          ..value = '₹${payment.additionalCharges?.toString() ?? '0'}';
         sheet.cell(CellIndex.indexByColumnRow(columnIndex: 7, rowIndex: row))
-          ..value = '₹${payment.tips?.toString() ?? '0'}';
+          ..value = '₹${payment.taxAmount?.toString() ?? '0'}';
         sheet.cell(CellIndex.indexByColumnRow(columnIndex: 8, rowIndex: row))
-          ..value = '₹${payment.additionalDiscount?.toString() ?? '0'}';
+          ..value = '₹${payment.tips?.toString() ?? '0'}';
         sheet.cell(CellIndex.indexByColumnRow(columnIndex: 9, rowIndex: row))
-          ..value = payment.paymentMethod ?? '';
+          ..value = '₹${payment.additionalDiscount?.toString() ?? '0'}';
         sheet.cell(CellIndex.indexByColumnRow(columnIndex: 10, rowIndex: row))
+          ..value = payment.paymentMethod ?? '';
+        sheet.cell(CellIndex.indexByColumnRow(columnIndex: 11, rowIndex: row))
           ..value = '₹${payment.finalTotal?.toString() ?? '0'}';
       }
 
@@ -289,7 +298,7 @@ class OverallBookingController extends GetxController {
         ..value = 'Grand Total'
         ..cellStyle = CellStyle(bold: true);
       sheet
-          .cell(CellIndex.indexByColumnRow(columnIndex: 10, rowIndex: totalRow))
+          .cell(CellIndex.indexByColumnRow(columnIndex: 11, rowIndex: totalRow))
         ..value = '₹${calculateTotalForExport(dataToExport).toStringAsFixed(2)}'
         ..cellStyle = CellStyle(bold: true);
 
@@ -311,7 +320,8 @@ class OverallBookingController extends GetxController {
       CustomSnackbar.showError('Error', 'Failed to export Excel: $e');
     }
   }
-Future<void> exportToPdf() async {
+
+  Future<void> exportToPdf() async {
     try {
       final pdf = pw.Document();
 
@@ -352,6 +362,7 @@ Future<void> exportToPdf() async {
                     'Staff Name',
                     'Total Service',
                     'Total Service Amount',
+                    'Membership Discount',
                     'Additional Charges',
                     'Taxes',
                     'Tip',
@@ -367,6 +378,7 @@ Future<void> exportToPdf() async {
                             : 'N/A',
                         payment.serviceCount?.toString() ?? '0',
                         '₹${payment.serviceAmount?.toString() ?? '0'}',
+                        '₹${payment.membershipDiscount?.toString() ?? '0'}',
                         '₹${payment.additionalCharges?.toString() ?? '0'}',
                         '₹${payment.taxAmount?.toString() ?? '0'}',
                         '₹${payment.tips?.toString() ?? '0'}',

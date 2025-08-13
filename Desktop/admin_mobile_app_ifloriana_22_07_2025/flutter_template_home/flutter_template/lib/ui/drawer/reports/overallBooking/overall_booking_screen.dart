@@ -194,6 +194,7 @@ class OverallBookingScreen extends StatelessWidget {
                         DataColumn(label: Text('Staff Name')),
                         DataColumn(label: Text('Total Service')),
                         DataColumn(label: Text('Total Service Amount')),
+                        DataColumn(label: Text('Membership Discount')),
                         DataColumn(label: Text('Additional Charges')),
                         DataColumn(label: Text('Taxes')),
                         DataColumn(label: Text('Tip')),
@@ -213,6 +214,8 @@ class OverallBookingScreen extends StatelessWidget {
                               Text(payment.serviceCount?.toString() ?? '0')),
                           DataCell(Text(
                               '₹${payment.serviceAmount?.toString() ?? '0'}')),
+                          DataCell(Text(
+                              '₹${payment.membershipDiscount?.toString() ?? '0'}')),
                           DataCell(Text(
                               '₹${payment.additionalCharges?.toString() ?? '0'}')),
                           DataCell(
