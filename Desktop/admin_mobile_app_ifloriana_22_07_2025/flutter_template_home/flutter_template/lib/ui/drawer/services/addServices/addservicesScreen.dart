@@ -12,6 +12,7 @@ import 'package:get/get.dart';
 
 import '../../../../network/network_const.dart';
 import '../../../../wiget/appbar/commen_appbar.dart';
+import '../../../../wiget/loading.dart';
 
 class AddNewService extends StatelessWidget {
   AddNewService({super.key});
@@ -393,7 +394,7 @@ class AddNewService extends StatelessWidget {
                       )),
                   SizedBox(height: 20.h),
                   Obx(() => getController.isLoading.value
-                      ? const CircularProgressIndicator()
+                      ? const CustomLoadingAvatar()
                       : Btn_serviceAdd()),
                   const SizedBox(height: 10),
                 ],

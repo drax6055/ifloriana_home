@@ -57,16 +57,18 @@ class ProductListScreen extends StatelessWidget {
           return Center(child: CustomLoadingAvatar());
         } else {
           return SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
+            scrollDirection: Axis.vertical,
             child: Container(
-              color: Colors.white,
-              child: DataTable(
-                columns: _createColumns(),
-                rows: _createRows(),
-                columnSpacing: 30,
-                horizontalMargin: 16,
-              ),
-            ),
+                color: Colors.white,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    columns: _createColumns(),
+                    rows: _createRows(),
+                    columnSpacing: 30,
+                    horizontalMargin: 16,
+                  ),
+                )),
           );
         }
       }),

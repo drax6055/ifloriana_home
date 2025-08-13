@@ -12,6 +12,8 @@ import 'package:flutter_template/wiget/custome_text.dart';
 import 'package:get/get.dart';
 import 'package:multi_dropdown/multi_dropdown.dart';
 
+import '../../../../wiget/loading.dart';
+
 class Postbranchesscreen extends StatelessWidget {
   Postbranchesscreen({super.key});
   final Postbranchescontroller getController =
@@ -203,7 +205,7 @@ class Postbranchesscreen extends StatelessWidget {
               SizedBox(
                   width: 16,
                   height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2)),
+                  child: CustomLoadingAvatar()),
               SizedBox(width: 12),
               Text('Loading services...',
                   style: TextStyle(color: Colors.grey.shade600)),

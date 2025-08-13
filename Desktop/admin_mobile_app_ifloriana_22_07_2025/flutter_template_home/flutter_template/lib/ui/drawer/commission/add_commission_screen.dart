@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../wiget/custome_snackbar.dart';
+import '../../../wiget/loading.dart';
 import 'add_commission_controller.dart';
 import 'package:flutter_template/network/model/branch_model.dart';
 
@@ -16,7 +17,7 @@ class AddCommissionScreen extends StatelessWidget {
                 : 'Add Commission'),
           ),
           body: controller.isLoading.value
-              ? Center(child: CircularProgressIndicator())
+              ? Center(child: CustomLoadingAvatar())
               : SingleChildScrollView(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(

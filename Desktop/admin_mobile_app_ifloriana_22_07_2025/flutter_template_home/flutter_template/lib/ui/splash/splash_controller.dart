@@ -5,6 +5,7 @@ import 'package:flutter_template/ui/drawer/customers/customersScreen.dart'
 import 'package:get/get.dart';
 import '../../route/app_route.dart';
 import '../../wiget/custome_snackbar.dart';
+import '../drawer/appointment/appointmentScreen.dart';
 import '../drawer/branches/getBranches/getBranchesScreen.Dart';
 import '../drawer/branches/post_branches_screena.dart/postBranchesScreen.dart';
 import '../drawer/coupons/couponsScreen.dart';
@@ -15,6 +16,7 @@ import '../drawer/reports/dailyBooking/dailyBooking_screen.dart';
 import '../drawer/reports/overallBooking/overall_booking_screen.dart';
 import '../drawer/services/addServices/addservicesScreen.dart';
 import '../drawer/staff/staffDetailsScreen.dart';
+import '../drawer/staffEarnings/statffEarningScreen.dart';
 
 class SplashController extends GetxController {
   @override
@@ -35,7 +37,7 @@ class SplashController extends GetxController {
         String? managerAccessToken = managerUser?.token;
 
         if (accessToken != null && accessToken.isNotEmpty) {
-          Get.to(Getmanagerscreen());
+          Get.to(Statffearningscreen());
           // Get.offNamed(Routes.drawerScreen); // Regular user
         } else if (managerAccessToken != null &&
             managerAccessToken.isNotEmpty) {

@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../utils/validation.dart';
 import '../../../../wiget/Custome_textfield.dart';
 import '../../../../wiget/custome_dropdown.dart';
+import '../../../../wiget/loading.dart';
 
 class Newappointmentscreen extends StatelessWidget {
   final Newappointmentcontroller getController =
@@ -161,8 +162,7 @@ class Newappointmentscreen extends StatelessWidget {
                 ? SizedBox(
                     width: 24,
                     height: 24,
-                    child: CircularProgressIndicator(
-                        color: Colors.white, strokeWidth: 2))
+                    child: CustomLoadingAvatar())
                 : Text(
                     step == 4
                         ? "Add Booking"
@@ -384,7 +384,7 @@ class Newappointmentscreen extends StatelessWidget {
       // Fetch staff if not already fetched
       if (getController.staff.isEmpty) {
         getController.fetchStaffsForBranch();
-        return Center(child: CircularProgressIndicator(color: primaryColor));
+        return Center(child: CustomLoadingAvatar());
       }
       final staffList = getController.filteredStaff;
       if (staffList.isEmpty) {

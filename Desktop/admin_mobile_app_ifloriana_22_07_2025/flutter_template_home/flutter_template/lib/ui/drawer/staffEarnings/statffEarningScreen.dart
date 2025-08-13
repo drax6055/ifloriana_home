@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_template/utils/colors.dart';
 import 'package:get/get.dart';
 
+import '../../../wiget/appbar/commen_appbar.dart';
+import '../../../wiget/loading.dart';
 import 'statffEarningController.dart';
 
 class Statffearningscreen extends StatelessWidget {
@@ -9,29 +12,72 @@ class Statffearningscreen extends StatelessWidget {
   final Statffearningcontroller getController =
       Get.put(Statffearningcontroller());
 
+  final RxBool isSearching = false.obs;
+  final TextEditingController searchController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Container(
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(70.h),
           child: Obx(() {
-            if (getController.isLoading.value) {
-              return Center(child: CircularProgressIndicator());
-            }
-            return Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: TextField(
-                    decoration: InputDecoration(
-                      labelText: 'Search by Staff Name',
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.search),
+            return CustomAppBar(
+              title: isSearching.value ? '' : 'Staff Earning',
+              actions: [
+                if (isSearching.value)
+                  SizedBox(
+                    width: 270.w,
+                    child: Padding(
+                      padding: EdgeInsets.only(right: 8.0),
+                      child: TextField(
+                        controller: searchController,
+                        autofocus: true,
+                        decoration: InputDecoration(
+                          fillColor: Colors.white,
+                          filled: true,
+                          hintText: 'Search by Staff Name',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none,
+                          ),
+                          hintStyle: TextStyle(color: grey),
+                        ),
+                        style: TextStyle(color: Colors.black, fontSize: 18),
+                        onSubmitted: (value) {
+                          getController.updateSearchQuery(value);
+                          isSearching.value = false;
+                        },
+                      ),
                     ),
-                    onChanged: getController.updateSearchQuery,
                   ),
+                IconButton(
+                  icon: Icon(isSearching.value ? Icons.close : Icons.search,
+                      color: Colors.white),
+                  onPressed: () {
+                    if (isSearching.value) {
+                      isSearching.value = false;
+                      searchController.clear();
+                      getController.updateSearchQuery('');
+                    } else {
+                      isSearching.value = true;
+                    }
+                  },
                 ),
-                Expanded(
+              ],
+            );
+          }),
+        ),
+        body: Obx(() {
+          if (getController.isLoading.value) {
+            return Center(child: CustomLoadingAvatar());
+          }
+          return Column(
+            children: [
+              Expanded(
+                child: RefreshIndicator(
+                  color: primaryColor,
+                  onRefresh: getController.getStaffEarningData,
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: DataTable(
@@ -50,14 +96,14 @@ class Statffearningscreen extends StatelessWidget {
                           cells: [
                             DataCell(Row(
                               children: [
-                                CircleAvatar(
-                                  backgroundImage: staff['staff_image'] != null
-                                      ? NetworkImage(staff['staff_image'])
-                                      : null,
-                                  child: staff['staff_image'] == null
-                                      ? Icon(Icons.person)
-                                      : null,
-                                ),
+                                // CircleAvatar(
+                                //   backgroundImage: staff['staff_image'] != null
+                                //       ? NetworkImage(staff['staff_image'])
+                                //       : null,
+                                //   child: staff['staff_image'] == null
+                                //       ? Icon(Icons.person)
+                                //       : null,
+                                // ),
                                 SizedBox(width: 8),
                                 Text(staff['staff_name'] ?? ''),
                               ],
@@ -69,7 +115,7 @@ class Statffearningscreen extends StatelessWidget {
                             DataCell(Text('₹ ${staff['staff_earning']}')),
                             DataCell(
                               IconButton(
-                                icon: Icon(Icons.payments, color: Colors.green),
+                                icon: Icon(Icons.payments, color: primaryColor),
                                 onPressed: () {
                                   _showPayoutSheet(
                                       context, staff, getController);
@@ -82,10 +128,10 @@ class Statffearningscreen extends StatelessWidget {
                     ),
                   ),
                 ),
-              ],
-            );
-          }),
-        ),
+              )
+            ],
+          );
+        }),
       ),
     );
   }

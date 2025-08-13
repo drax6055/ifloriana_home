@@ -106,7 +106,7 @@ class EditCustomerScreen extends StatelessWidget {
     return Obx(() {
       if (!customerController.packagesLoaded.value ||
           !customerController.membershipsLoaded.value) {
-        return const Center(child: CircularProgressIndicator());
+        return const Center(child: CustomLoadingAvatar());
       }
       WidgetsBinding.instance.addPostFrameCallback((_) {
         prefillCustomerFields(customer);

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../wiget/loading.dart';
 import 'commission_list_controller.dart';
 import 'add_commission_screen.dart';
 
@@ -12,7 +13,7 @@ class CommissionListScreen extends StatelessWidget {
       appBar: AppBar(title: Text('All Commissions')),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return Center(child: CircularProgressIndicator());
+          return Center(child: CustomLoadingAvatar());
         }
         if (controller.commissionList.isEmpty) {
           return Center(child: Text('No commissions found'));

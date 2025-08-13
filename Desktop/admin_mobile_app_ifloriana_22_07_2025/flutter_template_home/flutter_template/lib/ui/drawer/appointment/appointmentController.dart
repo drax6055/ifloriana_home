@@ -49,19 +49,44 @@ class Appointment {
     final service = firstService['service'] ?? {};
     final staff = firstService['staff'] ?? {};
     final branchMembership = customer['branch_membership'];
+
+    // Helper function to safely convert dynamic to string
+    String toString(dynamic value) {
+      if (value == null) return '';
+      if (value is String) return value;
+      if (value is Map) {
+        // Handle image object - construct URL or return empty string
+        if (value.containsKey('data') && value.containsKey('contentType')) {
+          // This is an image object, you might want to construct a URL here
+          // For now, return empty string to avoid errors
+          return '';
+        }
+        return value.toString();
+      }
+      return value.toString();
+    }
+
+    // Helper function to safely convert dynamic to int
+    int toInt(dynamic value) {
+      if (value == null) return 0;
+      if (value is int) return value;
+      if (value is double) return value.toInt();
+      if (value is String) return int.tryParse(value) ?? 0;
+      return 0;
+    }
+
     return Appointment(
-      appointmentId: json['appointment_id'] ?? '',
-      date: (json['appointment_date'] ?? '').toString().split('T')[0],
-      time: json['appointment_time'] ?? '',
-      clientName: customer['full_name'] ?? '-',
-      clientImage: customer['image'],
-      clientPhone: customer['phone_number'],
-      amount: (json['total_payment'] ?? 0) is int
-          ? json['total_payment']
-          : int.tryParse(json['total_payment'].toString()) ?? 0,
-      staffName: staff['full_name'] ?? '-',
-      staffImage: staff['image'],
-      serviceName: service['name'] ?? '-',
+      appointmentId: toString(json['appointment_id']),
+      date: toString(json['appointment_date']).split('T')[0],
+      time: toString(json['appointment_time']),
+      clientName: toString(customer['full_name']),
+      clientImage:
+          customer['image'] is Map ? null : toString(customer['image']),
+      clientPhone: toString(customer['phone_number']),
+      amount: toInt(json['total_payment']),
+      staffName: toString(staff['full_name']),
+      staffImage: staff['image'] is Map ? null : toString(staff['image']),
+      serviceName: toString(service['name']),
       membership: customer['branch_membership'] != null ? 'Yes' : '-',
       package: (customer['branch_package'] != null &&
               (customer['branch_package'] is List
@@ -69,15 +94,16 @@ class Appointment {
                   : true))
           ? 'Yes'
           : '-',
-      status: json['status'] ?? '-',
-      paymentStatus: json['payment_status'] ?? '-',
+      status: toString(json['status']),
+      paymentStatus: toString(json['payment_status']),
       branchMembershipDiscount: branchMembership != null
           ? (branchMembership['discount'] is int
               ? (branchMembership['discount'] as int).toDouble()
               : (branchMembership['discount'] ?? 0).toDouble())
           : null,
-      branchMembershipDiscountType:
-          branchMembership != null ? branchMembership['discount_type'] : null,
+      branchMembershipDiscountType: branchMembership != null
+          ? toString(branchMembership['discount_type'])
+          : null,
     );
   }
 }
@@ -179,6 +205,7 @@ class AppointmentController extends GetxController {
         final List data = response['data'] ?? [];
         appointments.value = data.map((e) => Appointment.fromJson(e)).toList();
       }
+      print("${Apis.baseUrl}/appointments?salon_id=${loginUser.salonId}");
     } catch (e) {
       CustomSnackbar.showError('Error', 'Failed to get data: $e');
     } finally {

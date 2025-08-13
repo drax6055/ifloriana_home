@@ -4,6 +4,7 @@ import 'package:flutter_template/ui/drawer/staffPayoutRepoer/staffPayoutReoirtCo
 import 'package:flutter_template/ui/splash/splash_controller.dart';
 import 'package:flutter_template/utils/colors.dart';
 import 'package:get/get.dart';
+import '../../../wiget/loading.dart';
 import 'staff_payout_model.dart';
 import 'package:intl/intl.dart';
 
@@ -19,7 +20,7 @@ class Staffpayoutreportscreen extends StatelessWidget {
       appBar: AppBar(title: Text('Staff Payout Report')),
       body: Obx(() {
         if (getController.isLoading.value) {
-          return Center(child: CircularProgressIndicator());
+          return Center(child: CustomLoadingAvatar());
         }
         if (getController.payouts.isEmpty) {
           return Center(

@@ -402,9 +402,7 @@ class AddInhouseproductScreen extends StatelessWidget {
               ? SizedBox(
                   width: 20,
                   height: 20,
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                    strokeWidth: 2,
+                  child: CustomLoadingAvatar(
                   ),
                 )
               : Icon(Icons.send, color: Colors.white),
