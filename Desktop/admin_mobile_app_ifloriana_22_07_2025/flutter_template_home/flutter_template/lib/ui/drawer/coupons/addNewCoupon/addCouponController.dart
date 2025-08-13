@@ -58,7 +58,7 @@ class Addcouponcontroller extends GetxController {
     // Pre-fill image
     singleImage.value = null;
     editImageUrl.value = coupon.imageUrl ?? '';
-    _originalImageUrl = coupon.imageUrl; // Store original image URL
+
 
     // Format dates to YYYY-MM-DD
     if (coupon.startDate != null) {
@@ -115,8 +115,8 @@ class Addcouponcontroller extends GetxController {
 
   final Rx<File?> singleImage = Rx<File?>(null);
   final RxString editImageUrl = ''.obs;
-  // Store the original image URL when editing to restore if needed
-  String? _originalImageUrl;
+
+  // String? _originalImageUrl;
 
   Future<void> getBranches() async {
     final loginUser = await prefs.getUser();
@@ -172,7 +172,6 @@ class Addcouponcontroller extends GetxController {
     if (pickedFile != null) {
       // Clear the existing image URL only when a new image is actually selected
       editImageUrl.value = '';
-      print('New image selected from camera, clearing editImageUrl');
     }
     await _handlePickedFile(pickedFile);
   }
@@ -185,14 +184,6 @@ class Addcouponcontroller extends GetxController {
       if (mimeType == null) {
         CustomSnackbar.showError(
             'Invalid Image', 'Only JPG, JPEG, PNG images are allowed!');
-        // Restore the original image URL if validation fails
-        if (isEditMode.value &&
-            editImageUrl.value.isEmpty &&
-            _originalImageUrl != null) {
-          editImageUrl.value = _originalImageUrl!;
-          print(
-              'Restored original image URL after validation failure: ${editImageUrl.value}');
-        }
         return;
       }
       if (await file.length() < maxSizeInBytes) {
@@ -200,14 +191,6 @@ class Addcouponcontroller extends GetxController {
         print('Image file accepted: ${file.path}');
       } else {
         CustomSnackbar.showError('Error', 'Image size must be less than 150KB');
-        // Restore the original image URL if size validation fails
-        if (isEditMode.value &&
-            editImageUrl.value.isEmpty &&
-            _originalImageUrl != null) {
-          editImageUrl.value = _originalImageUrl!;
-          print(
-              'Restored original image URL after size validation failure: ${editImageUrl.value}');
-        }
       }
     }
   }
@@ -238,16 +221,6 @@ class Addcouponcontroller extends GetxController {
       return 'image/png';
     }
     return null;
-  }
-
-  // Method to clear new image selection and restore original
-  void clearNewImageSelection() {
-    singleImage.value = null;
-    if (isEditMode.value && _originalImageUrl != null) {
-      editImageUrl.value = _originalImageUrl!;
-      print(
-          'Cleared new image selection, restored original: ${editImageUrl.value}');
-    }
   }
 
   Future onCoupons() async {
@@ -286,26 +259,9 @@ class Addcouponcontroller extends GetxController {
           filename: singleImage.value!.path.split(Platform.pathSeparator).last,
           contentType: MediaType(mimeParts[0], mimeParts[1]),
         );
-        print('Using new image: ${singleImage.value!.path}');
       } else if (editImageUrl.value.isNotEmpty) {
-        // Preserve existing image (either from edit mode or add mode)
-        if (isEditMode.value) {
-          // In edit mode, ensure we're not losing the image
-          if (_originalImageUrl != null &&
-              editImageUrl.value == _originalImageUrl) {
-            print('Preserving original image: ${editImageUrl.value}');
-          } else {
-            print('Using current image: ${editImageUrl.value}');
-          }
-        } else {
-          print('Using existing image URL: ${editImageUrl.value}');
-        }
         couponData['image'] = editImageUrl.value;
-      } else {
-        print('No image selected and no existing image');
-      }
-
-      // Validate that we have an image in edit mode
+      } 
       if (isEditMode.value && couponData['image'] == null) {
         CustomSnackbar.showError(
             'Error', 'Image is required for editing coupon');
@@ -315,15 +271,14 @@ class Addcouponcontroller extends GetxController {
       formData = dio.FormData.fromMap(couponData);
 
       if (isEditMode.value && editingCouponId.value != null) {
-        // Update existing coupon
-        print('Updating coupon with image: ${couponData['image']}');
+      
         await dioClient.dio.put(
           '${Apis.baseUrl}${Endpoints.coupons}/${editingCouponId.value}?salon_id=${loginUser!.salonId}',
           data: formData,
           options:
               dio.Options(headers: {'Content-Type': 'multipart/form-data'}),
         );
-        print('Coupon updated successfully');
+      
         Get.back();
       } else {
         // Add new coupon
@@ -334,13 +289,13 @@ class Addcouponcontroller extends GetxController {
           options:
               dio.Options(headers: {'Content-Type': 'multipart/form-data'}),
         );
-        print('Coupon added successfully');
+       
         Get.back();
       }
       var updateList = Get.put(CouponsController());
       await updateList.getCoupons();
     } catch (e) {
-      print('==> here Error: $e');
+     
       CustomSnackbar.showError('Error', e.toString());
     }
   }
