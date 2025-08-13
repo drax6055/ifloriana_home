@@ -7,11 +7,8 @@ import 'package:flutter_template/wiget/Custome_button.dart';
 import 'package:flutter_template/wiget/Custome_textfield.dart';
 import 'package:flutter_template/wiget/appbar/commen_appbar.dart';
 import 'package:flutter_template/wiget/custome_dropdown.dart';
-import 'package:flutter_template/wiget/custome_snackbar.dart';
 import 'package:get/get.dart';
 import 'package:flutter_template/ui/drawer/manager/getManager/getmanagerController.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 
 import '../../../../utils/colors.dart';
 import '../../../../network/network_const.dart';
@@ -31,7 +28,7 @@ class Managerscreen extends StatelessWidget {
       getController.passwordController.text = manager!.password;
       getController.confirmPasswordController.text = manager!.password;
       getController.selectedGender.value =
-          manager!.gender?.capitalizeFirst ?? 'Male' ?? 'male';
+          manager!.gender?.capitalizeFirst ?? 'Male';
 
       // Set network image for edit mode
       getController.editImageUrl.value = manager!.image_url;
@@ -46,6 +43,9 @@ class Managerscreen extends StatelessWidget {
           }
         });
       }
+    } else {
+      // Ensure fresh form when adding new manager
+      getController.resetForm();
     }
   }
 
@@ -76,6 +76,16 @@ class Managerscreen extends StatelessWidget {
                         Gender(),
                         _buildBranchDropdown(),
                         Btn_saveManager(context),
+                        if (manager == null)
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                              onPressed: () {
+                                getController.resetForm();
+                              },
+                              child: const Text('Clear Form'),
+                            ),
+                          ),
                       ],
                     )),
               )));
@@ -290,8 +300,7 @@ class Managerscreen extends StatelessWidget {
           value: getController.selectedBranch.value,
           decoration: InputDecoration(
             labelText: 'Branch *',
-            labelStyle: CustomTextStyles.textFontMedium(
-                size: 14, color: grey),
+            labelStyle: CustomTextStyles.textFontMedium(size: 14, color: grey),
             border: const OutlineInputBorder(),
             focusedBorder: const OutlineInputBorder(
               borderSide: BorderSide(

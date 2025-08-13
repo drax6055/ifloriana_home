@@ -5,6 +5,7 @@ import 'package:flutter_template/utils/colors.dart';
 import 'package:flutter_template/wiget/appbar/commen_appbar.dart';
 import 'package:get/get.dart';
 import 'package:flutter_template/ui/drawer/manager/addManager/managerScreen.dart';
+import 'package:flutter_template/ui/drawer/manager/addManager/managerController.dart';
 import 'package:flutter_template/wiget/loading.dart';
 
 import '../udpateFromExisting/upgradeFromExistingScreen.dart';
@@ -20,7 +21,7 @@ class Getmanagerscreen extends StatelessWidget {
         title: "Manager",
         actions: [
           PopupMenuButton<String>(
-            icon: Icon(Icons.filter_list, color: white),
+            // icon: Icon(Icons.filter_list, color: white),
             onSelected: (value) {
               if (value == 'all') {
                 getController.clearFilter();
@@ -226,6 +227,9 @@ class Getmanagerscreen extends StatelessWidget {
                           color: Colors.blue,
                           onTap: () {
                             Navigator.of(context).pop();
+                            if (Get.isRegistered<Managercontroller>()) {
+                              Get.delete<Managercontroller>(force: true);
+                            }
                             Get.to(Managerscreen());
                           },
                         ),
