@@ -51,14 +51,13 @@ class Addcouponcontroller extends GetxController {
       selectedBranches.value = branches;
       // Initialize branch controller with selected branches
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        branchController.selectWhere((item) =>
+        branchController.selectWhere((item) =>  
             selectedBranches.any((branch) => branch.id == item.value.id));
       });
     }
     // Pre-fill image
     singleImage.value = null;
     editImageUrl.value = coupon.imageUrl ?? '';
-
 
     // Format dates to YYYY-MM-DD
     if (coupon.startDate != null) {
@@ -244,7 +243,7 @@ class Addcouponcontroller extends GetxController {
     try {
       dio.FormData? formData;
 
-      // Handle image logic
+      // IMAGE HANDLING
       if (singleImage.value != null) {
         // New image selected
         final mimeType = _getMimeType(singleImage.value!.path);
@@ -259,43 +258,40 @@ class Addcouponcontroller extends GetxController {
           filename: singleImage.value!.path.split(Platform.pathSeparator).last,
           contentType: MediaType(mimeParts[0], mimeParts[1]),
         );
-      } else if (editImageUrl.value.isNotEmpty) {
-        couponData['image'] = editImageUrl.value;
-      } 
-      if (isEditMode.value && couponData['image'] == null) {
-        CustomSnackbar.showError(
-            'Error', 'Image is required for editing coupon');
-        return;
+      } else {
+        if (!isEditMode.value) {
+          // ADD MODE → image is required
+          CustomSnackbar.showError('Error', 'Image is required for new coupon');
+          return;
+        }
+        // EDIT MODE → if no new image, don't send image field at all
       }
 
       formData = dio.FormData.fromMap(couponData);
 
       if (isEditMode.value && editingCouponId.value != null) {
-      
+        // UPDATE COUPON
         await dioClient.dio.put(
           '${Apis.baseUrl}${Endpoints.coupons}/${editingCouponId.value}?salon_id=${loginUser!.salonId}',
           data: formData,
           options:
               dio.Options(headers: {'Content-Type': 'multipart/form-data'}),
         );
-      
         Get.back();
       } else {
-        // Add new coupon
-        print('Adding new coupon with image: ${couponData['image']}');
+        // ADD COUPON
         await dioClient.dio.post(
           '${Apis.baseUrl}${Endpoints.coupons}',
           data: formData,
           options:
               dio.Options(headers: {'Content-Type': 'multipart/form-data'}),
         );
-       
         Get.back();
       }
+
       var updateList = Get.put(CouponsController());
       await updateList.getCoupons();
     } catch (e) {
-     
       CustomSnackbar.showError('Error', e.toString());
     }
   }
