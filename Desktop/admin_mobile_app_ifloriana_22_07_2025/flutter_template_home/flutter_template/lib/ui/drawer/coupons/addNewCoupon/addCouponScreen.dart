@@ -35,74 +35,6 @@ class AddCouponScreen extends StatelessWidget {
               SizedBox(
                 height: 2.h,
               ),
-              CustomTextFormField(
-                controller: getController.nameController,
-                labelText: 'Name',
-                keyboardType: TextInputType.text,
-                validator: (value) => Validation.validatename(value),
-              ),
-              CustomTextFormField(
-                controller: getController.descriptionController,
-                labelText: 'Description',
-                maxLines: 2,
-                keyboardType: TextInputType.text,
-                validator: (value) => Validation.validatedisscription(value),
-              ),
-              Row(
-                children: [
-                  Expanded(child: coupon_type()),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  Expanded(child: discount_type()),
-                ],
-              ),
-              Row(
-                children: [
-                  Expanded(child: startTime(context)),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  Expanded(child: endTime(context)),
-                ],
-              ),
-              branchChips(),
-              CustomTextFormField(
-                controller: getController.coponCodeController,
-                labelText: 'Coupon Code',
-                keyboardType: TextInputType.text,
-                validator: (value) => Validation.validateisBlanck(value),
-              ),
-              CustomTextFormField(
-                controller: getController.discountAmtController,
-                labelText: 'Discount Amount',
-                keyboardType: TextInputType.number,
-                validator: (value) => Validation.validateisBlanck(value),
-              ),
-              CustomTextFormField(
-                controller: getController.userLimitController,
-                labelText: 'Use Limit',
-                keyboardType: TextInputType.number,
-                validator: (value) => Validation.validateisBlanck(value),
-              ),
-              Obx(() => Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      CustomTextWidget(
-                        text: 'Status',
-                        textStyle:
-                            CustomTextStyles.textFontRegular(size: 14.sp),
-                      ),
-                      Switch(
-                        value: getController.isActive.value,
-                        onChanged: (value) {
-                          getController.isActive.value = value;
-                        },
-                        activeColor: primaryColor,
-                      ),
-                    ],
-                  )),
-              // Add image picker and preview
               Obx(() {
                 final file = getController.singleImage.value;
                 final netUrl = getController.editImageUrl.value;
@@ -176,6 +108,75 @@ class AddCouponScreen extends StatelessWidget {
                   ),
                 );
               }),
+              CustomTextFormField(
+                controller: getController.nameController,
+                labelText: 'Name',
+                keyboardType: TextInputType.text,
+                validator: (value) => Validation.validatename(value),
+              ),
+              CustomTextFormField(
+                controller: getController.descriptionController,
+                labelText: 'Description',
+                maxLines: 2,
+                keyboardType: TextInputType.text,
+                validator: (value) => Validation.validatedisscription(value),
+              ),
+              Row(
+                children: [
+                  Expanded(child: coupon_type()),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Expanded(child: discount_type()),
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(child: startTime(context)),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Expanded(child: endTime(context)),
+                ],
+              ),
+              branchChips(),
+              CustomTextFormField(
+                controller: getController.coponCodeController,
+                labelText: 'Coupon Code',
+                keyboardType: TextInputType.text,
+                validator: (value) => Validation.validateisBlanck(value),
+              ),
+              CustomTextFormField(
+                controller: getController.discountAmtController,
+                labelText: 'Discount Amount',
+                keyboardType: TextInputType.number,
+                validator: (value) => Validation.validateisBlanck(value),
+              ),
+              CustomTextFormField(
+                controller: getController.userLimitController,
+                labelText: 'Use Limit',
+                keyboardType: TextInputType.number,
+                validator: (value) => Validation.validateisBlanck(value),
+              ),
+              Obx(() => Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      CustomTextWidget(
+                        text: 'Status',
+                        textStyle:
+                            CustomTextStyles.textFontRegular(size: 14.sp),
+                      ),
+                      Switch(
+                        value: getController.isActive.value,
+                        onChanged: (value) {
+                          getController.isActive.value = value;
+                        },
+                        activeColor: primaryColor,
+                      ),
+                    ],
+                  )),
+              // Add image picker and preview
+
               Btn_Coupons(),
               SizedBox(
                 height: 5.h,
