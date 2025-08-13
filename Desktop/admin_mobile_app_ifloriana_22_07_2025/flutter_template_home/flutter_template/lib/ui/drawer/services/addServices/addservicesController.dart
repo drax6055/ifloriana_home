@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_template/main.dart';
-import 'package:flutter_template/network/model/addService.dart';
 import 'package:flutter_template/network/network_const.dart';
 import 'package:flutter_template/wiget/custome_snackbar.dart';
 import 'package:get/get.dart';
@@ -17,8 +16,8 @@ class Category {
 
   factory Category.fromJson(Map<String, dynamic> json) {
     return Category(
-      id: json['_id'] ?? '',
-      name: json['name'] ?? '',
+      id: json['_id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
     );
   }
 }
@@ -58,7 +57,9 @@ class Service {
           ? json['status']
           : int.tryParse(json['status']?.toString() ?? '0'),
       description: json['description']?.toString(),
-      categoryId: json['category_id']?.toString(),
+      categoryId: json['category_id'] is Map
+          ? (json['category_id']['_id']?.toString())
+          : json['category_id']?.toString(),
       image_url: json['image_url']?.toString(),
     );
   }
@@ -97,7 +98,7 @@ class Addservicescontroller extends GetxController {
     super.onClose();
   }
 
-  void startEditing(Service service) async {
+  Future<void> startEditing(Service service) async {
     isEditing.value = true;
     editingService.value = service;
     nameController.text = service.name ?? '';
@@ -114,25 +115,10 @@ class Addservicescontroller extends GetxController {
     if (categories.isEmpty) {
       await getCategorys();
     }
-
-    // Preselect category with a slight delay to ensure UI is ready
-    await Future.delayed(Duration(milliseconds: 100));
-
-    if (service.categoryId != null && service.categoryId!.isNotEmpty) {
-      final categoryToSelect = categories.firstWhereOrNull(
-        (category) => category.id == service.categoryId,
-      );
-
-      if (categoryToSelect != null) {
-        selectedCategory.value = categoryToSelect;
-        print('Category preselected: ${categoryToSelect.name}');
-      } else {
-        print('Category not found for ID: ${service.categoryId}');
-        selectedCategory.value = null;
-      }
-    } else {
-      selectedCategory.value = null;
-    }
+    final categoryToSelect = categories.firstWhereOrNull(
+      (category) => category.id == service.categoryId,
+    );
+    selectedCategory.value = categoryToSelect;
   }
 
   void resetForm() {

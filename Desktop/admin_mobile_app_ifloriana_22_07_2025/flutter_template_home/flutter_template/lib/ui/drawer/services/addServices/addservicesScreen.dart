@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_template/commen_items/commen_class.dart';
 import 'package:flutter_template/ui/drawer/services/addServices/addservicesController.dart';
 import 'package:flutter_template/utils/colors.dart';
 import 'package:flutter_template/utils/custom_text_styles.dart';
@@ -116,7 +115,7 @@ class AddNewService extends StatelessWidget {
                             icon:
                                 Icon(Icons.edit_outlined, color: primaryColor),
                             onPressed: () async {
-                              getController.startEditing(service);
+                              await getController.startEditing(service);
                               showAddCategorySheet(context);
                             },
                           ),
