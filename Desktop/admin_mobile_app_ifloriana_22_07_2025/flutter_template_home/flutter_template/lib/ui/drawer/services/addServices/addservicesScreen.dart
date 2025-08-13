@@ -25,7 +25,6 @@ class AddNewService extends StatelessWidget {
         appBar: CustomAppBar(
           title: "Services",
         ),
-
         body: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Obx(() {
@@ -340,7 +339,7 @@ class AddNewService extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: 10.h),
+                  // SizedBox(height: 10.h),
                   Obx(() {
                     return DropdownButtonFormField<Category>(
                       decoration: InputDecoration(
@@ -353,7 +352,7 @@ class AddNewService extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                         labelText: "Select Category",
-                        labelStyle: TextStyle(color: primaryColor),
+                        labelStyle: TextStyle(color: grey),
                       ),
                       value: getController.selectedCategory.value,
                       items: getController.categories.map((category) {
@@ -373,9 +372,9 @@ class AddNewService extends StatelessWidget {
                       },
                     );
                   }),
-                  SizedBox(height: 10.h),
+                  // SizedBox(height: 10.h),
                   InputTxtfield_discription(),
-                  SizedBox(height: 10.h),
+                  // SizedBox(height: 10.h),
                   Obx(() => Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
