@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import '../../../../utils/colors.dart';
 import '../../../../wiget/appbar/commen_appbar.dart'; // Import CustomAppBar
 import '../../../../wiget/loading.dart'; // Import CustomLoadingAvatar
@@ -15,7 +14,7 @@ class DailybookingScreen extends StatelessWidget {
     final Dailybookingcontroller controller =
         Get.put(Dailybookingcontroller()); //
     final RxBool isSearching = false.obs;
-    final TextEditingController searchController = TextEditingController();
+    // final TextEditingController searchController = TextEditingController();
 
     return SafeArea(
       child: Scaffold(
@@ -188,11 +187,17 @@ class DailybookingScreen extends StatelessWidget {
                         DataColumn(label: Text('Date')),
                         DataColumn(label: Text('Appointments')),
                         DataColumn(label: Text('Services')),
+                        DataColumn(label: Text('Used Packages')),
                         DataColumn(label: Text('Service Amount')),
+                        DataColumn(label: Text('Product Amount')),
                         DataColumn(label: Text('Tax')),
                         DataColumn(label: Text('Tips')),
                         DataColumn(label: Text('Discount')),
+                        DataColumn(label: Text('Membership Discount')),
                         DataColumn(label: Text('Additional Charges')),
+                        DataColumn(label: Text('Cash')),
+                        DataColumn(label: Text('Card')),
+                        DataColumn(label: Text('UPI')),
                         DataColumn(label: Text('Final Amount')),
                       ],
                       rows: controller.filteredDailyReports.map((report) {
@@ -203,13 +208,27 @@ class DailybookingScreen extends StatelessWidget {
                           DataCell(
                               Text(report.servicesCount?.toString() ?? '0')),
                           DataCell(
+                              Text(report.usedPackageCount?.toString() ?? '0')),
+                          DataCell(
                               Text(report.serviceAmount?.toString() ?? '0')),
+                          DataCell(
+                              Text(report.productAmount?.toString() ?? '0')),
                           DataCell(Text(report.taxAmount?.toString() ?? '0')),
                           DataCell(Text(report.tipsEarning?.toString() ?? '0')),
                           DataCell(Text(
                               report.additionalDiscount?.toString() ?? '0')),
                           DataCell(Text(
+                              report.membershipDiscount?.toString() ?? '0')),
+                          DataCell(Text(
                               report.additionalCharges?.toString() ?? '0')),
+                          DataCell(Text(
+                              report.paymentBreakdown?.cash?.toString() ??
+                                  '0')),
+                          DataCell(Text(
+                              report.paymentBreakdown?.card?.toString() ??
+                                  '0')),
+                          DataCell(Text(
+                              report.paymentBreakdown?.upi?.toString() ?? '0')),
                           DataCell(Text(report.finalAmount?.toString() ?? '0')),
                         ]);
                       }).toList(),

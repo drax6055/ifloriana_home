@@ -122,8 +122,8 @@ class Dailybookingcontroller extends GetxController {
         },
       );
       print(
-          '${Apis.baseUrl}${Endpoints.dailyBookings}/?salon_id=${loginUser!.salonId}');
-      if (response != null && response.data != null) {
+          '${Apis.baseUrl}${Endpoints.dailyBookings}/?salon_id=${loginUser.salonId}');
+      if (response.data != null) {
         dailyReports.value = response.data!;
         filteredDailyReports.value =
             response.data!; // Initialize filtered reports
@@ -174,11 +174,17 @@ class Dailybookingcontroller extends GetxController {
         'Date',
         'Appointments',
         'Services',
+        'Used Packages',
         'Service Amount',
+        'Product Amount',
         'Tax',
         'Tips',
         'Discount',
+        'Membership Discount',
         'Additional Charges',
+        'Cash',
+        'Card',
+        'UPI',
         'Final Amount',
       ];
 
@@ -206,16 +212,28 @@ class Dailybookingcontroller extends GetxController {
         sheet.cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: row))
           ..value = report.servicesCount?.toString() ?? '0';
         sheet.cell(CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: row))
-          ..value = '₹${report.serviceAmount?.toString() ?? '0'}';
+          ..value = report.usedPackageCount?.toString() ?? '0';
         sheet.cell(CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: row))
-          ..value = '₹${report.taxAmount?.toString() ?? '0'}';
+          ..value = '₹${report.serviceAmount?.toString() ?? '0'}';
         sheet.cell(CellIndex.indexByColumnRow(columnIndex: 5, rowIndex: row))
-          ..value = '₹${report.tipsEarning?.toString() ?? '0'}';
+          ..value = '₹${report.productAmount?.toString() ?? '0'}';
         sheet.cell(CellIndex.indexByColumnRow(columnIndex: 6, rowIndex: row))
-          ..value = '₹${report.additionalDiscount?.toString() ?? '0'}';
+          ..value = '₹${report.taxAmount?.toString() ?? '0'}';
         sheet.cell(CellIndex.indexByColumnRow(columnIndex: 7, rowIndex: row))
-          ..value = '₹${report.additionalCharges?.toString() ?? '0'}';
+          ..value = '₹${report.tipsEarning?.toString() ?? '0'}';
         sheet.cell(CellIndex.indexByColumnRow(columnIndex: 8, rowIndex: row))
+          ..value = '₹${report.additionalDiscount?.toString() ?? '0'}';
+        sheet.cell(CellIndex.indexByColumnRow(columnIndex: 9, rowIndex: row))
+          ..value = '₹${report.membershipDiscount?.toString() ?? '0'}';
+        sheet.cell(CellIndex.indexByColumnRow(columnIndex: 10, rowIndex: row))
+          ..value = '₹${report.additionalCharges?.toString() ?? '0'}';
+        sheet.cell(CellIndex.indexByColumnRow(columnIndex: 11, rowIndex: row))
+          ..value = '₹${report.paymentBreakdown?.cash?.toString() ?? '0'}';
+        sheet.cell(CellIndex.indexByColumnRow(columnIndex: 12, rowIndex: row))
+          ..value = '₹${report.paymentBreakdown?.card?.toString() ?? '0'}';
+        sheet.cell(CellIndex.indexByColumnRow(columnIndex: 13, rowIndex: row))
+          ..value = '₹${report.paymentBreakdown?.upi?.toString() ?? '0'}';
+        sheet.cell(CellIndex.indexByColumnRow(columnIndex: 14, rowIndex: row))
           ..value = '₹${report.finalAmount?.toString() ?? '0'}';
       }
 
@@ -223,7 +241,8 @@ class Dailybookingcontroller extends GetxController {
       sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: totalRow))
         ..value = 'Grand Total'
         ..cellStyle = CellStyle(bold: true);
-      sheet.cell(CellIndex.indexByColumnRow(columnIndex: 8, rowIndex: totalRow))
+      sheet
+          .cell(CellIndex.indexByColumnRow(columnIndex: 14, rowIndex: totalRow))
         ..value = '₹${calculateTotalForExport(dataToExport).toStringAsFixed(2)}'
         ..cellStyle = CellStyle(bold: true);
 
@@ -281,22 +300,34 @@ class Dailybookingcontroller extends GetxController {
                     'Date',
                     'Appointments',
                     'Services',
+                    'Used Packages',
                     'Service Amount',
+                    'Product Amount',
                     'Tax',
                     'Tips',
                     'Discount',
+                    'Membership Discount',
                     'Additional Charges',
+                    'Cash',
+                    'Card',
+                    'UPI',
                     'Final Amount',
                   ],
                   ...dataToExport.map((report) => [
                         report.date ?? '',
                         report.appointmentsCount?.toString() ?? '0',
                         report.servicesCount?.toString() ?? '0',
+                        report.usedPackageCount?.toString() ?? '0',
                         '₹${report.serviceAmount?.toString() ?? '0'}',
+                        '₹${report.productAmount?.toString() ?? '0'}',
                         '₹${report.taxAmount?.toString() ?? '0'}',
                         '₹${report.tipsEarning?.toString() ?? '0'}',
                         '₹${report.additionalDiscount?.toString() ?? '0'}',
+                        '₹${report.membershipDiscount?.toString() ?? '0'}',
                         '₹${report.additionalCharges?.toString() ?? '0'}',
+                        '₹${report.paymentBreakdown?.cash?.toString() ?? '0'}',
+                        '₹${report.paymentBreakdown?.card?.toString() ?? '0'}',
+                        '₹${report.paymentBreakdown?.upi?.toString() ?? '0'}',
                         '₹${report.finalAmount?.toString() ?? '0'}',
                       ]),
                   [

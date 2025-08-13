@@ -8,8 +8,10 @@ import '../../wiget/custome_snackbar.dart';
 import '../drawer/branches/getBranches/getBranchesScreen.Dart';
 import '../drawer/branches/post_branches_screena.dart/postBranchesScreen.dart';
 import '../drawer/coupons/couponsScreen.dart';
+import '../drawer/manager/getManager/getmanagerScreen.dart';
 import '../drawer/products/product_list/product_list_screen.dart';
 import '../drawer/products/subcategory/subcategoryScreen.dart';
+import '../drawer/reports/dailyBooking/dailyBooking_screen.dart';
 import '../drawer/reports/overallBooking/overall_booking_screen.dart';
 import '../drawer/services/addServices/addservicesScreen.dart';
 import '../drawer/staff/staffDetailsScreen.dart';
@@ -33,7 +35,7 @@ class SplashController extends GetxController {
         String? managerAccessToken = managerUser?.token;
 
         if (accessToken != null && accessToken.isNotEmpty) {
-          Get.to(OverallBookingScreen());
+          Get.to(Getmanagerscreen());
           // Get.offNamed(Routes.drawerScreen); // Regular user
         } else if (managerAccessToken != null &&
             managerAccessToken.isNotEmpty) {
