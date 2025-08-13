@@ -91,27 +91,29 @@ class Staffpayoutreportscreen extends StatelessWidget {
             ),
             Expanded(
               child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: DataTable(
-                  columns: const [
-                    DataColumn(label: Text('Payment Date')),
-                    DataColumn(label: Text('Staff')),
-                    DataColumn(label: Text('Commission Amount')),
-                    DataColumn(label: Text('Tips Amount')),
-                    DataColumn(label: Text('Payment Type')),
-                    DataColumn(label: Text('Total Pay')),
-                  ],
-                  rows: getController.filteredPayouts.map((payout) {
-                    return DataRow(cells: [
-                      DataCell(Text(payout.formattedDate)),
-                      DataCell(Text(payout.staffName)),
-                      DataCell(Text(payout.commissionAmount.toString())),
-                      DataCell(Text(payout.tips.toString())),
-                      DataCell(Text(payout.paymentType)),
-                      DataCell(Text(payout.totalPay.toString())),
-                    ]);
-                  }).toList(),
-                ),
+                scrollDirection: Axis.vertical,
+                child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                      columns: const [
+                        DataColumn(label: Text('Payment Date')),
+                        DataColumn(label: Text('Staff')),
+                        DataColumn(label: Text('Commission Amount')),
+                        DataColumn(label: Text('Tips Amount')),
+                        DataColumn(label: Text('Payment Type')),
+                        DataColumn(label: Text('Total Pay')),
+                      ],
+                      rows: getController.filteredPayouts.map((payout) {
+                        return DataRow(cells: [
+                          DataCell(Text(payout.formattedDate)),
+                          DataCell(Text(payout.staffName)),
+                          DataCell(Text(payout.commissionAmount.toString())),
+                          DataCell(Text(payout.tips.toString())),
+                          DataCell(Text(payout.paymentType)),
+                          DataCell(Text(payout.totalPay.toString())),
+                        ]);
+                      }).toList(),
+                    )),
               ),
             ),
           ],

@@ -50,7 +50,7 @@ class Statffearningcontroller extends GetxController {
       final response = await dioClient.postData(
         '${Apis.baseUrl}/staffEarnings/pay/$staffId',
         {
-          "payment_method": paymentMethod,
+          "payment_method": paymentMethod.toLowerCase(),
           "discription": description,
           "salon_id": loginUser!.salonId,
         },

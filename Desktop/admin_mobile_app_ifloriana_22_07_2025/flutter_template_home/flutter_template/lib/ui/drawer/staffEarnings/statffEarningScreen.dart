@@ -3,9 +3,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_template/utils/colors.dart';
 import 'package:get/get.dart';
 
+import '../../../wiget/Custome_button.dart';
 import '../../../wiget/appbar/commen_appbar.dart';
 import '../../../wiget/loading.dart';
 import 'statffEarningController.dart';
+import '../../../network/network_const.dart';
 
 class Statffearningscreen extends StatelessWidget {
   Statffearningscreen({super.key});
@@ -79,52 +81,91 @@ class Statffearningscreen extends StatelessWidget {
                   color: primaryColor,
                   onRefresh: getController.getStaffEarningData,
                   child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: DataTable(
-                      columns: const [
-                        DataColumn(label: Text('Name')),
-                        DataColumn(label: Text('Total Booking')),
-                        DataColumn(label: Text('Service Amount')),
-                        DataColumn(label: Text('Commission Earning')),
-                        DataColumn(label: Text('Tip Earning')),
-                        DataColumn(label: Text('Staff Earning')),
-                        DataColumn(label: Text('Action')),
-                      ],
-                      rows: getController.filteredStaffEarnings
-                          .map<DataRow>((staff) {
-                        return DataRow(
-                          cells: [
-                            DataCell(Row(
-                              children: [
-                                // CircleAvatar(
-                                //   backgroundImage: staff['staff_image'] != null
-                                //       ? NetworkImage(staff['staff_image'])
-                                //       : null,
-                                //   child: staff['staff_image'] == null
-                                //       ? Icon(Icons.person)
-                                //       : null,
-                                // ),
-                                SizedBox(width: 8),
-                                Text(staff['staff_name'] ?? ''),
-                              ],
-                            )),
-                            DataCell(Text('${staff['total_booking']}')),
-                            DataCell(Text('₹ ${staff['service_amount']}')),
-                            DataCell(Text('₹ ${staff['commission_earning']}')),
-                            DataCell(Text('₹ ${staff['tip_earning']}')),
-                            DataCell(Text('₹ ${staff['staff_earning']}')),
-                            DataCell(
-                              IconButton(
-                                icon: Icon(Icons.payments, color: primaryColor),
-                                onPressed: () {
-                                  _showPayoutSheet(
-                                      context, staff, getController);
-                                },
+                    scrollDirection: Axis.vertical,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: DataTable(
+                        columns: const [
+                          DataColumn(label: Text('Name')),
+                          DataColumn(label: Text('Total Booking')),
+                          DataColumn(label: Text('Service Amount')),
+                          DataColumn(label: Text('Commission Earning')),
+                          DataColumn(label: Text('Tip Earning')),
+                          DataColumn(label: Text('Staff Earning')),
+                          DataColumn(label: Text('Action')),
+                        ],
+                        rows: getController.filteredStaffEarnings
+                            .map<DataRow>((staff) {
+                          return DataRow(
+                            cells: [
+                              DataCell(Row(
+                                children: [
+                                  (staff['staff_image'] != null &&
+                                          staff['staff_image']
+                                              .toString()
+                                              .isNotEmpty)
+                                      ? ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          child: Image.network(
+                                            '${Apis.pdfUrl}${staff['staff_image']}?v=${DateTime.now().millisecondsSinceEpoch}',
+                                            width: 40,
+                                            height: 40,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              return Container(
+                                                width: 40,
+                                                height: 40,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.grey[300],
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                                child: const Icon(
+                                                    Icons.image_not_supported),
+                                              );
+                                            },
+                                          ),
+                                        )
+                                      : Container(
+                                          width: 40,
+                                          height: 40,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[300],
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: const Icon(
+                                            Icons.image_not_supported,
+                                            color: Color.fromARGB(
+                                                255, 177, 177, 177),
+                                          ),
+                                        ),
+                                  SizedBox(width: 8),
+                                  Text(staff['staff_name'] ?? ''),
+                                ],
+                              )),
+                              DataCell(Text('${staff['total_booking']}')),
+                              DataCell(Text('₹ ${staff['service_amount']}')),
+                              DataCell(
+                                  Text('₹ ${staff['commission_earning']}')),
+                              DataCell(Text('₹ ${staff['tip_earning']}')),
+                              DataCell(Text('₹ ${staff['staff_earning']}')),
+                              DataCell(
+                                IconButton(
+                                  icon:
+                                      Icon(Icons.payments, color: primaryColor),
+                                  onPressed: () {
+                                    _showPayoutSheet(
+                                        context, staff, getController);
+                                  },
+                                ),
                               ),
-                            ),
-                          ],
-                        );
-                      }).toList(),
+                            ],
+                          );
+                        }).toList(),
+                      ),
                     ),
                   ),
                 ),
@@ -157,14 +198,37 @@ class Statffearningscreen extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  CircleAvatar(
-                    backgroundImage: staff['staff_image'] != null
-                        ? NetworkImage(staff['staff_image'])
-                        : null,
-                    child: staff['staff_image'] == null
-                        ? Icon(Icons.person)
-                        : null,
-                  ),
+                  (staff['staff_image'] != null &&
+                          staff['staff_image'].toString().isNotEmpty)
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.network(
+                            '${Apis.pdfUrl}${staff['staff_image']}?v=${DateTime.now().millisecondsSinceEpoch}',
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[300],
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(Icons.image_not_supported),
+                              );
+                            },
+                          ),
+                        )
+                      : Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(Icons.image_not_supported),
+                        ),
                   SizedBox(width: 12),
                   Text(staff['staff_name'] ?? '',
                       style:
@@ -172,25 +236,45 @@ class Statffearningscreen extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 16),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text('Select Method *'),
-              ),
               Obx(() => DropdownButtonFormField<String>(
                     value: paymentMethod.value,
                     items: [
                       DropdownMenuItem(value: 'cash', child: Text('Cash')),
                       DropdownMenuItem(value: 'upi', child: Text('Upi')),
+                      DropdownMenuItem(value: 'online', child: Text('Online')),
                     ],
                     onChanged: (v) => paymentMethod.value = v ?? 'cash',
-                    decoration: InputDecoration(border: OutlineInputBorder()),
+                    decoration: InputDecoration(
+                      labelText: 'Select Method *',
+                      labelStyle: TextStyle(color: grey),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                      ),
+                      focusedBorder: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                        borderSide: BorderSide(
+                          color: primaryColor,
+                          width: 2.0,
+                        ),
+                      ),
+                    ),
                   )),
               SizedBox(height: 16),
               TextField(
                 controller: descController,
                 decoration: InputDecoration(
                   labelText: 'Description',
-                  border: OutlineInputBorder(),
+                  labelStyle: TextStyle(color: grey),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                  ),
+                  focusedBorder: const OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                    borderSide: BorderSide(
+                      color: primaryColor,
+                      width: 2.0,
+                    ),
+                  ),
                 ),
               ),
               SizedBox(height: 16),
@@ -214,7 +298,7 @@ class Statffearningscreen extends StatelessWidget {
               SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
+                child: ElevatedButtonExample(
                   onPressed: () {
                     controller.payoutStaff(
                       staffId: staff['staff_id'],
@@ -222,7 +306,7 @@ class Statffearningscreen extends StatelessWidget {
                       description: descController.text,
                     );
                   },
-                  child: Text('Payout'),
+                  text: "Payout",
                 ),
               ),
             ],
