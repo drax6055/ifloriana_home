@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_template/commen_items/commen_class.dart';
 import 'package:flutter_template/ui/drawer/coupons/addNewCoupon/addCouponController.dart';
+import 'package:flutter_template/ui/drawer/coupons/couponsController.dart';
 import 'package:flutter_template/utils/colors.dart';
 import 'package:flutter_template/utils/custom_text_styles.dart';
 import 'package:flutter_template/utils/validation.dart';
@@ -11,6 +12,7 @@ import 'package:flutter_template/wiget/appbar/commen_appbar.dart';
 import 'package:flutter_template/wiget/custome_dropdown.dart';
 import 'package:flutter_template/wiget/custome_text.dart';
 import 'package:get/get.dart';
+import 'package:multi_dropdown/multi_dropdown.dart';
 import '../../../../network/network_const.dart';
 
 class AddCouponScreen extends StatelessWidget {
@@ -255,45 +257,45 @@ class AddCouponScreen extends StatelessWidget {
 
   Widget branchChips() {
     return Obx(() {
-      return Wrap(
-        spacing: 8.0,
-        runSpacing: 8.0,
-        children: [
-          FilterChip(
-            label:
-                Text(getController.allSelected ? 'Deselect All' : 'Select All'),
-            selected: getController.allSelected,
-            onSelected: (selected) {
-              if (selected) {
-                getController.selectedBranches
-                    .assignAll(getController.branchList);
-              } else {
-                getController.selectedBranches.clear();
-              }
-            },
-            selectedColor: primaryColor.withOpacity(0.2),
+      return MultiDropdown<Branch>(
+        items: getController.branchList
+            .map((branch) => DropdownItem(
+                  label: branch.name ?? 'Unknown',
+                  value: branch,
+                ))
+            .toList(),
+        controller: getController.branchController,
+        enabled: true,
+        searchEnabled: true,
+        chipDecoration: const ChipDecoration(
+          backgroundColor: primaryColor,
+          wrap: true,
+          runSpacing: 2,
+          spacing: 10,
+        ),
+        fieldDecoration: const FieldDecoration(
+          hintText: 'Select Branches *',
+          showClearIcon: true,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+            borderSide: BorderSide(color: Colors.grey, width: 1.0),
           ),
-          ...getController.branchList.map((branch) {
-            final isSelected =
-                getController.selectedBranches.any((b) => b.id == branch.id);
-            return FilterChip(
-              label: Text(branch.name ?? ''),
-              selected: isSelected,
-              onSelected: (selected) {
-                if (selected) {
-                  if (!getController.selectedBranches
-                      .any((b) => b.id == branch.id)) {
-                    getController.selectedBranches.add(branch);
-                  }
-                } else {
-                  getController.selectedBranches
-                      .removeWhere((b) => b.id == branch.id);
-                }
-              },
-              selectedColor: primaryColor.withOpacity(0.2),
-            );
-          }).toList(),
-        ],
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+            borderSide: BorderSide(color: primaryColor, width: 2.0),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+            borderSide: BorderSide(color: Colors.red, width: 1.0),
+          ),
+        ),
+        dropdownItemDecoration: DropdownItemDecoration(
+          selectedIcon: const Icon(Icons.check_box, color: primaryColor),
+          disabledIcon: Icon(Icons.lock, color: Colors.grey.shade300),
+        ),
+        onSelectionChange: (selectedItems) {
+          getController.selectedBranches.value = selectedItems;
+        },
       );
     });
   }

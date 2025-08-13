@@ -32,12 +32,12 @@ class CouponsScreen extends StatelessWidget {
                   margin:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   child: ListTile(
-                    leading: (coupon.image_url != null &&
-                            coupon.image_url!.isNotEmpty)
+                    leading: (coupon.imageUrl != null &&
+                            coupon.imageUrl!.isNotEmpty)
                         ? ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: Image.network(
-                              '${Apis.pdfUrl}${coupon.image_url}?v=${DateTime.now().millisecondsSinceEpoch}',
+                              '${Apis.pdfUrl}${coupon.imageUrl}?v=${DateTime.now().millisecondsSinceEpoch}',
                               width: 50,
                               height: 50,
                               fit: BoxFit.cover,
@@ -68,7 +68,7 @@ class CouponsScreen extends StatelessWidget {
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Type: ${coupon.type ?? '-'}"),
+                        Text("Type: ${coupon.couponType ?? '-'}"),
                         Text("Discount Type: ${coupon.discountType ?? '-'}"),
                         Text("Use Limit: ${coupon.useLimit ?? 0}"),
                         Text(
@@ -95,7 +95,7 @@ class CouponsScreen extends StatelessWidget {
                           icon: const Icon(Icons.delete_outline,
                               color: primaryColor),
                           onPressed: () async {
-                            await getController.deleteCoupon(coupon.id);
+                            await getController.deleteCoupon(coupon.sId);
                           },
                         ),
                       ],

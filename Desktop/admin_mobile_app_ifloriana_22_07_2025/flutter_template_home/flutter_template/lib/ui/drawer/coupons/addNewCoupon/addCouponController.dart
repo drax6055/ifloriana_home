@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_template/main.dart';
-import 'package:flutter_template/network/model/addCoupons.dart';
+
 import 'package:flutter_template/network/model/coupon_model.dart';
 import 'package:flutter_template/network/network_const.dart';
 import 'package:flutter_template/ui/drawer/coupons/couponsController.dart';
@@ -12,56 +12,64 @@ import 'package:http_parser/http_parser.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:multi_dropdown/multi_dropdown.dart';
 
-class Branch {
-  final String? id;
-  final String? name;
-
-  Branch({this.id, this.name});
-
-  factory Branch.fromJson(Map<String, dynamic> json) {
-    return Branch(
-      id: json['_id'],
-      name: json['name'],
-    );
-  }
-}
-
 class Addcouponcontroller extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    getBranches();
+    _initialize();
+  }
+
+  void _initialize() async {
     // Check if we're in edit mode
-    final coupon = Get.arguments as CouponModel?;
+    final coupon = Get.arguments as Data?;
     if (coupon != null) {
       isEditMode.value = true;
-      editingCouponId.value = coupon.id;
-      // Pre-fill the form
-      nameController.text = coupon.name ?? '';
-      descriptionController.text = coupon.description ?? '';
-      coponCodeController.text = coupon.code ?? '';
-      discountAmtController.text = coupon.discountAmount?.toString() ?? '';
-      userLimitController.text = coupon.useLimit?.toString() ?? '';
-      selectedCouponType.value = coupon.type?.capitalize ?? 'Custom';
-      selectedDiscountType.value = coupon.discountType?.capitalize ?? 'Percent';
-      isActive.value = coupon.status == 1;
-      // Pre-fill image
-      singleImage.value = null;
-      editImageUrl.value = coupon.image_url ?? '';
-      // Format dates to YYYY-MM-DD
-      if (coupon.startDate != null) {
-        final startDate = DateTime.parse(coupon.startDate!);
-        StarttimeController.text =
-            "${startDate.year}-${startDate.month.toString().padLeft(2, '0')}-${startDate.day.toString().padLeft(2, '0')}";
-      }
-      if (coupon.endDate != null) {
-        final endDate = DateTime.parse(coupon.endDate!);
-        EndtimeController.text =
-            "${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}";
-      }
+      editingCouponId.value = coupon.sId;
     } else {
       singleImage.value = null;
       editImageUrl.value = '';
+    }
+
+    await getBranches();
+  }
+
+  void populateFormForUpdate(Data coupon) {
+    // Pre-fill the form
+    nameController.text = coupon.name ?? '';
+    descriptionController.text = coupon.description ?? '';
+    coponCodeController.text = coupon.couponCode ?? '';
+    discountAmtController.text = coupon.discountAmount?.toString() ?? '';
+    userLimitController.text = coupon.useLimit?.toString() ?? '';
+    selectedCouponType.value = coupon.couponType?.capitalize ?? 'Custom';
+    selectedDiscountType.value = coupon.discountType?.capitalize ?? 'Percent';
+    isActive.value = coupon.status == 1;
+
+    if (coupon.branchId!.isNotEmpty) {
+      final branches = branchList
+          .where((b) => coupon.branchId!.any((branch) => branch.sId == b.id))
+          .toList();
+      selectedBranches.value = branches;
+      // Initialize branch controller with selected branches
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        branchController.selectWhere((item) =>
+            selectedBranches.any((branch) => branch.id == item.value.id));
+      });
+    }
+    // Pre-fill image
+    singleImage.value = null;
+    editImageUrl.value = coupon.imageUrl ?? '';
+    _originalImageUrl = coupon.imageUrl; // Store original image URL
+
+    // Format dates to YYYY-MM-DD
+    if (coupon.startDate != null) {
+      final startDate = DateTime.parse(coupon.startDate!);
+      StarttimeController.text =
+          "${startDate.year}-${startDate.month.toString().padLeft(2, '0')}-${startDate.day.toString().padLeft(2, '0')}";
+    }
+    if (coupon.endDate != null) {
+      final endDate = DateTime.parse(coupon.endDate!);
+      EndtimeController.text =
+          "${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}";
     }
   }
 
@@ -74,6 +82,7 @@ class Addcouponcontroller extends GetxController {
     userLimitController.dispose();
     StarttimeController.dispose();
     EndtimeController.dispose();
+    branchController.dispose();
     super.onClose();
   }
 
@@ -92,7 +101,7 @@ class Addcouponcontroller extends GetxController {
   var EndtimeController = TextEditingController();
   var branchList = <Branch>[].obs;
   var selectedBranches = <Branch>[].obs;
-  bool get allSelected => selectedBranches.length == branchList.length;
+  final branchController = MultiSelectController<Branch>();
 
   var selectedDiscountType = "Percent".obs;
   final List<String> dropdownCouponTypeItem = [
@@ -106,20 +115,15 @@ class Addcouponcontroller extends GetxController {
 
   final Rx<File?> singleImage = Rx<File?>(null);
   final RxString editImageUrl = ''.obs;
-
-  // Add this method to handle branch selection after branches are loaded
-  void selectBranches(List<String>? branchIds) {
-    if (branchIds != null && branchList.isNotEmpty) {
-      selectedBranches.value =
-          branchList.where((branch) => branchIds.contains(branch.id)).toList();
-    }
-  }
+  // Store the original image URL when editing to restore if needed
+  String? _originalImageUrl;
 
   Future<void> getBranches() async {
     final loginUser = await prefs.getUser();
     try {
+      print('Fetching branches for salon: ${loginUser!.salonId}');
       final response = await dioClient.getData(
-        '${Apis.baseUrl}${Endpoints.getBranchName}${loginUser!.salonId}',
+        '${Apis.baseUrl}${Endpoints.getBranchName}${loginUser.salonId}',
         (json) => json,
       );
 
@@ -130,10 +134,20 @@ class Addcouponcontroller extends GetxController {
       print(
           'Coupon branchList: ${branchList.map((b) => '${b.name} (${b.id})').toList()}');
 
-      // After branches are loaded, check if we need to select any
-      final coupon = Get.arguments as CouponModel?;
-      if (coupon != null && coupon.branchIds != null) {
-        selectBranches(coupon.branchIds);
+      // Populate the branch controller with available branches
+      branchController.setItems(branchList.value
+          .map((branch) => DropdownItem(
+                label: branch.name ?? 'Unknown',
+                value: branch,
+              ))
+          .toList());
+      print('Branch controller items set: ${branchController.items.length}');
+
+      // Check if we need to populate form for edit mode
+      final coupon = Get.arguments as Data?;
+      if (coupon != null && coupon.branchId != null) {
+        print('Branches loaded, now populating form for edit mode');
+        populateFormForUpdate(coupon);
       }
     } catch (e) {
       print('Coupon getBranches error: $e');
@@ -144,14 +158,22 @@ class Addcouponcontroller extends GetxController {
   Future<void> pickImageFromGallery() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    editImageUrl.value = '';
+    if (pickedFile != null) {
+      // Clear the existing image URL only when a new image is actually selected
+      editImageUrl.value = '';
+      print('New image selected from gallery, clearing editImageUrl');
+    }
     await _handlePickedFile(pickedFile);
   }
 
   Future<void> pickImageFromCamera() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
-    editImageUrl.value = '';
+    if (pickedFile != null) {
+      // Clear the existing image URL only when a new image is actually selected
+      editImageUrl.value = '';
+      print('New image selected from camera, clearing editImageUrl');
+    }
     await _handlePickedFile(pickedFile);
   }
 
@@ -163,12 +185,29 @@ class Addcouponcontroller extends GetxController {
       if (mimeType == null) {
         CustomSnackbar.showError(
             'Invalid Image', 'Only JPG, JPEG, PNG images are allowed!');
+        // Restore the original image URL if validation fails
+        if (isEditMode.value &&
+            editImageUrl.value.isEmpty &&
+            _originalImageUrl != null) {
+          editImageUrl.value = _originalImageUrl!;
+          print(
+              'Restored original image URL after validation failure: ${editImageUrl.value}');
+        }
         return;
       }
       if (await file.length() < maxSizeInBytes) {
         singleImage.value = file;
+        print('Image file accepted: ${file.path}');
       } else {
         CustomSnackbar.showError('Error', 'Image size must be less than 150KB');
+        // Restore the original image URL if size validation fails
+        if (isEditMode.value &&
+            editImageUrl.value.isEmpty &&
+            _originalImageUrl != null) {
+          editImageUrl.value = _originalImageUrl!;
+          print(
+              'Restored original image URL after size validation failure: ${editImageUrl.value}');
+        }
       }
     }
   }
@@ -187,6 +226,8 @@ class Addcouponcontroller extends GetxController {
     selectedBranches.clear();
     singleImage.value = null;
     editImageUrl.value = '';
+
+    print('Form reset - Image state cleared');
   }
 
   String? _getMimeType(String path) {
@@ -199,8 +240,19 @@ class Addcouponcontroller extends GetxController {
     return null;
   }
 
+  // Method to clear new image selection and restore original
+  void clearNewImageSelection() {
+    singleImage.value = null;
+    if (isEditMode.value && _originalImageUrl != null) {
+      editImageUrl.value = _originalImageUrl!;
+      print(
+          'Cleared new image selection, restored original: ${editImageUrl.value}');
+    }
+  }
+
   Future onCoupons() async {
     final loginUser = await prefs.getUser();
+
     Map<String, dynamic> couponData = {
       "name": nameController.text,
       "description": descriptionController.text,
@@ -218,8 +270,10 @@ class Addcouponcontroller extends GetxController {
 
     try {
       dio.FormData? formData;
-      // Add image if selected
+
+      // Handle image logic
       if (singleImage.value != null) {
+        // New image selected
         final mimeType = _getMimeType(singleImage.value!.path);
         if (mimeType == null) {
           CustomSnackbar.showError(
@@ -232,27 +286,55 @@ class Addcouponcontroller extends GetxController {
           filename: singleImage.value!.path.split(Platform.pathSeparator).last,
           contentType: MediaType(mimeParts[0], mimeParts[1]),
         );
+        print('Using new image: ${singleImage.value!.path}');
       } else if (editImageUrl.value.isNotEmpty) {
+        // Preserve existing image (either from edit mode or add mode)
+        if (isEditMode.value) {
+          // In edit mode, ensure we're not losing the image
+          if (_originalImageUrl != null &&
+              editImageUrl.value == _originalImageUrl) {
+            print('Preserving original image: ${editImageUrl.value}');
+          } else {
+            print('Using current image: ${editImageUrl.value}');
+          }
+        } else {
+          print('Using existing image URL: ${editImageUrl.value}');
+        }
         couponData['image'] = editImageUrl.value;
+      } else {
+        print('No image selected and no existing image');
       }
+
+      // Validate that we have an image in edit mode
+      if (isEditMode.value && couponData['image'] == null) {
+        CustomSnackbar.showError(
+            'Error', 'Image is required for editing coupon');
+        return;
+      }
+
       formData = dio.FormData.fromMap(couponData);
 
       if (isEditMode.value && editingCouponId.value != null) {
         // Update existing coupon
+        print('Updating coupon with image: ${couponData['image']}');
         await dioClient.dio.put(
           '${Apis.baseUrl}${Endpoints.coupons}/${editingCouponId.value}?salon_id=${loginUser!.salonId}',
           data: formData,
           options:
               dio.Options(headers: {'Content-Type': 'multipart/form-data'}),
         );
+        print('Coupon updated successfully');
         Get.back();
       } else {
+        // Add new coupon
+        print('Adding new coupon with image: ${couponData['image']}');
         await dioClient.dio.post(
           '${Apis.baseUrl}${Endpoints.coupons}',
           data: formData,
           options:
               dio.Options(headers: {'Content-Type': 'multipart/form-data'}),
         );
+        print('Coupon added successfully');
         Get.back();
       }
       var updateList = Get.put(CouponsController());

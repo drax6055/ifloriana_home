@@ -16,6 +16,18 @@ class Branch {
       name: json['name'],
     );
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Branch && other.id == id;
+  }
+
+  @override
+  int get hashCode => id.hashCode;
+
+  @override
+  String toString() => 'Branch(id: $id, name: $name)';
 }
 
 class CouponsController extends GetxController {
@@ -25,7 +37,7 @@ class CouponsController extends GetxController {
     getCoupons();
   }
 
-  var couponList = <CouponModel>[].obs;
+  var couponList = <Data>[].obs;
 
   Future<void> getCoupons() async {
     final loginUser = await prefs.getUser();
@@ -36,7 +48,7 @@ class CouponsController extends GetxController {
       );
       print('${response.toString()}');
       final data = response['data'] as List;
-      couponList.value = data.map((e) => CouponModel.fromJson(e)).toList();
+      couponList.value = data.map((e) => Data.fromJson(e)).toList();
     } catch (e) {
       print('${e.toString()}');
       CustomSnackbar.showError('Error', 'Failed to get data: $e');
@@ -52,7 +64,7 @@ class CouponsController extends GetxController {
         (json) => json,
       );
 
-      couponList.removeWhere((c) => c.id == couponId);
+      couponList.removeWhere((c) => c.sId == couponId);
       CustomSnackbar.showSuccess('Deleted', 'Coupon deleted successfully');
     } catch (e) {
       CustomSnackbar.showError('Error', 'Failed to delete coupon: $e');

@@ -452,6 +452,7 @@ class AddProductController extends GetxController {
 
     selectedBrand.value =
         brandList.firstWhereOrNull((b) => b.id == product.brandId?.id);
+    
     selectedCategory.value =
         categoryList.firstWhereOrNull((c) => c.id == product.categoryId?.id);
     selectedTag.value =
