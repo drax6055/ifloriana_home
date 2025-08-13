@@ -392,7 +392,7 @@ class Subcategoryscreen extends StatelessWidget {
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
             borderSide: const BorderSide(
-              color: secondaryColor,
+              color: primaryColor,
             ),
           ),
         ),
@@ -457,7 +457,14 @@ class Subcategoryscreen extends StatelessWidget {
         value: getController.selectedCategory.value,
         decoration: InputDecoration(
           labelText: "Select Category",
+          labelStyle: TextStyle(color: grey),
           border: OutlineInputBorder(),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(
+              color: primaryColor,
+            ),
+          ),
         ),
         items: getController.categoryList.map((Category category) {
           return DropdownMenuItem<Category>(
@@ -469,12 +476,6 @@ class Subcategoryscreen extends StatelessWidget {
           print('Category dropdown onChanged called with: ${newValue?.name}');
           if (newValue != null) {
             getController.selectedCategory.value = newValue;
-            print(
-                'Selected Category set to: ${getController.selectedCategory.value?.name}');
-            CustomSnackbar.showSuccess(
-              'Category Selected',
-              'ID: ${newValue.id}',
-            );
           }
         },
       );
