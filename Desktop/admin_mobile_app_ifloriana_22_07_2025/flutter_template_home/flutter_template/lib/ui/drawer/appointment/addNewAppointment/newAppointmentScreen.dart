@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_template/network/network_const.dart';
 import 'package:flutter_template/ui/drawer/appointment/addNewAppointment/newAppointmentController.dart';
@@ -628,6 +629,10 @@ class Newappointmentscreen extends StatelessWidget {
           labelText: 'Phone Number',
           keyboardType: TextInputType.phone,
           validator: (value) => Validation.validatePhone(value),
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+            LengthLimitingTextInputFormatter(10),
+          ],
         ),
         Obx(() => CustomDropdown<String>(
               value: getController.selectedGender.value.isEmpty
