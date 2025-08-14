@@ -1,7 +1,14 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:flutter_template/main.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:excel/excel.dart';
+import 'package:pdf/pdf.dart' as pw;
+import 'package:pdf/widgets.dart' as pw;
+import 'package:path_provider/path_provider.dart';
+import 'package:open_file/open_file.dart';
 
 import '../../../network/network_const.dart';
 import '../../../wiget/custome_snackbar.dart';
@@ -192,10 +199,16 @@ class PaymentSummaryState {
 
 class AppointmentController extends GetxController {
   var appointments = <Appointment>[].obs;
+  var filteredAppointments = <Appointment>[].obs;
   var isLoading = false.obs;
   var taxes = <TaxModel>[].obs;
   var coupons = <CouponModel>[].obs;
   var paymentSummaryState = PaymentSummaryState();
+
+  // Filter and sort variables
+  DateTime? selectedDate;
+  DateTimeRange? selectedDateRange;
+  String sortOrder = 'desc'; // Default to newest first
 
   @override
   void onInit() {
@@ -203,6 +216,66 @@ class AppointmentController extends GetxController {
     getTax();
     getCoupons();
     getAppointment();
+  }
+
+  // Filter and sort methods
+  void selectDate(DateTime date) {
+    selectedDate = date;
+    selectedDateRange = null;
+    _applyFilters();
+  }
+
+  void selectDateRange(DateTimeRange range) {
+    selectedDateRange = range;
+    selectedDate = null;
+    _applyFilters();
+  }
+
+  void setSortOrder(String order) {
+    sortOrder = order;
+    _applyFilters();
+  }
+
+  void clearFilters() {
+    selectedDate = null;
+    selectedDateRange = null;
+    sortOrder = 'desc';
+    _applyFilters();
+  }
+
+  void _applyFilters() {
+    var filtered = List<Appointment>.from(appointments);
+
+    // Apply date filters
+    if (selectedDate != null) {
+      filtered = filtered.where((appointment) {
+        final appointmentDate = DateTime.parse(appointment.date);
+        return appointmentDate.year == selectedDate!.year &&
+            appointmentDate.month == selectedDate!.month &&
+            appointmentDate.day == selectedDate!.day;
+      }).toList();
+    } else if (selectedDateRange != null) {
+      filtered = filtered.where((appointment) {
+        final appointmentDate = DateTime.parse(appointment.date);
+        return appointmentDate.isAfter(
+                selectedDateRange!.start.subtract(const Duration(days: 1))) &&
+            appointmentDate
+                .isBefore(selectedDateRange!.end.add(const Duration(days: 1)));
+      }).toList();
+    }
+
+    // Apply sorting
+    filtered.sort((a, b) {
+      final dateA = DateTime.parse(a.date);
+      final dateB = DateTime.parse(b.date);
+      if (sortOrder == 'asc') {
+        return dateA.compareTo(dateB);
+      } else {
+        return dateB.compareTo(dateA);
+      }
+    });
+
+    filteredAppointments.value = filtered;
   }
 
   Future<void> getAppointment() async {
@@ -216,6 +289,9 @@ class AppointmentController extends GetxController {
       if (response != null && response['success'] == true) {
         final List data = response['data'] ?? [];
         appointments.value = data.map((e) => Appointment.fromJson(e)).toList();
+        // Initialize filtered appointments
+        filteredAppointments.value = List.from(appointments);
+        _applyFilters();
       }
       print("${Apis.baseUrl}/appointments?salon_id=${loginUser.salonId}");
     } catch (e) {
@@ -336,22 +412,22 @@ class AppointmentController extends GetxController {
         (json) => json,
       );
 
-      if (response != null && response['success'] == true) {
-        final List payments = response['data'] ?? [];
-        final payment = payments.firstWhereOrNull(
-          (payment) => payment['appointment_id'] == appointmentId,
-        );
+      // if (response != null && response['success'] == true) {
+      final List payments = response['data'] ?? [];
+      final payment = payments.firstWhereOrNull(
+        (payment) => payment['appointment_id'] == appointmentId,
+      );
 
-        if (payment != null && payment['invoice_pdf_url'] != null) {
-          final pdfUrl = '${Apis.pdfUrl}${payment['invoice_pdf_url']}';
-          await openPdf(pdfUrl);
-        } else {
-          CustomSnackbar.showError(
-              'Error', 'No invoice found for this appointment');
-        }
+      if (payment != null && payment['invoice_pdf_url'] != null) {
+        final pdfUrl = '${Apis.pdfUrl}${payment['invoice_pdf_url']}';
+        await openPdf(pdfUrl);
       } else {
-        CustomSnackbar.showError('Error', 'Failed to fetch payment data');
+        CustomSnackbar.showError(
+            'Error', 'No invoice found for this appointment');
       }
+      // } else {
+      //   CustomSnackbar.showError('Error', 'Failed to fetch payment data');
+      // }
     } catch (e) {
       CustomSnackbar.showError('Error', 'Failed to open PDF: $e');
     }
@@ -384,6 +460,160 @@ class AppointmentController extends GetxController {
       await getAppointment();
     } catch (e) {
       CustomSnackbar.showError('Error', 'Failed to delete appointment: $e');
+    }
+  }
+
+  // Export methods
+  Future<void> exportToExcel() async {
+    try {
+      final excel = Excel.createExcel();
+      final sheet = excel['Appointments'];
+
+      // Add headers
+      sheet
+          .cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 0))
+          .value = 'Date & Time';
+      sheet
+          .cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 0))
+          .value = 'Client';
+      sheet
+          .cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: 0))
+          .value = 'Amount';
+      sheet
+          .cell(CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: 0))
+          .value = 'Staff Name';
+      sheet
+          .cell(CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: 0))
+          .value = 'Services';
+      sheet
+          .cell(CellIndex.indexByColumnRow(columnIndex: 5, rowIndex: 0))
+          .value = 'Membership';
+      sheet
+          .cell(CellIndex.indexByColumnRow(columnIndex: 6, rowIndex: 0))
+          .value = 'Package';
+      sheet
+          .cell(CellIndex.indexByColumnRow(columnIndex: 7, rowIndex: 0))
+          .value = 'Status';
+      sheet
+          .cell(CellIndex.indexByColumnRow(columnIndex: 8, rowIndex: 0))
+          .value = 'Payment Status';
+
+      // Add data
+      for (int i = 0; i < filteredAppointments.length; i++) {
+        final appointment = filteredAppointments[i];
+        final rowIndex = i + 1;
+
+        sheet
+            .cell(
+                CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: rowIndex))
+            .value = '${appointment.date} - ${appointment.time}';
+        sheet
+            .cell(
+                CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: rowIndex))
+            .value = appointment.clientName;
+        sheet
+            .cell(
+                CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: rowIndex))
+            .value = appointment.amount;
+        sheet
+            .cell(
+                CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: rowIndex))
+            .value = appointment.staffName;
+        sheet
+            .cell(
+                CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: rowIndex))
+            .value = appointment.serviceName;
+        sheet
+            .cell(
+                CellIndex.indexByColumnRow(columnIndex: 5, rowIndex: rowIndex))
+            .value = appointment.membership ?? '-';
+        sheet
+            .cell(
+                CellIndex.indexByColumnRow(columnIndex: 6, rowIndex: rowIndex))
+            .value = appointment.package ?? '-';
+        sheet
+            .cell(
+                CellIndex.indexByColumnRow(columnIndex: 7, rowIndex: rowIndex))
+            .value = appointment.status;
+        sheet
+            .cell(
+                CellIndex.indexByColumnRow(columnIndex: 8, rowIndex: rowIndex))
+            .value = appointment.paymentStatus;
+      }
+
+      // Save file
+      final directory = await getApplicationDocumentsDirectory();
+      final fileName =
+          'appointments_${DateTime.now().millisecondsSinceEpoch}.xlsx';
+      final file = File('${directory.path}/$fileName');
+      await file.writeAsBytes(excel.encode()!);
+
+      // Open file
+      await OpenFile.open(file.path);
+      CustomSnackbar.showSuccess('Success', 'Excel file exported successfully');
+    } catch (e) {
+      CustomSnackbar.showError('Error', 'Failed to export Excel: $e');
+    }
+  }
+
+  Future<void> exportToPdf() async {
+    try {
+      final pdf = pw.Document();
+
+      pdf.addPage(
+        pw.Page(
+          pageFormat: pw.PdfPageFormat.a4,
+          build: (pw.Context context) {
+            return pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Header(
+                  level: 0,
+                  child: pw.Text('Appointments Report',
+                      style: pw.TextStyle(
+                          fontSize: 20, fontWeight: pw.FontWeight.bold)),
+                ),
+                pw.SizedBox(height: 20),
+                pw.Table.fromTextArray(
+                  headers: [
+                    'Date & Time',
+                    'Client',
+                    'Amount',
+                    'Staff',
+                    'Service',
+                    'Status',
+                    'Payment'
+                  ],
+                  data: filteredAppointments
+                      .map((appointment) => [
+                            '${appointment.date} - ${appointment.time}',
+                            appointment.clientName,
+                            '₹${appointment.amount}',
+                            appointment.staffName,
+                            appointment.serviceName,
+                            appointment.status,
+                            appointment.paymentStatus,
+                          ])
+                      .toList(),
+                ),
+              ],
+            );
+          },
+        ),
+      );
+
+      // Save file
+      final directory = await getApplicationDocumentsDirectory();
+      final fileName =
+          'appointments_${DateTime.now().millisecondsSinceEpoch}.pdf';
+      final file = File('${directory.path}/$fileName');
+      await file.writeAsBytes(await pdf.save());
+
+      // Open file
+      await OpenFile.open(file.path);
+      CustomSnackbar.showSuccess('Success', 'PDF file exported successfully');
+    } catch (e) {
+      CustomSnackbar.showError('Error', 'Failed to export PDF: $e');
     }
   }
 }

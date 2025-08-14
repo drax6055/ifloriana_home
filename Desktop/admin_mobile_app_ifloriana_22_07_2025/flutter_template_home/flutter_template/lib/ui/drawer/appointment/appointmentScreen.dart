@@ -15,7 +15,106 @@ class Appointmentscreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: CustomAppBar(title: 'Appointments'),
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(70.h),
+          child: CustomAppBar(
+            title: 'Appointments',
+            backgroundColor: primaryColor,
+            actions: [
+              PopupMenuButton<String>(
+                onSelected: (value) async {
+                  if (value == 'date') {
+                    final DateTime? picked = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2101),
+                    );
+                    if (picked != null) {
+                      getController.selectDate(picked);
+                    }
+                  } else if (value == 'range') {
+                    final DateTimeRange? picked = await showDateRangePicker(
+                      context: context,
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2101),
+                    );
+                    if (picked != null) {
+                      getController.selectDateRange(picked);
+                    }
+                  } else if (value == 'sort_asc') {
+                    getController.setSortOrder('asc');
+                  } else if (value == 'sort_desc') {
+                    getController.setSortOrder('desc');
+                  } else if (value == 'clear') {
+                    getController.clearFilters();
+                  } else if (value == 'export') {
+                    _showExportDialog(context, getController);
+                  }
+                },
+                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                  const PopupMenuItem<String>(
+                    value: 'date',
+                    child: Text('Filter by Date'),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'range',
+                    child: Text('Filter by Date Range'),
+                  ),
+                  const PopupMenuDivider(),
+                  const PopupMenuItem<String>(
+                    value: 'sort_asc',
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.arrow_upward,
+                          size: 16,
+                          color: grey,
+                        ),
+                        SizedBox(width: 8),
+                        Text('Sort Oldest First'),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'sort_desc',
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.arrow_downward,
+                          size: 16,
+                          color: grey,
+                        ),
+                        SizedBox(width: 8),
+                        Text('Sort Newest First'),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuDivider(),
+                  const PopupMenuItem<String>(
+                    value: 'export',
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.file_download,
+                          size: 16,
+                          color: grey,
+                        ),
+                        SizedBox(width: 8),
+                        Text('Export Data'),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuDivider(),
+                  const PopupMenuItem<String>(
+                    value: 'clear',
+                    child: Text('Clear Filters'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
         body: Container(
           child: Obx(() {
             if (getController.isLoading.value) {
@@ -25,6 +124,11 @@ class Appointmentscreen extends StatelessWidget {
               return Center(
                   child: Text('No appointments found',
                       style: TextStyle(color: Colors.black)));
+            }
+            if (getController.filteredAppointments.isEmpty) {
+              return const Center(
+                  child:
+                      Text('No appointments found with the current filters.'));
             }
             return SingleChildScrollView(
               scrollDirection: Axis.vertical,
@@ -64,7 +168,7 @@ class Appointmentscreen extends StatelessWidget {
                           label: Text('Action',
                               style: TextStyle(color: Colors.black))),
                     ],
-                    rows: getController.appointments.map((a) {
+                    rows: getController.filteredAppointments.map((a) {
                       return DataRow(cells: [
                         DataCell(Text('${a.date} - ${a.time}',
                             style: TextStyle(color: Colors.black))),
@@ -857,6 +961,113 @@ class Appointmentscreen extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+
+  void _showExportDialog(
+      BuildContext context, AppointmentController controller) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+          title: const Text(
+            'Export Data',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+              color: primaryColor,
+            ),
+          ),
+          contentPadding: const EdgeInsets.fromLTRB(24.0, 20.0, 24.0, 0.0),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Choose your preferred export format:',
+                style: TextStyle(fontSize: 16, color: Colors.black87),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 30),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildExportOption(
+                    context,
+                    icon: Icons.table_chart,
+                    label: 'Excel',
+                    color: Colors.green,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      controller.exportToExcel();
+                    },
+                  ),
+                  _buildExportOption(
+                    context,
+                    icon: Icons.picture_as_pdf,
+                    label: 'PDF',
+                    color: Colors.red,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      controller.exportToPdf();
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+          actionsPadding: const EdgeInsets.all(16.0),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.grey, fontSize: 16),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildExportOption(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Card(
+      elevation: 5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 40, color: color),
+              const SizedBox(height: 10),
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
