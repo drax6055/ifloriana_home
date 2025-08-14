@@ -362,22 +362,39 @@ class Appointmentscreen extends StatelessWidget {
                                                         color:
                                                             Colors.brown[100])),
                                                 SizedBox(height: 16),
+                                                // Row(
+                                                //   mainAxisAlignment:
+                                                //       MainAxisAlignment
+                                                //           .spaceBetween,
+                                                //   children: [
+                                                Text('Date: ${a.date}',
+                                                    style: TextStyle(
+                                                        color: Colors.white)),
+                                                Text('Customer Details',
+                                                    style: TextStyle(
+                                                        color: Colors.white)),
                                                 Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
                                                   children: [
-                                                    Text('Date: ${a.date}',
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.white)),
-                                                    Text(
-                                                        'Customer: ${a.clientName} - ${a.clientPhone ?? ''}',
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.white)),
+                                                    SizedBox(width: 10),
+                                                    Column(
+                                                      children: [
+                                                        Text(
+                                                            'Name: ${a.clientName}',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white)),
+                                                        Text(
+                                                            'Phone: ${a.clientPhone ?? ''}',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white)),
+                                                      ],
+                                                    ),
                                                   ],
                                                 ),
+
+                                                // ],
+                                                // ),
                                                 SizedBox(height: 8),
                                                 Text(
                                                     'Service Amount: ₹ ${a.amount}',
