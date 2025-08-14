@@ -75,6 +75,17 @@ class Appointment {
       return 0;
     }
 
+    // Helper function to normalize status values
+    String _normalizeStatus(String status) {
+      final normalized = status.toLowerCase().trim();
+      if (normalized == 'check-in' || normalized == 'check in') {
+        return 'check in';
+      } else if (normalized == 'check-out' || normalized == 'check out') {
+        return 'check out';
+      }
+      return normalized;
+    }
+
     return Appointment(
       appointmentId: toString(json['appointment_id']),
       date: toString(json['appointment_date']).split('T')[0],
@@ -94,7 +105,7 @@ class Appointment {
                   : true))
           ? 'Yes'
           : '-',
-      status: toString(json['status']),
+      status: _normalizeStatus(toString(json['status'])),
       paymentStatus: toString(json['payment_status']),
       branchMembershipDiscount: branchMembership != null
           ? (branchMembership['discount'] is int
@@ -296,5 +307,22 @@ class AppointmentController extends GetxController {
     double totalWithTax = total + taxValue;
     double grandTotal = totalWithTax + tip;
     paymentSummaryState.grandTotal.value = grandTotal < 0 ? 0 : grandTotal;
+  }
+
+  // Cancel appointment method
+  Future<void> cancelAppointment(String appointmentId) async {
+    try {
+      final response = await dioClient.dio.put(
+        '${Apis.baseUrl}/appointments/$appointmentId',
+        data: {
+          'status': 'cancelled',
+        },
+      );
+      CustomSnackbar.showSuccess(
+          'Success', 'Appointment cancelled successfully');
+      await getAppointment();
+    } catch (e) {
+      CustomSnackbar.showError('Error', 'Failed to cancel appointment: $e');
+    }
   }
 }

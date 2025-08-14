@@ -70,17 +70,17 @@ class Appointmentscreen extends StatelessWidget {
                             style: TextStyle(color: Colors.black))),
                         DataCell(Row(
                           children: [
-                            CircleAvatar(
-                              backgroundImage: a.clientImage != null &&
-                                      a.clientImage!.isNotEmpty
-                                  ? NetworkImage(a.clientImage!)
-                                  : null,
-                              child: (a.clientImage == null ||
-                                      a.clientImage!.isEmpty)
-                                  ? Icon(Icons.person, color: Colors.black)
-                                  : null,
-                            ),
-                            SizedBox(width: 8),
+                            // CircleAvatar(
+                            //   backgroundImage: a.clientImage != null &&
+                            //           a.clientImage!.isNotEmpty
+                            //       ? NetworkImage(a.clientImage!)
+                            //       : null,
+                            //   child: (a.clientImage == null ||
+                            //           a.clientImage!.isEmpty)
+                            //       ? Icon(Icons.person, color: Colors.black)
+                            //       : null,
+                            // ),
+                            // SizedBox(width: 8),
                             Flexible(
                                 child: Text(a.clientName,
                                     style: TextStyle(color: Colors.black))),
@@ -90,17 +90,17 @@ class Appointmentscreen extends StatelessWidget {
                             style: TextStyle(color: Colors.black))),
                         DataCell(Row(
                           children: [
-                            CircleAvatar(
-                              backgroundImage: a.staffImage != null &&
-                                      a.staffImage!.isNotEmpty
-                                  ? NetworkImage(a.staffImage!)
-                                  : null,
-                              child: (a.staffImage == null ||
-                                      a.staffImage!.isEmpty)
-                                  ? Icon(Icons.person, color: Colors.black)
-                                  : null,
-                            ),
-                            SizedBox(width: 8),
+                            // CircleAvatar(
+                            //   backgroundImage: a.staffImage != null &&
+                            //           a.staffImage!.isNotEmpty
+                            //       ? NetworkImage(a.staffImage!)
+                            //       : null,
+                            //   child: (a.staffImage == null ||
+                            //           a.staffImage!.isEmpty)
+                            //       ? Icon(Icons.person, color: Colors.black)
+                            //       : null,
+                            // ),
+                            // SizedBox(width: 8),
                             Flexible(
                                 child: Text(a.staffName,
                                     style: TextStyle(color: Colors.black))),
@@ -120,25 +120,39 @@ class Appointmentscreen extends StatelessWidget {
                         DataCell(a.package == '-'
                             ? Text('-', style: TextStyle(color: Colors.black))
                             : Chip(
-                                label: Text('Yes'),
+                                label: Text(
+                                  'Yes',
+                                  style: TextStyle(color: white),
+                                ),
                                 backgroundColor: Colors.grey[700],
                                 labelStyle: TextStyle(color: Colors.black))),
                         DataCell(
-                          Chip(
-                            label: Text(
-                              a.status == 'upcoming'
-                                  ? 'Upcoming'
-                                  : a.status == 'cancelled'
-                                      ? 'Cancelled'
-                                      : 'Check-out',
-                              style: TextStyle(color: Colors.black),
-                            ),
-                            backgroundColor: a.status == 'upcoming'
-                                ? const Color.fromARGB(255, 166, 94, 179)
-                                : a.status == 'cancelled'
-                                    ? Colors.red
-                                    : Colors.green,
-                          ),
+                          GestureDetector(
+                              onTap: () {
+                                if (a.status.toLowerCase() == 'upcoming' ||
+                                    a.status.toLowerCase() == 'check in')
+                                  _showCancelAppointmentDialog(context, a);
+                              },
+                              child: Chip(
+                                label: Text(
+                                  a.status.toLowerCase() == 'upcoming'
+                                      ? 'Upcoming'
+                                      : a.status.toLowerCase() == 'cancelled'
+                                          ? 'Cancelled'
+                                          : a.status.toLowerCase() == 'check in'
+                                              ? 'Check In'
+                                              : 'Check-out',
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                                backgroundColor: a.status.toLowerCase() ==
+                                        'upcoming'
+                                    ? const Color.fromARGB(255, 166, 94, 179)
+                                    : a.status.toLowerCase() == 'cancelled'
+                                        ? const Color.fromARGB(255, 243, 88, 77)
+                                        : a.status.toLowerCase() == 'check in'
+                                            ? Colors.yellow
+                                            : Colors.green,
+                              )),
                         ),
                         DataCell(
                           GestureDetector(
@@ -557,7 +571,7 @@ class Appointmentscreen extends StatelessWidget {
                                                     SizedBox(width: 16),
                                                     ElevatedButton(
                                                       onPressed: () {
-                                                        // TODO: Implement generate bill logic
+                                                       
                                                         Get.back();
                                                       },
                                                       style: ElevatedButton
@@ -584,7 +598,7 @@ class Appointmentscreen extends StatelessWidget {
                                   style: TextStyle(color: Colors.black)),
                               backgroundColor: a.paymentStatus == 'Paid'
                                   ? Colors.green
-                                  : Colors.orange,
+                                  : Colors.yellow,
                             ),
                           ),
                         ),
@@ -606,6 +620,16 @@ class Appointmentscreen extends StatelessWidget {
                             //       color: primaryColor),
                             //   onPressed: () {},
                             // ),
+                            // Show cancel button only for upcoming or check in appointments
+                            // if (a.status.toLowerCase() == 'upcoming' ||
+                            //     a.status.toLowerCase() == 'check in')
+                            //   IconButton(
+                            //     icon: Icon(Icons.cancel_outlined,
+                            //         color: Colors.red),
+                            //     onPressed: () {
+                            //       _showCancelAppointmentDialog(context, a);
+                            //     },
+                            //   ),
                             IconButton(
                               icon: Icon(Icons.delete_outline,
                                   color: primaryColor),
@@ -620,6 +644,34 @@ class Appointmentscreen extends StatelessWidget {
           }),
         ),
       ),
+    );
+  }
+
+  void _showCancelAppointmentDialog(
+      BuildContext context, Appointment appointment) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Cancel Appointment'),
+          content: Text(
+              'Are you sure you want to cancel the appointment for ${appointment.clientName} on ${appointment.date} at ${appointment.time}?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('No', style: TextStyle(color: Colors.grey)),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await getController
+                    .cancelAppointment(appointment.appointmentId);
+              },
+              child: Text('Yes, Cancel', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
     );
   }
 }
