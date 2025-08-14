@@ -1,3 +1,4 @@
+import 'package:flutter_template/commen_items/commen_class.dart';
 import 'package:get/get.dart';
 import '../../../../main.dart';
 import '../../../../network/model/BranchMembership.dart';
@@ -13,6 +14,22 @@ class BranchMembershipListController extends GetxController {
   void onInit() {
     super.onInit();
     fetchMemberships();
+  }
+
+  void clearAllFields() {
+    if (!Get.isRegistered<Branchmembershipaddcontroller>()) {
+      Get.put(Branchmembershipaddcontroller());
+    }
+    final addController = Get.find<Branchmembershipaddcontroller>();
+
+    addController.memberShipNameController.clear();
+    addController.descriptionController.clear();
+    addController.discountAmountController.clear();
+    addController.membershipAmountController.clear();
+
+    addController.selected_Subscription_plan.value = '6-Months';
+    addController.selected_discountType.value = 'Fixed';
+    addController.isActive.value = true;
   }
 
   Future<void> fetchMemberships() async {
@@ -83,5 +100,6 @@ class BranchMembershipListController extends GetxController {
       print('==> here Error: $e');
       CustomSnackbar.showError('Error', e.toString());
     }
+    clearAllFields();
   }
 }

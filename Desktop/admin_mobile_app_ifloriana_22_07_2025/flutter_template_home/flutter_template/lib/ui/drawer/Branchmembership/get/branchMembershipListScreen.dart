@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_template/utils/colors.dart';
+import 'package:flutter_template/wiget/appbar/commen_appbar.dart';
 import 'package:get/get.dart';
 import '../../../../route/app_route.dart';
+import '../../../../wiget/Custome_button.dart';
 import '../../../../wiget/loading.dart';
 import 'branchMembershipListController.dart';
 import '../add/branchMembershipAddController.dart';
@@ -14,8 +17,8 @@ class BranchMembershipListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Branch Memberships'),
+      appBar: CustomAppBar(
+        title: 'Branch Memberships',
       ),
       body: RefreshIndicator(child: Obx(() {
         if (controller.isLoading.value) {
@@ -43,7 +46,7 @@ class BranchMembershipListScreen extends StatelessWidget {
                     Text('Plan: ${membership.subscriptionPlan}'),
                     Text('Amount: ₹${membership.membershipAmount}'),
                     Text(
-                        'Discount: ${membership.discount}${membership.discountType == 'percentage' ? '%' : ' ₹'}'),
+                        'Discount: ${membership.discountType == 'percentage' ? '%' : ' ₹'} ${membership.discount}'),
                     Text(
                         'Status: ${membership.status == 1 ? 'Active' : 'Inactive'}'),
                   ],
@@ -52,36 +55,37 @@ class BranchMembershipListScreen extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.delete, color: Colors.red),
+                      icon: Icon(Icons.edit_outlined, color: primaryColor),
                       onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: Text('Delete Membership'),
-                            content: Text(
-                                'Are you sure you want to delete "${membership.membershipName}"?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.of(context).pop(),
-                                child: Text('Cancel'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  controller.deleteMembership(membership.id);
-                                },
-                                child: Text('Delete',
-                                    style: TextStyle(color: Colors.red)),
-                              ),
-                            ],
-                          ),
-                        );
+                        showEditMembershipSheet(context, membership);
                       },
                     ),
                     IconButton(
-                      icon: Icon(Icons.edit, color: Colors.blue),
+                      icon: Icon(Icons.delete_outline, color: primaryColor),
                       onPressed: () {
-                        showEditMembershipSheet(context, membership);
+                        controller.deleteMembership(membership.id);
+                        // showDialog(
+                        //   context: context,
+                        //   builder: (context) => AlertDialog(
+                        //     title: Text('Delete Membership'),
+                        //     content: Text(
+                        //         'Are you sure you want to delete "${membership.membershipName}"?'),
+                        //     actions: [
+                        //       TextButton(
+                        //         onPressed: () => Navigator.of(context).pop(),
+                        //         child: Text('Cancel'),
+                        //       ),
+                        //       TextButton(
+                        //         onPressed: () {
+                        //           Navigator.of(context).pop();
+                        //           controller.deleteMembership(membership.id);
+                        //         },
+                        //         child: Text('Delete',
+                        //             style: TextStyle(color: Colors.red)),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // );
                       },
                     ),
                   ],
@@ -94,10 +98,15 @@ class BranchMembershipListScreen extends StatelessWidget {
         controller.fetchMemberships();
       }),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: primaryColor,
         onPressed: () {
+          controller.clearAllFields();
           Get.toNamed(Routes.branchmembershipaddscreen);
         },
-        child: Icon(Icons.add),
+        child: Icon(
+          Icons.add,
+          color: white,
+        ),
       ),
     );
   }
@@ -128,12 +137,10 @@ class BranchMembershipListScreen extends StatelessWidget {
             padding: EdgeInsets.all(10),
             child: SingleChildScrollView(
               child: Column(
+                spacing: 10,
                 children: [
-                  CustomTextFormField(
-                    controller: addController.descriptionController,
-                    labelText: 'Description',
-                    maxLines: 2,
-                    keyboardType: TextInputType.text,
+                  SizedBox(
+                    height: 5,
                   ),
                   CustomTextFormField(
                     controller: addController.memberShipNameController,
@@ -169,19 +176,12 @@ class BranchMembershipListScreen extends StatelessWidget {
                           }
                         },
                       )),
-                  Obx(() => Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Status'),
-                          Switch(
-                            value: addController.isActive.value,
-                            onChanged: (value) {
-                              addController.isActive.value = value;
-                            },
-                            activeColor: Colors.blue,
-                          ),
-                        ],
-                      )),
+                  CustomTextFormField(
+                    controller: addController.descriptionController,
+                    labelText: 'Description',
+                    maxLines: 2,
+                    keyboardType: TextInputType.text,
+                  ),
                   CustomTextFormField(
                     controller: addController.membershipAmountController,
                     labelText: "Membership Amount",
@@ -192,8 +192,21 @@ class BranchMembershipListScreen extends StatelessWidget {
                     labelText: "Discount Amount",
                     keyboardType: TextInputType.number,
                   ),
-                  ElevatedButton(
-                    child: Text('Update Membership'),
+                  Obx(() => Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Status'),
+                          Switch(
+                            value: addController.isActive.value,
+                            onChanged: (value) {
+                              addController.isActive.value = value;
+                            },
+                            activeColor: primaryColor,
+                          ),
+                        ],
+                      )),
+                  ElevatedButtonExample(
+                    text: 'Update Membership',
                     onPressed: () {
                       controller.updateMembership(membership.id);
                       Navigator.of(context).pop();

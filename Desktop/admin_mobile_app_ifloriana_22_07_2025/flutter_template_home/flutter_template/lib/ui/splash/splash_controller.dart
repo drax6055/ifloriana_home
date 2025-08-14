@@ -1,17 +1,19 @@
 import 'dart:async';
 import 'package:flutter_template/main.dart';
+import 'package:flutter_template/ui/auth/register/register_screen.dart';
+import 'package:flutter_template/ui/drawer/branches/getBranches/getBranchesScreen.Dart'
+    show GetBranchesScreen;
 import 'package:get/get.dart';
 import '../../route/app_route.dart';
 import '../../wiget/custome_snackbar.dart';
-import '../drawer/appointment/addNewAppointment/newAppointmentScreen.dart';
-import '../drawer/appointment/appointmentScreen.dart';
-import '../drawer/products/allProducts/addProductsScreen.dart';
-import '../drawer/products/product_list/product_list_screen.dart';
-
+import '../buy_product/getOrderList/getOrderListScreen.dart';
+import '../drawer/Branchmembership/get/branchMembershipListScreen.dart';
+import '../drawer/branchPackages/getBranchPackagesScreen.dart';
+import '../drawer/commission/commission_list_screen.dart';
+import '../drawer/coupons/couponsScreen.dart';
 
 class SplashController extends GetxController {
   @override
-
   navigateToNextScreen() async {
     try {
       var duration = const Duration(seconds: 2);
@@ -24,7 +26,7 @@ class SplashController extends GetxController {
         String? managerAccessToken = managerUser?.token;
 
         if (accessToken != null && accessToken.isNotEmpty) {
-          Get.to(Appointmentscreen());
+          Get.to(CouponsScreen());
           // Get.offNamed(Routes.drawerScreen); // Regular user
         } else if (managerAccessToken != null &&
             managerAccessToken.isNotEmpty) {

@@ -19,7 +19,7 @@ import 'package:flutter_template/ui/drawer/services/subCategory/subCategotySCree
 import 'package:flutter_template/ui/drawer/staff/addNewStaffScreen.dart';
 import 'package:flutter_template/ui/drawer/staff/staffDetailsScreen.dart'
     show Staffdetailsscreen;
-import 'package:flutter_template/ui/drawer/udpate_salon_details/updateSalon_screen.dart';
+// import 'package:flutter_template/ui/drawer/udpate_salon_details/updateSalon_screen.dart';
 import 'package:flutter_template/ui/tax/addNewTaxScreen.dart';
 import 'package:get/get.dart';
 import '../manager_ui/dashboard/dashboardScreen.dart';
@@ -69,10 +69,10 @@ class AppPages {
         name: Routes.forgotScreen,
         page: () => ForgotScreen(),
         transition: Transition.rightToLeft),
-    GetPage(
-        name: Routes.updateSalonScreen,
-        page: () => UpdatesalonScreen(),
-        transition: Transition.rightToLeft),
+    // GetPage(
+    //     name: Routes.updateSalonScreen,
+    //     page: () => UpdatesalonScreen(),
+    //     transition: Transition.rightToLeft),
     GetPage(
       name: Routes.adminprofilescreen,
       page: () => Adminprofilescreen(),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_template/ui/drawer/Branchmembership/add/branchMembershipAddController.dart';
+import 'package:flutter_template/wiget/appbar/commen_appbar.dart';
 import 'package:get/get.dart';
 
 import '../../../../utils/colors.dart';
@@ -17,39 +18,39 @@ class Branchmembershipaddscreen extends StatelessWidget {
       Get.put(Branchmembershipaddcontroller());
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: Scaffold(
-            body: Padding(
-                padding: EdgeInsets.all(10),
-                child: Column(
-                  spacing: 10,
-                  children: [
-                    InputTxtfield_discription(),
-                    InputTxtfield_membershipName(),
-                    subscription_plan(),
-                    discount_type(),
-                    Obx(() => Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            CustomTextWidget(
-                              text: 'Status',
-                              textStyle:
-                                  CustomTextStyles.textFontRegular(size: 14.sp),
-                            ),
-                            Switch(
-                              value: getController.isActive.value,
-                              onChanged: (value) {
-                                getController.isActive.value = value;
-                              },
-                              activeColor: primaryColor,
-                            ),
-                          ],
-                        )),
-                    InputTxtfield_Membership_Amount(),
-                    InputTxtfield_discountAmt(),
-                    Btn_Add_membership()
-                  ],
-                ))));
+    return Scaffold(
+        appBar: CustomAppBar(title: "Add Branch Membership"),
+        body: Padding(
+            padding: EdgeInsets.all(10),
+            child: Column(
+              spacing: 10,
+              children: [
+                InputTxtfield_membershipName(),
+                subscription_plan(),
+                discount_type(),
+                InputTxtfield_Membership_Amount(),
+                InputTxtfield_discountAmt(),
+                InputTxtfield_discription(),
+                Obx(() => Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        CustomTextWidget(
+                          text: 'Status',
+                          textStyle:
+                              CustomTextStyles.textFontRegular(size: 14.sp),
+                        ),
+                        Switch(
+                          value: getController.isActive.value,
+                          onChanged: (value) {
+                            getController.isActive.value = value;
+                          },
+                          activeColor: primaryColor,
+                        ),
+                      ],
+                    )),
+                Btn_Add_membership()
+              ],
+            )));
   }
 
   Widget InputTxtfield_discription() {
@@ -108,7 +109,7 @@ class Branchmembershipaddscreen extends StatelessWidget {
       controller: getController.discountAmountController,
       labelText: "Discount Amount",
       keyboardType: TextInputType.number,
-      validator: (value) => Validation.validatePhone(value),
+      validator: (value) => Validation.validateisBlanck(value),
     );
   }
 
@@ -117,7 +118,7 @@ class Branchmembershipaddscreen extends StatelessWidget {
       controller: getController.membershipAmountController,
       labelText: "Membership Amount",
       keyboardType: TextInputType.number,
-      validator: (value) => Validation.validatePhone(value),
+      validator: (value) => Validation.validateisBlanck(value),
     );
   }
 

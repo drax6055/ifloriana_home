@@ -287,13 +287,12 @@ class AppointmentController extends GetxController {
         '${Apis.baseUrl}/appointments?salon_id=${loginUser!.salonId}',
         (json) => json,
       );
-      if (response != null && response['success'] == true) {
-        final List data = response['data'] ?? [];
-        appointments.value = data.map((e) => Appointment.fromJson(e)).toList();
-        // Initialize filtered appointments
-        filteredAppointments.value = List.from(appointments);
-        _applyFilters();
-      }
+      // if (response != null && response['success'] == true) {
+      final List data = response['data'] ?? [];
+      appointments.value = data.map((e) => Appointment.fromJson(e)).toList();
+      filteredAppointments.value = List.from(appointments);
+      _applyFilters();
+      // }
       print("${Apis.baseUrl}/appointments?salon_id=${loginUser.salonId}");
     } catch (e) {
       CustomSnackbar.showError('Error', 'Failed to get data: $e');

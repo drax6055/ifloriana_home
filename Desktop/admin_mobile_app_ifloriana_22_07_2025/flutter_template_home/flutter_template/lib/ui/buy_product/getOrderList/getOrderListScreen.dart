@@ -68,7 +68,7 @@ class Getorderlistscreen extends StatelessWidget {
                 ),
                 PopupMenuButton<String>(
                   icon: Icon(
-                    Icons.filter_list,
+                    Icons.more_vert,
                     color: Colors.white,
                   ),
                   onSelected: (selected) {
@@ -92,7 +92,7 @@ class Getorderlistscreen extends StatelessWidget {
             child: Column(
               children: [
                 // Removed search TextField from here
-                Expanded( 
+                Expanded(
                   child: Obx(() {
                     if (controller.isLoading.value) {
                       return const Center(child: CustomLoadingAvatar());
@@ -145,7 +145,9 @@ class Getorderlistscreen extends StatelessWidget {
                                       children: [
                                         IconButton(
                                           icon: Icon(
-                                              Icons.remove_red_eye_outlined,color: primaryColor,),
+                                            Icons.insert_drive_file_outlined,
+                                            color: primaryColor,
+                                          ),
                                           onPressed: () {
                                             String pdfUrl =
                                                 '${Apis.pdfUrl}${report.invoice_pdf_url}';
@@ -154,7 +156,8 @@ class Getorderlistscreen extends StatelessWidget {
                                         ),
                                         IconButton(
                                           icon: Icon(
-                                              Icons.delete_outline_outlined,color: primaryColor),
+                                              Icons.delete_outline_outlined,
+                                              color: primaryColor),
                                           onPressed: () {
                                             if (report.order_code != null) {
                                               controller

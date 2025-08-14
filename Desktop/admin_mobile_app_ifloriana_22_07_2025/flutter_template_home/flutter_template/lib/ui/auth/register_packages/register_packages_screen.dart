@@ -20,23 +20,23 @@ class PackagesScreen extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppBar(
         title: "Preferable Package",
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: (String value) {
-              getController.selectedFilter.value = value;
-              getController.filterPackages();
-            },
-            itemBuilder: (BuildContext context) {
-              return {'All', 'Monthly', 'Quarterly', 'Half-Yearly', 'Yearly'}
-                  .map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(choice),
-                );
-              }).toList();
-            },
-          ),
-        ],
+        // actions: [
+        //   PopupMenuButton<String>(
+        //     onSelected: (String value) {
+        //       getController.selectedFilter.value = value;
+        //       getController.filterPackages();
+        //     },
+        //     itemBuilder: (BuildContext context) {
+        //       return {'All', 'Monthly', 'Quarterly', 'Half-Yearly', 'Yearly'}
+        //           .map((String choice) {
+        //         return PopupMenuItem<String>(
+        //           value: choice,
+        //           child: Text(choice),
+        //         );
+        //       }).toList();
+        //     },
+        //   ),
+        // ],
       ),
       body: RefreshIndicator(
         color: primaryColor,
@@ -100,20 +100,24 @@ class PackagesScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
+                    spacing: 4.w,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      CustomTextWidget(
-                        text: pkg.packageName ?? '',
-                        textStyle: CustomTextStyles.textFontBold(
-                          size: 16.sp,
-                          textOverflow: TextOverflow.ellipsis,
-                          color: white,
+                      Expanded(
+                        flex: 3,
+                        child: CustomTextWidget(
+                          text: pkg.packageName ?? '',
+                          textStyle: CustomTextStyles.textFontBold(
+                            size: 16.sp,
+                            textOverflow: TextOverflow.ellipsis,
+                            color: white,
+                          ),
                         ),
                       ),
-                      SizedBox(width: 5.w),
                       if (pkg.subscriptionPlan != null &&
                           pkg.subscriptionPlan!.isNotEmpty)
-                        Container(
+                        Expanded(
+                            child: Container(
                           decoration: BoxDecoration(
                             color: primaryColor,
                             borderRadius: BorderRadius.circular(10.r),
@@ -127,42 +131,40 @@ class PackagesScreen extends StatelessWidget {
                               color: white,
                             ),
                           ),
-                        ),
+                        )),
                     ],
                   ),
                   SizedBox(height: 10.h),
 
                   // Price container
                   Container(
+                    width: 170.w,
                     decoration: BoxDecoration(
                       color: primaryColor,
                       borderRadius: BorderRadius.circular(10.r),
                     ),
                     padding: const EdgeInsets.all(10),
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Flexible(
-                          child: CustomTextWidget(
-                            text: '₹${pkg.price.toString()}',
-                            textStyle: CustomTextStyles.textFontBold(
-                                size: 26.sp,
-                                color: white,
-                                textOverflow: TextOverflow.ellipsis),
-                          ),
+                        CustomTextWidget(
+                          text: '₹${pkg.price.toString()}',
+                          textStyle: CustomTextStyles.textFontBold(
+                              size: 26.sp,
+                              color: white,
+                              textOverflow: TextOverflow.ellipsis),
                         ),
-                        SizedBox(width: 15.w),
                         if (pkg.subscriptionPlan != null &&
                             pkg.subscriptionPlan!.isNotEmpty)
-                          Flexible(
-                            child: CustomTextWidget(
-                              text: pkg.subscriptionPlan!,
-                              textStyle: CustomTextStyles.textFontRegular(
-                                size: 12.sp,
-                                color: white,
-                              ),
-                              textAlign: TextAlign.right,
+                          CustomTextWidget(
+                            text: pkg.subscriptionPlan!,
+                            textStyle: CustomTextStyles.textFontRegular(
+                              size: 12.sp,
+                              color: white,
                             ),
+                            textAlign: TextAlign.right,
                           ),
+                        // SizedBox(width: 1),
                       ],
                     ),
                   ),
