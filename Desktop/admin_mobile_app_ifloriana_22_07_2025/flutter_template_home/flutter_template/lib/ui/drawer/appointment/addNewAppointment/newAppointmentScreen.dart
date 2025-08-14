@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_template/network/network_const.dart';
 import 'package:flutter_template/ui/drawer/appointment/addNewAppointment/newAppointmentController.dart';
+import 'package:flutter_template/utils/app_images.dart';
 import 'package:flutter_template/utils/colors.dart';
 import 'package:get/get.dart';
 import 'package:step_progress/step_progress.dart';
@@ -159,10 +161,7 @@ class Newappointmentscreen extends StatelessWidget {
               backgroundColor: primaryColor,
             ),
             child: isLoading
-                ? SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CustomLoadingAvatar())
+                ? SizedBox(width: 24, height: 24, child: CustomLoadingAvatar())
                 : Text(
                     step == 4
                         ? "Add Booking"
@@ -222,9 +221,8 @@ class Newappointmentscreen extends StatelessWidget {
                     CircleAvatar(
                       radius: 30.r,
                       backgroundImage: branch.image != null
-                          ? NetworkImage(branch.image!)
-                          : AssetImage('assets/placeholder.jpg')
-                              as ImageProvider,
+                          ? NetworkImage("${Apis.pdfUrl}${branch.image}"!)
+                          : AssetImage(AppImages.placeholder) as ImageProvider,
                     ),
                     SizedBox(height: 10.h),
                     Text(
@@ -435,13 +433,10 @@ class Newappointmentscreen extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 30.r,
-                    backgroundImage:
-                        staff.image != null && staff.image!.isNotEmpty
-                            ? (staff.image!.startsWith('http')
-                                ? NetworkImage(staff.image!)
-                                : AssetImage('assets/placeholder.jpg')
-                                    as ImageProvider)
-                            : AssetImage('assets/placeholder.jpg'),
+                    backgroundImage: staff.imageUrl != null &&
+                            staff.imageUrl!.isNotEmpty
+                        ? NetworkImage("${Apis.pdfUrl}${staff.imageUrl!}")
+                        : AssetImage(AppImages.placeholder) as ImageProvider,
                     backgroundColor: Colors.grey[200],
                   ),
                   SizedBox(height: 16.h),
@@ -511,9 +506,7 @@ class Newappointmentscreen extends StatelessWidget {
                         ? "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}"
                         : "Pick a date",
                     style: TextStyle(
-                      color: selectedDate != null
-                          ? primaryColor
-                          : Colors.grey[600],
+                      color: selectedDate != null ? black : Colors.grey[600],
                       fontWeight: selectedDate != null
                           ? FontWeight.w600
                           : FontWeight.normal,
@@ -523,6 +516,7 @@ class Newappointmentscreen extends StatelessWidget {
               ),
             ),
           ),
+          SizedBox(height: 10.h),
           if (selectedDate != null)
             Text("Available Slots",
                 style: TextStyle(
@@ -530,41 +524,48 @@ class Newappointmentscreen extends StatelessWidget {
                   fontSize: 18.sp,
                   color: primaryColor,
                 )),
-          if (selectedDate != null)
-            availableSlots.isEmpty
-                ? Padding(
-                    padding: const EdgeInsets.only(top: 16.0),
-                    child: Text(
-                      "No slots available for this date.",
-                      style: TextStyle(color: secondaryColor),
-                    ),
-                  )
-                : Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: availableSlots
-                        .map((slot) => ChoiceChip(
-                              label: Text(slot),
-                              selected: selectedSlot == slot,
-                              selectedColor: primaryColor,
-                              disabledColor: secondaryColor,
-                              checkmarkColor: Colors.white,
-                              onSelected: (selected) {
-                                if (selected) {
-                                  getController.selectedSlot.value = slot;
-                                  // Auto navigate to next step when both date and slot are selected
-                                  if (getController.selectedDate.value !=
-                                      null) {
-                                    Future.delayed(Duration(milliseconds: 500),
-                                        () {
-                                      getController.nextStep();
-                                    });
-                                  }
-                                }
-                              },
-                            ))
-                        .toList(),
-                  ),
+          SizedBox(height: 10.h),
+          Align(
+              alignment: Alignment.center,
+              child: availableSlots.isEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 16.0),
+                      child: Text(
+                        "No slots available for this date.",
+                        style: TextStyle(color: secondaryColor),
+                      ),
+                    )
+                  : Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: availableSlots.map((slot) {
+                        final isSelected = selectedSlot == slot;
+                        return ChoiceChip(
+                          label: Text(
+                            slot,
+                            style: TextStyle(
+                              color: isSelected
+                                  ? Colors.white
+                                  : Colors.black, // 👈 Change text color here
+                            ),
+                          ),
+                          selected: isSelected,
+                          selectedColor: primaryColor,
+                          disabledColor: secondaryColor,
+                          checkmarkColor: Colors.white,
+                          onSelected: (selected) {
+                            if (selected) {
+                              getController.selectedSlot.value = slot;
+                              if (getController.selectedDate.value != null) {
+                                Future.delayed(Duration(milliseconds: 500), () {
+                                  getController.nextStep();
+                                });
+                              }
+                            }
+                          },
+                        );
+                      }).toList(),
+                    ))
         ],
       );
     });

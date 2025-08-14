@@ -46,27 +46,82 @@ class BranchModel {
   });
 
   factory BranchModel.fromJson(Map<String, dynamic> json) {
+    String _toString(dynamic v) => v == null
+        ? ''
+        : (v is String)
+            ? v
+            : v.toString();
+    int _toInt(dynamic v) {
+      if (v == null) return 0;
+      if (v is int) return v;
+      if (v is double) return v.toInt();
+      if (v is String) return int.tryParse(v) ?? 0;
+      return 0;
+    }
+
+    double _toDouble(dynamic v) {
+      if (v == null) return 0;
+      if (v is num) return v.toDouble();
+      if (v is String) return double.tryParse(v) ?? 0;
+      return 0;
+    }
+
+    // Image may arrive as String or Map; extract a URL-like string if present
+    String? _parseImage(dynamic v) {
+      if (v == null) return null;
+      if (v is String && v.isNotEmpty) return v;
+      if (v is Map) {
+        final keys = ['url', 'path', 'file'];
+        for (final k in keys) {
+          final val = v[k];
+          if (val is String && val.isNotEmpty) return val;
+        }
+      }
+      return null;
+    }
+
+    // Services may be a list of service objects or a list of wrapper objects
+    final dynamicServices = (json['service_id'] as List?) ?? [];
+    final parsedServices = dynamicServices
+        .map((e) {
+          if (e is Map) {
+            final inner = e['service'] is Map ? e['service'] : e;
+            if (inner is Map<String, dynamic>) {
+              return ServiceModel.fromJson(inner);
+            }
+          }
+          return null;
+        })
+        .whereType<ServiceModel>()
+        .toList();
+
+    // Payment methods as strings regardless of underlying type
+    final methods = ((json['payment_method'] as List?) ?? [])
+        .map((m) => _toString(m))
+        .where((s) => s.isNotEmpty)
+        .toList();
+
     return BranchModel(
-      id: json['_id'] ?? '',
-      name: json['name'] ?? '',
-      category: json['category'] ?? '',
-      status: json['status'] ?? 0,
-      contactEmail: json['contact_email'] ?? '',
-      contactNumber: json['contact_number'] ?? '',
-      paymentMethod: List<String>.from(json['payment_method'] ?? []),
-      services: (json['service_id'] as List? ?? [])
-          .map((e) => ServiceModel.fromJson(e))
-          .toList(),
-      address: json['address'] ?? '',
-      landmark: json['landmark'] ?? '',
-      country: json['country'] ?? '',
-      state: json['state'] ?? '',
-      city: json['city'] ?? '',
-      postalCode: json['postal_code'] ?? '',
-      description: json['description'] ?? '',
-      image: json['image'],
-      ratingStar: (json['rating_star'] ?? 0).toDouble(),
-      totalReview: json['total_review'] ?? 0,
+      id: _toString(json['_id']),
+      name: _toString(json['name']),
+      category: json['category'] is Map
+          ? _toString(json['category']['name'] ?? json['category']['_id'])
+          : _toString(json['category']),
+      status: _toInt(json['status']),
+      contactEmail: _toString(json['contact_email']),
+      contactNumber: _toString(json['contact_number']),
+      paymentMethod: methods,
+      services: parsedServices,
+      address: _toString(json['address']),
+      landmark: _toString(json['landmark']),
+      country: _toString(json['country']),
+      state: _toString(json['state']),
+      city: _toString(json['city']),
+      postalCode: _toString(json['postal_code']),
+      description: _toString(json['description']),
+      image: _parseImage(json['image_url']),
+      ratingStar: _toDouble(json['rating_star']),
+      totalReview: _toInt(json['total_review']),
     );
   }
 }
@@ -87,12 +142,40 @@ class ServiceModel {
   });
 
   factory ServiceModel.fromJson(Map<String, dynamic> json) {
+    int _toInt(dynamic v) {
+      if (v == null) return 0;
+      if (v is int) return v;
+      if (v is double) return v.toInt();
+      if (v is String) return int.tryParse(v) ?? 0;
+      return 0;
+    }
+
+    double _toDouble(dynamic v) {
+      if (v == null) return 0;
+      if (v is num) return v.toDouble();
+      if (v is String) return double.tryParse(v) ?? 0;
+      return 0;
+    }
+
+    String? _parseImage(dynamic v) {
+      if (v == null) return null;
+      if (v is String && v.isNotEmpty) return v;
+      if (v is Map) {
+        final keys = ['url', 'path', 'file'];
+        for (final k in keys) {
+          final val = v[k];
+          if (val is String && val.isNotEmpty) return val;
+        }
+      }
+      return null;
+    }
+
     return ServiceModel(
-      id: json['_id'] ?? '',
-      name: json['name'] ?? '',
-      serviceDuration: json['service_duration'] ?? 0,
-      regularPrice: (json['regular_price'] ?? 0).toDouble(),
-      image: json['image'],
+      id: (json['_id'] ?? '').toString(),
+      name: (json['name'] ?? '').toString(),
+      serviceDuration: _toInt(json['service_duration']),
+      regularPrice: _toDouble(json['regular_price']),
+      image: _parseImage(json['image']),
     );
   }
 }
@@ -100,14 +183,14 @@ class ServiceModel {
 class StaffModel {
   final String id;
   final String fullName;
-  final String? image;
+  final String? imageUrl;
   final String branchId;
   final List<String> serviceIds;
 
   StaffModel({
     required this.id,
     required this.fullName,
-    this.image,
+    this.imageUrl,
     required this.branchId,
     required this.serviceIds,
   });
@@ -116,7 +199,7 @@ class StaffModel {
     return StaffModel(
       id: json['_id'] ?? '',
       fullName: json['full_name'] ?? '',
-      image: json['image'],
+      imageUrl: json['image_url'],
       branchId: json['branch_id'] is String
           ? json['branch_id']
           : (json['branch_id']?['_id'] ?? ''),
@@ -322,9 +405,9 @@ class Newappointmentcontroller extends GetxController {
         return selectedDate.value != null && selectedSlot.value != null;
       case 4:
         return fullNameController.text.isNotEmpty &&
-               emailController.text.isNotEmpty &&
-               phoneController.text.isNotEmpty &&
-               selectedGender.value.isNotEmpty;
+            emailController.text.isNotEmpty &&
+            phoneController.text.isNotEmpty &&
+            selectedGender.value.isNotEmpty;
       default:
         return true;
     }

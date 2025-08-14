@@ -3,6 +3,7 @@ import 'package:flutter_template/main.dart';
 import 'package:get/get.dart';
 import '../../route/app_route.dart';
 import '../../wiget/custome_snackbar.dart';
+import '../drawer/appointment/addNewAppointment/newAppointmentScreen.dart';
 import '../drawer/appointment/appointmentScreen.dart';
 import '../drawer/products/allProducts/addProductsScreen.dart';
 import '../drawer/products/product_list/product_list_screen.dart';
@@ -23,7 +24,7 @@ class SplashController extends GetxController {
         String? managerAccessToken = managerUser?.token;
 
         if (accessToken != null && accessToken.isNotEmpty) {
-          Get.to(Appointmentscreen());
+          Get.to(Newappointmentscreen());
           // Get.offNamed(Routes.drawerScreen); // Regular user
         } else if (managerAccessToken != null &&
             managerAccessToken.isNotEmpty) {

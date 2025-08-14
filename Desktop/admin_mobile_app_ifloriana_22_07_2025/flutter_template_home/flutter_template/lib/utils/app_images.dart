@@ -4,6 +4,7 @@ class AppImages {
   static final String applogo = 'assets/images/img/applogo.png';
   static const String cardbg = 'assets/images/img/appointment.png';
   static const String loading = 'assets/images/img/loading.gif';
+  static const String placeholder = 'assets/images/img/No_Image_Available.jpg';
 }
 
 class AppSVGImages {
