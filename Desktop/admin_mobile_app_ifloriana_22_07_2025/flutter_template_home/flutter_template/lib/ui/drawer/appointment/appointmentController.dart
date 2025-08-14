@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_template/main.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -467,38 +468,50 @@ class AppointmentController extends GetxController {
   Future<void> exportToExcel() async {
     try {
       final excel = Excel.createExcel();
-      final sheet = excel['Appointments'];
+      // Safely ensure only one sheet named 'Appointments'
+      Sheet sheet;
+      try {
+        if (excel.sheets.keys.contains('Sheet1')) {
+          try {
+            excel.rename('Sheet1', 'Appointments');
+          } catch (_) {
+            // Fallback: just use default sheet if rename unsupported
+          }
+        }
+        // Try to get the 'Appointments' sheet; fallback to first available
+        if (excel.sheets.keys.contains('Appointments')) {
+          sheet = excel['Appointments'];
+        } else {
+          final first = excel.sheets.keys.first;
+          sheet = excel[first]!;
+        }
+      } catch (_) {
+        final first = excel.sheets.keys.first;
+        sheet = excel[first]!;
+      }
 
-      // Add headers
-      sheet
-          .cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: 0))
-          .value = 'Date & Time';
-      sheet
-          .cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: 0))
-          .value = 'Client';
-      sheet
-          .cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: 0))
-          .value = 'Amount';
-      sheet
-          .cell(CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: 0))
-          .value = 'Staff Name';
-      sheet
-          .cell(CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: 0))
-          .value = 'Services';
-      sheet
-          .cell(CellIndex.indexByColumnRow(columnIndex: 5, rowIndex: 0))
-          .value = 'Membership';
-      sheet
-          .cell(CellIndex.indexByColumnRow(columnIndex: 6, rowIndex: 0))
-          .value = 'Package';
-      sheet
-          .cell(CellIndex.indexByColumnRow(columnIndex: 7, rowIndex: 0))
-          .value = 'Status';
-      sheet
-          .cell(CellIndex.indexByColumnRow(columnIndex: 8, rowIndex: 0))
-          .value = 'Payment Status';
+      // Add headers with styling
+      final headers = [
+        'Date & Time',
+        'Client',
+        'Amount',
+        'Staff Name',
+        'Services',
+        'Membership',
+        'Package',
+        'Status',
+        'Payment Status'
+      ];
 
-      // Add data
+      for (int i = 0; i < headers.length; i++) {
+        final cell =
+            sheet.cell(CellIndex.indexByColumnRow(columnIndex: i, rowIndex: 0));
+        cell.value = headers[i];
+        // Make headers bold
+        cell.cellStyle = CellStyle(bold: true);
+      }
+
+      // Add data from filtered appointments
       for (int i = 0; i < filteredAppointments.length; i++) {
         final appointment = filteredAppointments[i];
         final rowIndex = i + 1;
@@ -541,12 +554,19 @@ class AppointmentController extends GetxController {
             .value = appointment.paymentStatus;
       }
 
+      // Set column widths (Excel package doesn't have setColumnWidth method)
+      // Columns will auto-fit based on content
+
       // Save file
       final directory = await getApplicationDocumentsDirectory();
       final fileName =
           'appointments_${DateTime.now().millisecondsSinceEpoch}.xlsx';
       final file = File('${directory.path}/$fileName');
-      await file.writeAsBytes(excel.encode()!);
+      final bytes = excel.encode();
+      if (bytes == null) {
+        throw Exception('Excel encode failed');
+      }
+      await file.writeAsBytes(bytes, flush: true);
 
       // Open file
       await OpenFile.open(file.path);
@@ -559,45 +579,80 @@ class AppointmentController extends GetxController {
   Future<void> exportToPdf() async {
     try {
       final pdf = pw.Document();
+      final fontData =
+          await rootBundle.load('assets/fonts/NotoSans-Regular.ttf');
+      final ttf = pw.Font.ttf(fontData);
+      // Use MultiPage so long tables paginate correctly
 
       pdf.addPage(
-        pw.Page(
+        pw.MultiPage(
           pageFormat: pw.PdfPageFormat.a4,
+          margin: pw.EdgeInsets.all(20),
+          theme: pw.ThemeData.withFont(
+            base: ttf,
+            bold: ttf,
+          ),
           build: (pw.Context context) {
-            return pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                pw.Header(
-                  level: 0,
-                  child: pw.Text('Appointments Report',
-                      style: pw.TextStyle(
-                          fontSize: 20, fontWeight: pw.FontWeight.bold)),
+            return [
+              // Header
+              pw.Center(
+                child: pw.Text(
+                  'Appointments Report',
+                  style: pw.TextStyle(
+                    fontSize: 24,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
                 ),
-                pw.SizedBox(height: 20),
-                pw.Table.fromTextArray(
-                  headers: [
-                    'Date & Time',
-                    'Client',
-                    'Amount',
-                    'Staff',
-                    'Service',
-                    'Status',
-                    'Payment'
-                  ],
-                  data: filteredAppointments
-                      .map((appointment) => [
-                            '${appointment.date} - ${appointment.time}',
-                            appointment.clientName,
-                            '₹${appointment.amount}',
-                            appointment.staffName,
-                            appointment.serviceName,
-                            appointment.status,
-                            appointment.paymentStatus,
-                          ])
-                      .toList(),
-                ),
-              ],
-            );
+              ),
+              pw.SizedBox(height: 10),
+
+              // Export info
+              // pw.Text(
+              //   'Generated on: ${DateTime.now().toString().split('.')[0]}',
+              //   style: pw.TextStyle(fontSize: 12, color: pw.PdfColors.grey),
+              // ),
+              // pw.SizedBox(height: 5),
+              // pw.Text(
+              //   'Total Records: ${filteredAppointments.length}',
+              //   style: pw.TextStyle(fontSize: 12, color: pw.PdfColors.grey),
+              // ),
+              // pw.SizedBox(height: 20),
+
+              // Table
+              pw.Table.fromTextArray(
+                context: context,
+                border: pw.TableBorder.all(),
+                headers: [
+                  'Date & Time',
+                  'Client',
+                  'Amount',
+                  'Staff',
+                  'Service',
+                  'Status',
+                  'Payment'
+                ],
+                data: filteredAppointments
+                    .map((appointment) => [
+                          '${appointment.date}\n${appointment.time}',
+                          appointment.clientName,
+                          '₹${appointment.amount}',
+                          appointment.staffName,
+                          appointment.serviceName,
+                          appointment.status,
+                          appointment.paymentStatus,
+                        ])
+                    .toList(),
+                // headerStyle: pw.TextStyle(
+                //   fontWeight: pw.FontWeight.bold,
+                //   color: pw.PdfColors.white,
+                // ),
+                // headerDecoration: pw.BoxDecoration(
+                //   color: pw.PdfColors.blue,
+                // ),
+                cellHeight: 30,
+                cellPadding: pw.EdgeInsets.all(5),
+              ),
+            ];
           },
         ),
       );
