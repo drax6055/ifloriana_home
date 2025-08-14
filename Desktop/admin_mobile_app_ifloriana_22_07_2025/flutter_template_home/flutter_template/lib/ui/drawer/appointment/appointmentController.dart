@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter_template/main.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../network/network_const.dart';
 import '../../../wiget/custome_snackbar.dart';
@@ -323,6 +324,66 @@ class AppointmentController extends GetxController {
       await getAppointment();
     } catch (e) {
       CustomSnackbar.showError('Error', 'Failed to cancel appointment: $e');
+    }
+  }
+
+  // Get payment data by appointment ID and open PDF
+  Future<void> openAppointmentPdf(String appointmentId) async {
+    try {
+      final loginUser = await prefs.getUser();
+      final response = await dioClient.getData(
+        '${Apis.baseUrl}/payments?salon_id=${loginUser!.salonId}',
+        (json) => json,
+      );
+
+      if (response != null && response['success'] == true) {
+        final List payments = response['data'] ?? [];
+        final payment = payments.firstWhereOrNull(
+          (payment) => payment['appointment_id'] == appointmentId,
+        );
+
+        if (payment != null && payment['invoice_pdf_url'] != null) {
+          final pdfUrl = '${Apis.pdfUrl}${payment['invoice_pdf_url']}';
+          await openPdf(pdfUrl);
+        } else {
+          CustomSnackbar.showError(
+              'Error', 'No invoice found for this appointment');
+        }
+      } else {
+        CustomSnackbar.showError('Error', 'Failed to fetch payment data');
+      }
+    } catch (e) {
+      CustomSnackbar.showError('Error', 'Failed to open PDF: $e');
+    }
+  }
+
+  // Open PDF method
+  Future<void> openPdf(String url) async {
+    final uri = Uri.parse(url);
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+    } else {
+      CustomSnackbar.showError('Error', 'Could not open PDF.');
+    }
+  }
+
+  // Delete appointment method
+  Future<void> deleteAppointment(String appointmentId) async {
+    try {
+      final response = await dioClient.deleteData(
+        '${Apis.baseUrl}/appointments/$appointmentId',
+        (json) => json,
+      );
+
+      CustomSnackbar.showSuccess('Success', 'Appointment deleted successfully');
+      // Refresh the appointments list
+      await getAppointment();
+    } catch (e) {
+      CustomSnackbar.showError('Error', 'Failed to delete appointment: $e');
     }
   }
 }
