@@ -4,6 +4,7 @@ import 'package:flutter_template/ui/drawer/appointment/appointmentController.dar
 import 'package:flutter_template/utils/colors.dart';
 import 'package:get/get.dart';
 
+import '../../../wiget/appbar/commen_appbar.dart';
 import '../../../wiget/loading.dart';
 
 class Appointmentscreen extends StatelessWidget {
@@ -14,6 +15,7 @@ class Appointmentscreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: CustomAppBar(title: 'Appointments'),
         body: Container(
           child: Obx(() {
             if (getController.isLoading.value) {
@@ -29,7 +31,7 @@ class Appointmentscreen extends StatelessWidget {
               child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
-                    headingRowColor: MaterialStateProperty.all(secondaryColor),
+                    // headingRowColor: MaterialStateProperty.all(secondaryColor),
                     columns: const [
                       DataColumn(
                           label: Text('Date & Time',
@@ -109,7 +111,10 @@ class Appointmentscreen extends StatelessWidget {
                         DataCell(a.membership == '-'
                             ? Text('-', style: TextStyle(color: Colors.black))
                             : Chip(
-                                label: Text('Yes'),
+                                label: Text(
+                                  'Yes',
+                                  style: TextStyle(color: white),
+                                ),
                                 backgroundColor: Colors.grey[700],
                                 labelStyle: TextStyle(color: Colors.black))),
                         DataCell(a.package == '-'
@@ -129,7 +134,7 @@ class Appointmentscreen extends StatelessWidget {
                               style: TextStyle(color: Colors.black),
                             ),
                             backgroundColor: a.status == 'upcoming'
-                                ? Colors.purple
+                                ? const Color.fromARGB(255, 166, 94, 179)
                                 : a.status == 'cancelled'
                                     ? Colors.red
                                     : Colors.green,
@@ -588,17 +593,22 @@ class Appointmentscreen extends StatelessWidget {
                             IconButton(
                               icon: Icon(Icons.receipt,
                                   color: a.paymentStatus == 'Paid'
-                                      ? Colors.blue
+                                      ? primaryColor
                                       : Colors.grey),
-                              onPressed:
-                                  a.paymentStatus == 'Paid' ? () {} : null,
+                              onPressed: a.paymentStatus == 'Paid'
+                                  ? () {
+                                      print('===> paid');
+                                    }
+                                  : null,
                             ),
+                            // IconButton(
+                            //   icon: Icon(Icons.edit_outlined,
+                            //       color: primaryColor),
+                            //   onPressed: () {},
+                            // ),
                             IconButton(
-                              icon: Icon(Icons.edit, color: Colors.cyanAccent),
-                              onPressed: () {},
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.delete, color: Colors.redAccent),
+                              icon: Icon(Icons.delete_outline,
+                                  color: primaryColor),
                               onPressed: () {},
                             ),
                           ],

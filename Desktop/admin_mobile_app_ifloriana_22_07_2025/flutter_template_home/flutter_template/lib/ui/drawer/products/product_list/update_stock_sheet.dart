@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_template/utils/colors.dart';
 import 'package:get/get.dart';
 import 'product_list_controller.dart';
 import 'product_list_model.dart';
@@ -65,10 +66,10 @@ class _UpdateStockSheetState extends State<UpdateStockSheet> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                IconButton(
-                  icon: Icon(Icons.close, color: Colors.red[700]),
-                  onPressed: () => Get.back(),
-                )
+                // IconButton(
+                //   icon: Icon(Icons.close, color: Colors.red[700]),
+                //   onPressed: () => Get.back(),
+                // )
               ],
             ),
             SizedBox(height: 20),
@@ -164,7 +165,7 @@ class _UpdateStockSheetState extends State<UpdateStockSheet> {
           onPressed: _onUpdateStock,
           child: Text('Update Stock', style: TextStyle(color: Colors.white)),
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue, // More visible in light mode
+            backgroundColor: primaryColor, // More visible in light mode
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
@@ -173,7 +174,7 @@ class _UpdateStockSheetState extends State<UpdateStockSheet> {
         SizedBox(width: 10),
         TextButton(
           onPressed: () => Get.back(),
-          child: Text('Cancel', style: TextStyle(color: Colors.blue)),
+          child: Text('Cancel', style: TextStyle(color: primaryColor)),
         ),
       ],
     );
