@@ -212,6 +212,10 @@ class StaffServiceReportController extends GetxController {
       pdf.addPage(
         pw.MultiPage(
           pageFormat: PdfPageFormat.a4,
+          theme: pw.ThemeData.withFont(
+            base: ttf,
+            bold: ttf,
+          ),
           build: (pw.Context context) {
             final dataToExport = filteredStaffServiceReports;
             return [
