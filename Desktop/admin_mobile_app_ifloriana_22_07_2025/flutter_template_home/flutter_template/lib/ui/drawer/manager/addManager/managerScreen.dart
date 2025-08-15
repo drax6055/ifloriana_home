@@ -301,8 +301,11 @@ class Managerscreen extends StatelessWidget {
           decoration: InputDecoration(
             labelText: 'Branch *',
             labelStyle: CustomTextStyles.textFontMedium(size: 14, color: grey),
-            border: const OutlineInputBorder(),
+            border: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(8)),
+            ),
             focusedBorder: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(8)),
               borderSide: BorderSide(
                   color: primaryColor, width: 2.0), // Active/focused border
             ),

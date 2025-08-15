@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_template/utils/colors.dart';
+import 'package:flutter_template/wiget/Custome_button.dart';
 import 'package:get/get.dart';
+import '../../../wiget/appbar/commen_appbar.dart';
 import '../../../wiget/custome_snackbar.dart';
 import '../../../wiget/loading.dart';
 import 'add_commission_controller.dart';
@@ -11,24 +15,55 @@ class AddCommissionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() => Scaffold(
-          appBar: AppBar(
-            title: Text(controller.editingId != null
+          appBar: CustomAppBar(
+            title: controller.editingId != null
                 ? 'Edit Commission'
-                : 'Add Commission'),
+                : 'Add Commission',
           ),
           body: controller.isLoading.value
               ? Center(child: CustomLoadingAvatar())
               : SingleChildScrollView(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
+                    spacing: 10,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      TextFormField(
+                          controller: controller.commissionNameController,
+                          decoration: InputDecoration(
+                            labelText: 'Commission Name *',
+                            labelStyle: TextStyle(color: grey),
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(8.0)),
+                            ),
+                            focusedBorder: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(8.0)),
+                              borderSide: BorderSide(
+                                color: primaryColor,
+                                width: 2.0,
+                              ),
+                            ),
+                          )),
                       Obx(() {
                         return DropdownButtonFormField<BranchModel>(
                           value: controller.selectedBranch.value,
                           decoration: InputDecoration(
                             labelText: "Select Branch",
-                            border: OutlineInputBorder(),
+                            labelStyle: TextStyle(color: grey),
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(8.0)),
+                            ),
+                            focusedBorder: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(8.0)),
+                              borderSide: BorderSide(
+                                color: primaryColor,
+                                width: 2.0,
+                              ),
+                            ),
                           ),
                           items:
                               controller.branchList.map((BranchModel branch) {
@@ -48,79 +83,128 @@ class AddCommissionScreen extends StatelessWidget {
                           },
                         );
                       }),
-                      SizedBox(height: 16),
+                      // SizedBox(height: 16),
                       // Commission Name
-                      TextFormField(
-                        controller: controller.commissionNameController,
-                        decoration:
-                            InputDecoration(labelText: 'Commission Name *'),
-                      ),
-                      SizedBox(height: 16),
+
+                      // SizedBox(height: 16),
                       // Commission Type Dropdown
                       DropdownButtonFormField<String>(
-                        value: controller.commissionType.value.isEmpty
-                            ? null
-                            : controller.commissionType.value,
-                        items: controller.commissionTypeOptions
-                            .map((type) => DropdownMenuItem(
-                                value: type, child: Text(type)))
-                            .toList(),
-                        onChanged: (val) =>
-                            controller.commissionType.value = val ?? '',
-                        decoration:
-                            InputDecoration(labelText: 'Commission Type *'),
-                      ),
-                      SizedBox(height: 24),
-                      Text('Slots',
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      SizedBox(height: 8),
+                          value: controller.commissionType.value.isEmpty
+                              ? null
+                              : controller.commissionType.value,
+                          items: controller.commissionTypeOptions
+                              .map((type) => DropdownMenuItem(
+                                  value: type, child: Text(type)))
+                              .toList(),
+                          onChanged: (val) =>
+                              controller.commissionType.value = val ?? '',
+                          decoration: InputDecoration(
+                            labelText: 'Commission Type *',
+                            labelStyle: TextStyle(color: grey),
+                            border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(8.0)),
+                            ),
+                            focusedBorder: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(8.0)),
+                              borderSide: BorderSide(
+                                color: primaryColor,
+                                width: 2.0,
+                              ),
+                            ),
+                          )),
+                      // SizedBox(height: 24),
+                      // Text('Slots',
+                      //     style: TextStyle(fontWeight: FontWeight.bold)),
+                      // SizedBox(height: 8),
                       ...List.generate(controller.slots.length, (index) {
                         final slot = controller.slots[index];
                         return Row(
+                          spacing: 5,
                           children: [
                             Expanded(
                               child: TextFormField(
                                 initialValue: slot.slot,
                                 decoration: InputDecoration(
-                                    labelText: 'Slot *',
-                                    hintText: 'Ex: 1000-1999'),
+                                  border: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(8)),
+                                  ),
+                                  focusedBorder: const OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(8.0)),
+                                    borderSide: BorderSide(
+                                      color: primaryColor,
+                                      width: 2.0,
+                                    ),
+                                  ),
+                                  labelText: 'Slot *',
+                                  labelStyle: TextStyle(color: grey),
+                                ),
                                 onChanged: (val) => slot.slot = val,
                               ),
                             ),
-                            SizedBox(width: 8),
+                            // SizedBox(width: 8),
                             Expanded(
                               child: TextFormField(
                                 initialValue: slot.amount,
                                 decoration: InputDecoration(
-                                    labelText: 'Amount *', hintText: 'Ex: 5'),
+                                  border: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(8.0)),
+                                  ),
+                                  focusedBorder: const OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(8.0)),
+                                    borderSide: BorderSide(
+                                      color: primaryColor,
+                                      width: 2.0,
+                                    ),
+                                  ),
+                                  labelText: 'Amount *',
+                                  labelStyle: TextStyle(color: grey),
+                                ),
                                 onChanged: (val) => slot.amount = val,
                               ),
                             ),
                             IconButton(
-                              icon: Icon(Icons.delete, color: Colors.red),
+                              icon: Icon(Icons.delete_outline,
+                                  color: primaryColor),
                               onPressed: () => controller.removeSlot(index),
                             ),
                           ],
                         );
                       }),
-                      SizedBox(height: 8),
+                      // SizedBox(height: 8),
                       ElevatedButton(
                         onPressed: controller.addSlot,
-                        child: Text('+ Add Slot'),
+                        child: Text(
+                          '+ Add Slot',
+                          style: TextStyle(color: white),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryColor,
+                        ),
                       ),
-                      SizedBox(height: 24),
-                      Row(
-                        children: [
-                          ElevatedButton(
-                            onPressed: controller.postCommission,
-                            child: Text(controller.editingId != null
-                                ? 'Update Commission'
-                                : 'Add Commission'),
-                          ),
-                          SizedBox(width: 16),
-                          
-                        ],
-                      ),
+                      // SizedBox(height: 24),
+
+                      ElevatedButtonExample(
+                          text: controller.editingId != null
+                              ? 'Update Commission'
+                              : 'Add Commission',
+                          onPressed: controller.postCommission)
+                      // Row(
+                      // children: [
+                      // ElevatedButton(
+                      //   onPressed: controller.postCommission,
+                      //   child: Text(controller.editingId != null
+                      //       ? 'Update Commission'
+                      //       : 'Add Commission'),
+                      // ),
+                      // SizedBox(width: 16),
+                      // ],
+                      // ),
                     ],
                   ),
                 ),

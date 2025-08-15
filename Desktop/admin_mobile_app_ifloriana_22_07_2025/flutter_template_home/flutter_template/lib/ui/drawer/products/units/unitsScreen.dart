@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_template/ui/drawer/products/units/unitsController.dart';
+import 'package:flutter_template/wiget/appbar/commen_appbar.dart';
 import 'package:get/get.dart';
 import 'package:multi_dropdown/multi_dropdown.dart';
 
@@ -17,6 +18,7 @@ class Unitsscreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: CustomAppBar(title: "Units"),
       body: Obx(() {
         if (getController.unitsList.isEmpty) {
           return Center(child: Text('No units found.'));
@@ -28,19 +30,26 @@ class Unitsscreen extends StatelessWidget {
             final branchNames = unit.branches.map((b) => b.name).join(', ');
             return ListTile(
               title: Text(unit.name ?? ''),
-              subtitle: Text('Branches: ' + branchNames),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(unit.status == 1 ? 'Active' : 'Inactive',
+                      style: TextStyle(
+                          color: unit.status == 1 ? Colors.green : Colors.red)),
+                  Text('Branches: ' + branchNames),
+                ],
+              ),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(unit.status == 1 ? 'Active' : 'Inactive'),
                   IconButton(
-                    icon: Icon(Icons.edit, color: Colors.blue),
+                    icon: Icon(Icons.edit_outlined, color: primaryColor),
                     onPressed: () {
                       showEditUnitSheet(context, unit);
                     },
                   ),
                   IconButton(
-                    icon: Icon(Icons.delete, color: Colors.red),
+                    icon: Icon(Icons.delete_outline, color: primaryColor),
                     onPressed: () async {
                       getController.deleteUnit(unit.id!);
                     },
@@ -52,10 +61,14 @@ class Unitsscreen extends StatelessWidget {
         );
       }),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: primaryColor,
         onPressed: () {
           showAddCategorySheet(context);
         },
-        child: Icon(Icons.add),
+        child: Icon(
+          Icons.add,
+          color: white,
+        ),
       ),
     );
   }
@@ -85,6 +98,7 @@ class Unitsscreen extends StatelessWidget {
                     keyboardType: TextInputType.text,
                     validator: (value) => Validation.validatename(value),
                   ),
+                  branchDropdown(),
                   Obx(() => Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -102,7 +116,6 @@ class Unitsscreen extends StatelessWidget {
                           ),
                         ],
                       )),
-                  branchDropdown(),
                   Btn_SubCategoryAdd(),
                   const SizedBox(height: 10),
                 ],
@@ -144,6 +157,7 @@ class Unitsscreen extends StatelessWidget {
                     keyboardType: TextInputType.text,
                     validator: (value) => Validation.validatename(value),
                   ),
+                  branchDropdown(),
                   Obx(() => Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -161,7 +175,6 @@ class Unitsscreen extends StatelessWidget {
                           ),
                         ],
                       )),
-                  branchDropdown(),
                   ElevatedButtonExample(
                     text: "Update Unit",
                     onPressed: () {

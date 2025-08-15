@@ -1,16 +1,11 @@
 import 'dart:async';
 import 'package:flutter_template/main.dart';
-import 'package:flutter_template/ui/auth/register/register_screen.dart';
-import 'package:flutter_template/ui/drawer/branches/getBranches/getBranchesScreen.Dart'
-    show GetBranchesScreen;
 import 'package:get/get.dart';
 import '../../route/app_route.dart';
 import '../../wiget/custome_snackbar.dart';
-import '../buy_product/getOrderList/getOrderListScreen.dart';
-import '../drawer/Branchmembership/get/branchMembershipListScreen.dart';
-import '../drawer/branchPackages/getBranchPackagesScreen.dart';
-import '../drawer/commission/commission_list_screen.dart';
-import '../drawer/coupons/couponsScreen.dart';
+
+import '../drawer/products/units/unitsScreen.dart';
+import '../drawer/products/variations/variationScreen.dart';
 
 class SplashController extends GetxController {
   @override
@@ -26,7 +21,7 @@ class SplashController extends GetxController {
         String? managerAccessToken = managerUser?.token;
 
         if (accessToken != null && accessToken.isNotEmpty) {
-          Get.to(GetBranchPackagesScreen());
+          Get.to(Variationscreen());
           // Get.offNamed(Routes.drawerScreen); // Regular user
         } else if (managerAccessToken != null &&
             managerAccessToken.isNotEmpty) {

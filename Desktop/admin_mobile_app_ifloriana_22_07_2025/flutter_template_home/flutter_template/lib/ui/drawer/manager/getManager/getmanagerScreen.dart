@@ -118,24 +118,58 @@ class Getmanagerscreen extends StatelessWidget {
                         itemBuilder: (context, index) {
                           final manager = getController.filteredManagers[index];
                           return ExpansionTile(
-                            leading: CircleAvatar(
-                              backgroundColor: Colors.grey[300],
-                              child: manager.image_url.isNotEmpty
-                                  ? ClipOval(
-                                      child: Image.network(
-                                        '${Apis.pdfUrl}${manager.image_url}?v=${DateTime.now().millisecondsSinceEpoch}',
-                                        width: 40,
-                                        height: 40,
-                                        fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          return Icon(Icons.person,
-                                              color: Colors.grey[600]);
-                                        },
-                                      ),
-                                    )
-                                  : Icon(Icons.person, color: Colors.grey[600]),
-                            ),
+                            leading: manager.image_url.isNotEmpty
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Image.network(
+                                      '${Apis.pdfUrl}${manager.image_url}?v=${DateTime.now().millisecondsSinceEpoch}',
+                                      width: 50,
+                                      height: 50,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Container(
+                                          width: 50,
+                                          height: 50,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[300],
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: const Icon(
+                                              Icons.image_not_supported),
+                                        );
+                                      },
+                                    ),
+                                  )
+                                : Container(
+                                    width: 50,
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[300],
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child:
+                                        const Icon(Icons.image_not_supported),
+                                  ),
+                            // leading: CircleAvatar(
+                            //   backgroundColor: Colors.grey[300],
+                            //   child: manager.image_url.isNotEmpty
+                            //       ? ClipOval(
+                            //           child: Image.network(
+                            //             '${Apis.pdfUrl}${manager.image_url}?v=${DateTime.now().millisecondsSinceEpoch}',
+                            //             width: 40,
+                            //             height: 40,
+                            //             fit: BoxFit.cover,
+                            //             errorBuilder:
+                            //                 (context, error, stackTrace) {
+                            //               return Icon(Icons.person,
+                            //                   color: Colors.grey[600]);
+                            //             },
+                            //           ),
+                            //         )
+                            //       : Icon(Icons.person, color: Colors.grey[600]),
+                            // ),
                             shape: Border.all(color: Colors.transparent),
                             title: Text('${manager.full_name}'),
                             subtitle: Column(

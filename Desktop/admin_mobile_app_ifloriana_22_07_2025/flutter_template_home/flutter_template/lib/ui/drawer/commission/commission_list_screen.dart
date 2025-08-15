@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_template/utils/colors.dart';
 import 'package:get/get.dart';
+import '../../../wiget/appbar/commen_appbar.dart';
 import '../../../wiget/loading.dart';
 import 'commission_list_controller.dart';
 import 'add_commission_screen.dart';
@@ -10,7 +12,7 @@ class CommissionListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('All Commissions')),
+      appBar: CustomAppBar(title: 'Commissions'),
       body: Obx(() {
         if (controller.isLoading.value) {
           return Center(child: CustomLoadingAvatar());
@@ -32,7 +34,7 @@ class CommissionListScreen extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.edit, color: Colors.blue),
+                      icon: Icon(Icons.edit_outlined, color: primaryColor),
                       onPressed: () {
                         Get.to(() => AddCommissionScreen(), arguments: item)
                             ?.then((result) {
@@ -43,7 +45,7 @@ class CommissionListScreen extends StatelessWidget {
                       },
                     ),
                     IconButton(
-                      icon: Icon(Icons.delete, color: Colors.red),
+                      icon: Icon(Icons.delete_outline, color: primaryColor),
                       onPressed: () async {
                         final confirm = await showDialog<bool>(
                           context: context,
@@ -82,6 +84,7 @@ class CommissionListScreen extends StatelessWidget {
         );
       }),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: primaryColor,
         onPressed: () {
           Get.to(() => AddCommissionScreen())?.then((result) {
             if (result == true) {
@@ -89,7 +92,10 @@ class CommissionListScreen extends StatelessWidget {
             }
           });
         },
-        child: Icon(Icons.add),
+        child: Icon(
+          Icons.add,
+          color: white,
+        ),
       ),
     );
   }

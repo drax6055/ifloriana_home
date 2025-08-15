@@ -9,6 +9,7 @@ import '../../../../utils/custom_text_styles.dart';
 import '../../../../utils/validation.dart';
 import '../../../../wiget/Custome_button.dart';
 import '../../../../wiget/Custome_textfield.dart';
+import '../../../../wiget/appbar/commen_appbar.dart';
 import '../../../../wiget/custome_dropdown.dart';
 import '../../../../wiget/custome_text.dart';
 import '../../../../wiget/loading.dart';
@@ -20,9 +21,8 @@ class Variationscreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Variations'),
-        backgroundColor: primaryColor,
+      appBar: CustomAppBar(
+        title: 'Variations',
       ),
       body: Padding(
         padding: EdgeInsets.all(10),
@@ -66,8 +66,8 @@ class Variationscreen extends StatelessWidget {
                               ),
                               if (getController.valueControllers.length > 1)
                                 IconButton(
-                                  icon: Icon(Icons.remove_circle,
-                                      color: Colors.red),
+                                  icon: Icon(Icons.cancel_outlined,
+                                      color: primaryColor),
                                   onPressed: () {
                                     getController.removeValueField(i);
                                   },
@@ -81,10 +81,13 @@ class Variationscreen extends StatelessWidget {
                           onPressed: () {
                             getController.addValueField();
                           },
-                          icon: Icon(Icons.add),
+                          icon: Icon(
+                            Icons.add,
+                            color: white,
+                          ),
                           label: Text('Add Value'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: secondaryColor,
+                            backgroundColor: primaryColor,
                             foregroundColor: Colors.white,
                             padding: EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 8),
@@ -147,12 +150,12 @@ class Variationscreen extends StatelessWidget {
           showClearIcon: true,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(color: Colors.grey),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),
-            borderSide: const BorderSide(
-              color: secondaryColor,
+            borderSide: BorderSide(
+              color: primaryColor,
+              width: 2.0,
             ),
           ),
         ),

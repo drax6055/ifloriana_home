@@ -9,6 +9,7 @@ import '../../../../../utils/validation.dart';
 import '../../../../../wiget/Custome_button.dart';
 import '../../../../../wiget/Custome_textfield.dart';
 import '../../../../../wiget/custome_text.dart';
+import '../../../../wiget/appbar/commen_appbar.dart';
 
 class Tagsscreen extends StatelessWidget {
   Tagsscreen({super.key});
@@ -17,12 +18,10 @@ class Tagsscreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Product SubCategories'),
-        backgroundColor: primaryColor,
-      ),
+      appBar: CustomAppBar(title: "Product SubCategories"),
       body: RefreshIndicator(
-        onRefresh: () async{
+        color: primaryColor,
+        onRefresh: () async {
           getController.getTags();
         },
         child: Obx(() {
@@ -36,44 +35,55 @@ class Tagsscreen extends StatelessWidget {
               final branchNames = tag.branches.map((b) => b.name).join(', ');
               return ListTile(
                 title: Text(tag.name ?? ''),
-                subtitle: Text('Branches: $branchNames'),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      tag.status == 1 ? 'Active' : 'Inactive',
+                      style: TextStyle(
+                        color: tag.status == 1 ? Colors.green : Colors.red,
+                      ),
+                    ),
+                    Text('Branches: $branchNames'),
+                  ],
+                ),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(tag.status == 1 ? 'Active' : 'Inactive'),
                     IconButton(
-                      icon: Icon(Icons.edit, color: Colors.blue),
+                      icon: Icon(Icons.edit_outlined, color: primaryColor),
                       onPressed: () {
                         showEditTagSheet(context, tag);
                       },
                     ),
                     IconButton(
-                      icon: Icon(Icons.delete, color: Colors.red),
+                      icon: Icon(Icons.delete_outline, color: primaryColor),
                       onPressed: () async {
-                        final confirm = await showDialog<bool>(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: Text('Delete Tag'),
-                            content: Text(
-                                'Are you sure you want to delete this tag?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () =>
-                                    Navigator.of(context).pop(false),
-                                child: Text('Cancel'),
-                              ),
-                              TextButton(
-                                onPressed: () =>
-                                    Navigator.of(context).pop(true),
-                                child: Text('Delete',
-                                    style: TextStyle(color: Colors.red)),
-                              ),
-                            ],
-                          ),
-                        );
-                        if (confirm == true) {
-                          getController.deleteTag(tag.id!);
-                        }
+                         getController.deleteTag(tag.id!);
+                        // final confirm = await showDialog<bool>(
+                        //   context: context,
+                        //   builder: (context) => AlertDialog(
+                        //     title: Text('Delete Tag'),
+                        //     content: Text(
+                        //         'Are you sure you want to delete this tag?'),
+                        //     actions: [
+                        //       TextButton(
+                        //         onPressed: () =>
+                        //             Navigator.of(context).pop(false),
+                        //         child: Text('Cancel'),
+                        //       ),
+                        //       TextButton(
+                        //         onPressed: () =>
+                        //             Navigator.of(context).pop(true),
+                        //         child: Text('Delete',
+                        //             style: TextStyle(color: Colors.red)),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // );
+                        // if (confirm == true) {
+                        //   getController.deleteTag(tag.id!);
+                        // }
                       },
                     ),
                   ],
