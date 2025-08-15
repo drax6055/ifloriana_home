@@ -128,7 +128,7 @@ class GetBranchPackagesScreen extends StatelessWidget {
                           // SizedBox(height: 8.h),
                           ...package.branchId.map(
                             (branch) => Text(
-                              branch.name,
+                              "${branch.name},",
                               style:
                                   CustomTextStyles.textFontRegular(size: 12.sp),
                             ),
