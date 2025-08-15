@@ -117,8 +117,9 @@ class Variationcontroller extends GetxController {
       await dioClient.postData<ProductVariation>(
         '${Apis.baseUrl}${Endpoints.postVariation}',
         branchData,
-        (json) => ProductVariation.fromJson(json),
+        (json) => ProductVariation.fromJson(json['data']),
       );
+      Get.back();
       CustomSnackbar.showSuccess('Success', 'Variation added successfully');
     } catch (e) {
       print('==> here Error: $e');

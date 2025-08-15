@@ -3,7 +3,9 @@ import 'package:flutter_template/ui/drawer/products/variations/get/variationGetC
 import 'package:get/get.dart';
 import '../../../../../route/app_route.dart';
 import '../../../../../utils/colors.dart';
+import '../../../../../wiget/appbar/commen_appbar.dart';
 import '../update_variation_screen.dart';
+import '../variationScreen.dart';
 
 class VariationGetscreen extends StatelessWidget {
   VariationGetscreen({super.key});
@@ -13,9 +15,8 @@ class VariationGetscreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Variations'),
-        backgroundColor: primaryColor,
+      appBar: CustomAppBar(
+        title: 'Variations',
       ),
       body: Padding(
         padding: EdgeInsets.all(10),
@@ -39,24 +40,27 @@ class VariationGetscreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Type: ${variation.type ?? ''}'),
-                      Text('Values: ${variation.value?.join(", ") ?? ''}'),
+                      // Text('Values: ${variation.value?.join(", ") ?? ''}'),
                       Text('Branches: $branchNames'),
                       Text(
-                          'Status: ${variation.status == 1 ? 'Active' : 'Inactive'}'),
+                        ' ${variation.status == 1 ? 'Active' : 'Inactive'}',
+                        style: TextStyle(
+                            color: variation.status == 1 ? Colors.green : grey),
+                      ),
                     ],
                   ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: Icon(Icons.edit, color: Colors.blue),
+                        icon: Icon(Icons.edit_outlined, color: primaryColor),
                         onPressed: () {
                           Get.to(() => UpdateVariationscreen(
                               variationToEdit: variation));
                         },
                       ),
                       IconButton(
-                        icon: Icon(Icons.delete, color: Colors.red),
+                        icon: Icon(Icons.delete_outline, color: primaryColor),
                         onPressed: () {
                           getController.deleteVariation(variation.sId ?? '');
                         },
@@ -70,10 +74,14 @@ class VariationGetscreen extends StatelessWidget {
         })),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: primaryColor,
         onPressed: () {
-          Get.toNamed(Routes.addVariationscreen);
+          Get.to(Variationscreen());
         },
-        child: Icon(Icons.add),
+        child: Icon(
+          Icons.add,
+          color: white,
+        ),
       ),
     );
   }

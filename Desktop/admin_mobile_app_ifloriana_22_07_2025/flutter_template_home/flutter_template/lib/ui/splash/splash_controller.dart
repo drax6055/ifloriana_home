@@ -5,6 +5,7 @@ import '../../route/app_route.dart';
 import '../../wiget/custome_snackbar.dart';
 
 import '../drawer/products/units/unitsScreen.dart';
+import '../drawer/products/variations/get/variationGetScreen.dart';
 import '../drawer/products/variations/variationScreen.dart';
 
 class SplashController extends GetxController {
@@ -21,7 +22,7 @@ class SplashController extends GetxController {
         String? managerAccessToken = managerUser?.token;
 
         if (accessToken != null && accessToken.isNotEmpty) {
-          Get.to(Variationscreen());
+          Get.to(VariationGetscreen());
           // Get.offNamed(Routes.drawerScreen); // Regular user
         } else if (managerAccessToken != null &&
             managerAccessToken.isNotEmpty) {
