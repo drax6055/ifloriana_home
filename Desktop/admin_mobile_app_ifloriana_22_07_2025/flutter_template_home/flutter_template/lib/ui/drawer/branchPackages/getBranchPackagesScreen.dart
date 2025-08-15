@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../../utils/colors.dart';
 import '../../../utils/custom_text_styles.dart';
+import '../../../wiget/appbar/commen_appbar.dart';
 import '../../../wiget/loading.dart';
 import 'getBranchPackagesController.dart';
 import 'branchPackagesScreen.dart';
@@ -14,10 +15,11 @@ class GetBranchPackagesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Branch Packages'),
+      appBar: CustomAppBar(
+        title: 'Branch Packages',
       ),
       body: RefreshIndicator(
+        color: primaryColor,
         child: Obx(() {
           if (controller.isLoading.value) {
             return Center(child: CustomLoadingAvatar());
@@ -38,10 +40,11 @@ class GetBranchPackagesScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final package = controller.packages[index];
               return Card(
-                margin: EdgeInsets.only(bottom: 16.r),
+                // margin: EdgeInsets.only(bottom: 16.r),
                 child: Padding(
                   padding: EdgeInsets.all(16.r),
                   child: Column(
+                    spacing: 5,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
@@ -51,29 +54,23 @@ class GetBranchPackagesScreen extends StatelessWidget {
                             child: Text(
                               package.packageName,
                               style: CustomTextStyles.textFontBold(
-                                  size: 18.sp,
+                                  size: 16.sp,
                                   textOverflow: TextOverflow.ellipsis),
                             ),
                           ),
                           Row(
                             children: [
-                              Text(
-                                '₹${package.packagePrice}',
-                                style: CustomTextStyles.textFontBold(
-                                    size: 18.sp,
-                                    color: primaryColor,
-                                    textOverflow: TextOverflow.ellipsis),
-                              ),
-                              SizedBox(width: 8.w),
                               IconButton(
-                                icon: Icon(Icons.edit, color: primaryColor),
+                                icon: Icon(Icons.edit_outlined,
+                                    color: primaryColor),
                                 onPressed: () {
                                   Get.to(() => DynamicInputScreen(),
                                       arguments: package);
                                 },
                               ),
                               IconButton(
-                                icon: Icon(Icons.delete, color: Colors.red),
+                                icon: Icon(Icons.delete_outline,
+                                    color: primaryColor),
                                 onPressed: () =>
                                     _showDeleteConfirmation(package.id),
                               ),
@@ -81,64 +78,77 @@ class GetBranchPackagesScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      SizedBox(height: 8.h),
-                      Text(
-                        package.description,
-                        style: CustomTextStyles.textFontRegular(size: 14.sp),
+                      // SizedBox(height: 8.h),
+                      // Text(
+                      //   package.description,
+                      //   style: CustomTextStyles.textFontRegular(size: 12.sp),
+                      // ),
+                      // SizedBox(height: 8.h),
+
+                      // SizedBox(height: 16.h),
+                      // Text(
+                      //   'Services Included:',
+                      //   style: CustomTextStyles.textFontBold(
+                      //       size: 12.sp, textOverflow: TextOverflow.ellipsis),
+                      // ),
+                      // // SizedBox(height: 8.h),
+                      // ...package.packageDetails.map(
+                      //   (detail) => Row(
+                      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //     children: [
+                      //       Expanded(
+                      //         child: Text(
+                      //           '${detail.serviceId.name} (${detail.quantity}x)',
+                      //           style: CustomTextStyles.textFontRegular(
+                      //             size: 12.sp,
+                      //           ),
+                      //         ),
+                      //       ),
+                      //       Text(
+                      //         '₹${detail.discountedPrice}',
+                      //         style: CustomTextStyles.textFontRegular(
+                      //           size: 12.sp,
+                      //           color: primaryColor,
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
+                      // SizedBox(height: 8.h),
+                      Row(
+                        spacing: 5.w,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Available at:',
+                            style: CustomTextStyles.textFontBold(
+                                size: 12.sp,
+                                textOverflow: TextOverflow.ellipsis),
+                          ),
+                          // SizedBox(height: 8.h),
+                          ...package.branchId.map(
+                            (branch) => Text(
+                              branch.name,
+                              style:
+                                  CustomTextStyles.textFontRegular(size: 12.sp),
+                            ),
+                          ),
+                        ],
                       ),
-                      SizedBox(height: 8.h),
+
                       Text(
                         'Valid from ${_formatDate(package.startDate)} to ${_formatDate(package.endDate)}',
                         style: CustomTextStyles.textFontRegular(
-                          size: 14.sp,
-                          color: Colors.grey,
+                          size: 10.sp,
                         ),
                       ),
-                      SizedBox(height: 16.h),
                       Text(
-                        'Services Included:',
+                        'Price: ₹${package.packagePrice}',
                         style: CustomTextStyles.textFontBold(
-                            size: 16.sp, textOverflow: TextOverflow.ellipsis),
+                            size: 16.sp,
+                            color: primaryColor,
+                            textOverflow: TextOverflow.ellipsis),
                       ),
-                      SizedBox(height: 8.h),
-                      ...package.packageDetails.map((detail) => Padding(
-                            padding: EdgeInsets.only(bottom: 8.h),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    '${detail.serviceId.name} (${detail.quantity}x)',
-                                    style: CustomTextStyles.textFontRegular(
-                                      size: 14.sp,
-                                    ),
-                                  ),
-                                ),
-                                Text(
-                                  '₹${detail.discountedPrice}',
-                                  style: CustomTextStyles.textFontRegular(
-                                    size: 14.sp,
-                                    color: primaryColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )),
-                      SizedBox(height: 8.h),
-                      Text(
-                        'Available at:',
-                        style: CustomTextStyles.textFontBold(
-                            size: 16.sp, textOverflow: TextOverflow.ellipsis),
-                      ),
-                      SizedBox(height: 8.h),
-                      ...package.branchId.map((branch) => Padding(
-                            padding: EdgeInsets.only(bottom: 4.h),
-                            child: Text(
-                              branch.name,
-                              style:
-                                  CustomTextStyles.textFontRegular(size: 14.sp),
-                            ),
-                          )),
                     ],
                   ),
                 ),

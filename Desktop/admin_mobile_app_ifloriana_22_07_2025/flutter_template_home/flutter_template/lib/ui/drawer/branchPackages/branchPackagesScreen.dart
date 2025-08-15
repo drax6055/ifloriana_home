@@ -6,7 +6,9 @@ import 'package:get/get.dart';
 import 'package:flutter_template/utils/colors.dart';
 import 'package:flutter_template/ui/drawer/branchPackages/branchPackagesController.dart';
 import '../../../utils/validation.dart';
+import '../../../wiget/Custome_button.dart';
 import '../../../wiget/Custome_textfield.dart';
+import '../../../wiget/appbar/commen_appbar.dart';
 import '../../../wiget/custome_snackbar.dart';
 import '../../../wiget/custome_text.dart';
 
@@ -19,7 +21,7 @@ class DynamicInputScreen extends StatelessWidget {
 
     return Scaffold(
       appBar:
-          AppBar(title: Text(isEditing ? 'Update Package' : 'Create Package')),
+          CustomAppBar(title: isEditing ? 'Update Package' : 'Create Package'),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
@@ -27,6 +29,9 @@ class DynamicInputScreen extends StatelessWidget {
             spacing: 10,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              SizedBox(
+                height: 1,
+              ),
               branchDropdown(),
               CustomTextFormField(
                 controller: controller.nameController,
@@ -42,9 +47,10 @@ class DynamicInputScreen extends StatelessWidget {
                 validator: (value) => Validation.validatedisscription(value),
               ),
               Row(
+                spacing: 5,
                 children: [
                   Expanded(child: startTime(context)),
-                  SizedBox(width: 5),
+                  // SizedBox(width: 5),
                   Expanded(child: endTime(context)),
                 ],
               ),
@@ -61,6 +67,7 @@ class DynamicInputScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Column(
+                            spacing: 8,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
@@ -71,8 +78,8 @@ class DynamicInputScreen extends StatelessWidget {
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold)),
                                   IconButton(
-                                    icon:
-                                        Icon(Icons.delete, color: primaryColor),
+                                    icon: Icon(Icons.delete_outline,
+                                        color: primaryColor),
                                     onPressed: () =>
                                         controller.removeContainer(index),
                                   ),
@@ -94,12 +101,24 @@ class DynamicInputScreen extends StatelessWidget {
                                 },
                                 decoration: InputDecoration(
                                   labelText: "Select Service",
-                                  border: OutlineInputBorder(),
+                                  labelStyle: TextStyle(color: grey),
+                                  border: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(8.0)),
+                                  ),
+                                  focusedBorder: const OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(8.0)),
+                                    borderSide: BorderSide(
+                                      color: primaryColor,
+                                      width: 2.0,
+                                    ),
+                                  ),
                                 ),
                               ),
-                              SizedBox(height: 10),
+                              // SizedBox(height: 10),
                               Row(
-                                spacing: 10,
+                                spacing: 5,
                                 children: [
                                   Expanded(
                                     child: CustomTextFormField(
@@ -120,7 +139,7 @@ class DynamicInputScreen extends StatelessWidget {
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 10),
+                              // SizedBox(height: 10),
                               Text("Total: ₹${data.total.value}",
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -188,22 +207,24 @@ class DynamicInputScreen extends StatelessWidget {
                       ],
                     ),
                   )),
-              ElevatedButton(
+              ElevatedButtonExample(
+                text: isEditing ? 'Update Package' : 'Create Package',
                 onPressed: controller.submitPackage,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  minimumSize: Size(double.infinity, 50),
-                ),
-                child: Text(
-                  isEditing ? 'Update Package' : 'Create Package',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
+              )
+              // style: ElevatedButton.styleFrom(
+              //   backgroundColor: primaryColor,
+              //   minimumSize: Size(double.infinity, 50),
+              // )),
+              //   child: Text(
+              //     isEditing ? 'Update Package' : 'Create Package',
+              //     style: TextStyle(
+              //       color: Colors.white,
+              //       fontSize: 16,
+              //       fontWeight: FontWeight.bold,
+              //     ),
+              //   ),
+              // ),
+              // SizedBox(height: 20),
             ],
           ),
         ),
@@ -217,7 +238,17 @@ class DynamicInputScreen extends StatelessWidget {
         value: controller.selectedBranch.value,
         decoration: InputDecoration(
           labelText: "Select Branch",
-          border: OutlineInputBorder(),
+          labelStyle: TextStyle(color: grey),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+          ),
+          focusedBorder: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8.0)),
+            borderSide: BorderSide(
+              color: primaryColor,
+              width: 2.0,
+            ),
+          ),
         ),
         items: controller.branchList.map((Branch branch) {
           return DropdownMenuItem<Branch>(
