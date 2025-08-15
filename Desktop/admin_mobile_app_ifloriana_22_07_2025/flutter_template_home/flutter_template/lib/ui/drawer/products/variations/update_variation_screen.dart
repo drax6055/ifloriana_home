@@ -9,6 +9,7 @@ import '../../../../utils/custom_text_styles.dart';
 import '../../../../utils/validation.dart';
 import '../../../../wiget/Custome_button.dart';
 import '../../../../wiget/Custome_textfield.dart';
+import '../../../../wiget/appbar/commen_appbar.dart';
 import '../../../../wiget/custome_dropdown.dart';
 import '../../../../wiget/custome_text.dart';
 import '../../../../wiget/loading.dart';
@@ -23,9 +24,8 @@ class UpdateVariationscreen extends StatelessWidget {
         Get.put(UpdateVariationcontroller(variationToEdit: variationToEdit));
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Update Variation'),
-        backgroundColor: primaryColor,
+      appBar: CustomAppBar(
+        title: 'Update Variations',
       ),
       body: Padding(
         padding: EdgeInsets.all(10),
@@ -84,10 +84,16 @@ class UpdateVariationscreen extends StatelessWidget {
                           onPressed: () {
                             getController.addValueField();
                           },
-                          icon: Icon(Icons.add),
-                          label: Text('Add Value'),
+                          icon: Icon(
+                            Icons.add,
+                            color: white,
+                          ),
+                          label: Text(
+                            'Add Value',
+                            style: TextStyle(color: white),
+                          ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: secondaryColor,
+                            backgroundColor: primaryColor,
                             foregroundColor: Colors.white,
                             padding: EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 8),

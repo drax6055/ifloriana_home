@@ -52,8 +52,9 @@ class Variationcontroller extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    clearFormFields();
     getBranches();
-    valueControllers.add(TextEditingController());
+    // valueControllers.add(TextEditingController());
   }
 
   @override
@@ -95,6 +96,18 @@ class Variationcontroller extends GetxController {
     }
   }
 
+  void clearFormFields() {
+    nameController.clear();
+    selectedType.value = 'Text';
+    isActive.value = true;
+
+    // Clear branch selection
+    selectedBranches.clear();
+    branchController.clearAll();
+    valueControllers.clear();
+    valueControllers.add(TextEditingController());
+  }
+
   Future onBranchAdd() async {
     final loginUser = await prefs.getUser();
     // Collect branch IDs
@@ -121,6 +134,7 @@ class Variationcontroller extends GetxController {
       );
       Get.back();
       CustomSnackbar.showSuccess('Success', 'Variation added successfully');
+      clearFormFields();
     } catch (e) {
       print('==> here Error: $e');
       CustomSnackbar.showError('Error', e.toString());

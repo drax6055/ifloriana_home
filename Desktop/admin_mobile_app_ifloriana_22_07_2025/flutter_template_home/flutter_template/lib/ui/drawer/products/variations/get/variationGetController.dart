@@ -1,4 +1,3 @@
-
 import 'package:flutter_template/main.dart';
 import 'package:get/get.dart';
 
@@ -26,6 +25,9 @@ class VariationGetcontroller extends GetxController {
         final List<dynamic> data = response['data'];
         variations.value = data.map((e) => Data.fromJson(e)).toList();
       }
+
+      print(
+          '=====> ${Apis.baseUrl}${Endpoints.postVariation}?salon_id=${loginUser!.salonId}');
     } catch (e) {
       CustomSnackbar.showError('Error', 'Failed to fetch variations: $e');
     }

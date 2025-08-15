@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_template/commen_items/commen_class.dart';
 import 'package:flutter_template/ui/drawer/services/subCategory/subCategoryController.dart';
 import 'package:flutter_template/utils/colors.dart';
 import 'package:flutter_template/utils/custom_text_styles.dart';
 import 'package:flutter_template/utils/validation.dart';
 import 'package:flutter_template/wiget/Custome_button.dart';
 import 'package:flutter_template/wiget/Custome_textfield.dart';
+import 'package:flutter_template/wiget/appbar/commen_appbar.dart';
 import 'package:flutter_template/wiget/custome_snackbar.dart';
 import 'package:flutter_template/wiget/custome_text.dart';
 import 'package:get/get.dart';
+import 'package:flutter_template/network/network_const.dart';
 
 class Subcategotyscreen extends StatelessWidget {
   Subcategotyscreen({super.key});
@@ -17,8 +18,8 @@ class Subcategotyscreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: Scaffold(
+    return Scaffold(
+      appBar: CustomAppBar(title: "Sub Category"),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Obx(() {
@@ -51,10 +52,14 @@ class Subcategotyscreen extends StatelessWidget {
         }),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: primaryColor,
         onPressed: () => showAddCategorySheet(context),
-        child: Icon(Icons.add),
+        child: Icon(
+          Icons.add,
+          color: white,
+        ),
       ),
-    ));
+    );
   }
 
   void showAddCategorySheet(BuildContext context, {SubCategory? subCategory}) {
@@ -63,10 +68,11 @@ class Subcategotyscreen extends StatelessWidget {
       getController.selectedBranch.value = getController.branchList
           .firstWhereOrNull((c) => c.id == subCategory.categoryId);
       getController.isActive.value = subCategory.status == 1;
+      getController.singleImage.value = null;
+      getController.editImageUrl.value =
+          subCategory.id.isNotEmpty ? subCategory.id : '';
     } else {
-      getController.nameController.clear();
-      getController.selectedBranch.value = null;
-      getController.isActive.value = true;
+      getController.resetForm();
     }
 
     Get.bottomSheet(
@@ -83,12 +89,8 @@ class Subcategotyscreen extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Expanded(
-                    child: Imagepicker(),
-                  ),
-                  SizedBox(
-                    width: 5.w,
-                  ),
+                  Expanded(child: Imagepicker()),
+                  SizedBox(width: 5.w),
                   Expanded(
                     flex: 3,
                     child: CustomTextFormField(
@@ -118,10 +120,8 @@ class Subcategotyscreen extends StatelessWidget {
                       ),
                     ],
                   )),
-              Btn_Subcategory(subCategory: subCategory),
-              SizedBox(
-                height: 20.h,
-              )
+              Btn_Subcategory(subCategory: subCategory, context: context),
+              SizedBox(height: 20.h),
             ],
           ),
         ),
@@ -162,7 +162,42 @@ class Subcategotyscreen extends StatelessWidget {
   Widget Imagepicker() {
     return Obx(() {
       return GestureDetector(
-        onTap: () => pickImage(isMultiple: false),
+        onTap: () {
+          Get.bottomSheet(
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.photo_library),
+                    title: const Text('Choose from Gallery'),
+                    onTap: () {
+                      Get.back();
+                      getController.pickImageFromGallery();
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.camera_alt),
+                    title: const Text('Take Photo'),
+                    onTap: () {
+                      Get.back();
+                      getController.pickImageFromCamera();
+                    },
+                  ),
+                ],
+              ),
+            ),
+            isScrollControlled: true,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+            ),
+          );
+        },
         child: Container(
           height: 50.h,
           width: 70.w,
@@ -172,29 +207,47 @@ class Subcategotyscreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(10.r),
             color: secondaryColor.withOpacity(0.2),
           ),
-          child: singleImage.value != null
+          child: getController.singleImage.value != null
               ? ClipRRect(
                   borderRadius: BorderRadius.circular(10.r),
                   child: Image.file(
-                    singleImage.value!,
+                    getController.singleImage.value!,
                     fit: BoxFit.cover,
                   ),
                 )
-              : Icon(Icons.image_rounded, color: primaryColor, size: 30.sp),
+              : getController.editImageUrl.value.isNotEmpty
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(10.r),
+                      child: Image.network(
+                        // You may need to adjust the URL prefix as per your backend
+                        '${Apis.pdfUrl}${getController.editImageUrl.value}?v=${DateTime.now().millisecondsSinceEpoch}',
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                      ),
+                    )
+                  : Center(
+                      child: Icon(
+                        Icons.image_rounded,
+                        color: primaryColor,
+                        size: 30.sp,
+                      ),
+                    ),
         ),
       );
     });
   }
 
-  Widget Btn_Subcategory({SubCategory? subCategory}) {
+  Widget Btn_Subcategory(
+      {SubCategory? subCategory, required BuildContext context}) {
     return ElevatedButtonExample(
       text: subCategory == null ? "Add SubCategory" : "Update SubCategory",
-      onPressed: () {
+      onPressed: () async {
         if (subCategory == null) {
-          getController.onaddNewSubcategory();
+          await getController.onaddNewSubcategory();
         } else {
-          getController.onEditSubcategory(subCategory);
+          await getController.onEditSubcategory(subCategory);
         }
+        Navigator.of(context).pop();
       },
     );
   }

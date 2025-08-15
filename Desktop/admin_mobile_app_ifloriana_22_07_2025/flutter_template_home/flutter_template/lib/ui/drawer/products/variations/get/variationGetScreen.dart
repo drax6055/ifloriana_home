@@ -20,58 +20,66 @@ class VariationGetscreen extends StatelessWidget {
       ),
       body: Padding(
         padding: EdgeInsets.all(10),
-        child: RefreshIndicator(onRefresh: () async {
-          getController.getVariation();
-        }, child: Obx(() {
-          if (getController.variations.isEmpty) {
-            return Center(child: Text('No variations found'));
-          }
-          return ListView.builder(
-            itemCount: getController.variations.length,
-            itemBuilder: (context, index) {
-              final variation = getController.variations[index];
-              final branchNames =
-                  variation.branchId?.map((b) => b.name).join(', ') ?? '';
-              return Card(
-                margin: EdgeInsets.symmetric(vertical: 8),
-                child: ListTile(
-                  title: Text(variation.name ?? ''),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Type: ${variation.type ?? ''}'),
-                      // Text('Values: ${variation.value?.join(", ") ?? ''}'),
-                      Text('Branches: $branchNames'),
-                      Text(
-                        ' ${variation.status == 1 ? 'Active' : 'Inactive'}',
-                        style: TextStyle(
-                            color: variation.status == 1 ? Colors.green : grey),
-                      ),
-                    ],
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.edit_outlined, color: primaryColor),
-                        onPressed: () {
-                          Get.to(() => UpdateVariationscreen(
-                              variationToEdit: variation));
-                        },
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.delete_outline, color: primaryColor),
-                        onPressed: () {
-                          getController.deleteVariation(variation.sId ?? '');
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              );
+        child: RefreshIndicator(
+            color: primaryColor,
+            onRefresh: () async {
+              getController.getVariation();
             },
-          );
-        })),
+            child: Obx(() {
+              if (getController.variations.isEmpty) {
+                return Center(child: Text('No variations found'));
+              }
+              return ListView.builder(
+                itemCount: getController.variations.length,
+                itemBuilder: (context, index) {
+                  final variation = getController.variations[index];
+                  final branchNames =
+                      variation.branchId?.map((b) => b.name).join(', ') ?? '';
+                  return Card(
+                    margin: EdgeInsets.symmetric(vertical: 8),
+                    child: ListTile(
+                      title: Text(variation.name ?? ''),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Type: ${variation.type ?? ''}'),
+                          // Text('Values: ${variation.value?.join(", ") ?? ''}'),
+                          Text('Branches: $branchNames'),
+                          Text(
+                            ' ${variation.status == 1 ? 'Active' : 'Inactive'}',
+                            style: TextStyle(
+                                color: variation.status == 1
+                                    ? Colors.green
+                                    : grey),
+                          ),
+                        ],
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon:
+                                Icon(Icons.edit_outlined, color: primaryColor),
+                            onPressed: () {
+                              Get.to(() => UpdateVariationscreen(
+                                  variationToEdit: variation));
+                            },
+                          ),
+                          IconButton(
+                            icon:
+                                Icon(Icons.delete_outline, color: primaryColor),
+                            onPressed: () {
+                              getController
+                                  .deleteVariation(variation.sId ?? '');
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            })),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: primaryColor,

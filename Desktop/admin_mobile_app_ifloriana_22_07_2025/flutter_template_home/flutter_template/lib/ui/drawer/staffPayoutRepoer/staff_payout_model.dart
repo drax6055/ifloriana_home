@@ -3,10 +3,10 @@ import 'package:intl/intl.dart';
 class StaffPayout {
   final String paymentDate;
   final String staffName;
-  final int commissionAmount;
-  final int tips;
+  final num commissionAmount;
+  final num tips;
   final String paymentType;
-  final int totalPay;
+  final num totalPay;
 
   StaffPayout({
     required this.paymentDate,

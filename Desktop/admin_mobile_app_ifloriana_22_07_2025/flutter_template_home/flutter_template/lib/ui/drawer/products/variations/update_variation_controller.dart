@@ -124,6 +124,18 @@ class UpdateVariationcontroller extends GetxController {
     }
   }
 
+  void clearFormFields() {
+    nameController.clear();
+    selectedType.value = 'Text';
+    isActive.value = true;
+
+    // Clear branch selection
+    selectedBranches.clear();
+    branchController.clearAll();
+    valueControllers.clear();
+    valueControllers.add(TextEditingController());
+  }
+
   Future<void> onBranchUpdate() async {
     final loginUser = await prefs.getUser();
     final branchIds =
@@ -146,8 +158,7 @@ class UpdateVariationcontroller extends GetxController {
         branchData,
         (json) => json,
       );
-      CustomSnackbar.showSuccess('Success', 'Variation updated successfully');
-      // Refresh the list on the previous screen
+      clearFormFields();
       final VariationGetcontroller getController =
           Get.find<VariationGetcontroller>();
       getController.getVariation();
