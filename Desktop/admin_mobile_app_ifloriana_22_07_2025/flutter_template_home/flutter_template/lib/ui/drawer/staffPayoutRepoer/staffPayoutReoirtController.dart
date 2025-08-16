@@ -143,6 +143,42 @@ class StatffearningReportcontroller extends GetxController {
     grandTotal.value = total;
   }
 
+  // Helper method to safely parse API response
+  List<StaffPayout> safeParsePayouts(dynamic data) {
+    List<StaffPayout> parsedPayouts = [];
+
+    if (data == null) return parsedPayouts;
+
+    try {
+      if (data is List) {
+        for (int i = 0; i < data.length; i++) {
+          try {
+            final item = data[i];
+            if (item is Map<String, dynamic>) {
+              final payout = StaffPayout.fromJson(item);
+              parsedPayouts.add(payout);
+            }
+          } catch (parseError) {
+            print('Error parsing item $i: $parseError');
+            continue; // Skip this item and continue with others
+          }
+        }
+      } else if (data is Map<String, dynamic>) {
+        // Single item response
+        try {
+          final payout = StaffPayout.fromJson(data);
+          parsedPayouts.add(payout);
+        } catch (parseError) {
+          print('Error parsing single item: $parseError');
+        }
+      }
+    } catch (e) {
+      print('Error in safeParsePayouts: $e');
+    }
+
+    return parsedPayouts;
+  }
+
   Future<void> getStaffEarningDataReport() async {
     try {
       isLoading.value = true;
@@ -160,45 +196,27 @@ class StatffearningReportcontroller extends GetxController {
       );
 
       print('Response received: ${response.toString()}');
+      print('Response type: ${response.runtimeType}');
 
-      if (response['success'] == true && response['data'] != null) {
-        payouts.value = List<StaffPayout>.from(
-          response['data'].map((x) => StaffPayout.fromJson(x)),
-        );
+      if (response != null &&
+          response['success'] == true &&
+          response['data'] != null) {
+        print('Success response, data type: ${response['data'].runtimeType}');
+
+        final parsedPayouts = safeParsePayouts(response['data']);
+        payouts.value = parsedPayouts;
         filteredPayouts.value = payouts;
         calculateGrandTotal();
-        print('Successfully loaded ${payouts.length} payouts');
+        print(
+            'Successfully loaded ${payouts.length} payouts from staff-payouts endpoint');
+
+        if (parsedPayouts.isEmpty) {
+          print('No payouts from staff-payouts, trying fallback endpoint');
+          await tryFallbackEndpoint(loginUser.salonId ?? '');
+        }
       } else {
         print('No data or success false, trying revenue-commissions endpoint');
-        // Fallback to revenue-commissions endpoint
-        try {
-          final fallbackResponse = await dioClient.getData(
-            '${Apis.baseUrl}${Endpoints.getcommition}${loginUser.salonId}',
-            (json) => json,
-          );
-
-          if (fallbackResponse['success'] == true &&
-              fallbackResponse['data'] != null) {
-            // Transform revenue-commissions data to StaffPayout format
-            payouts.value = List<StaffPayout>.from(
-              fallbackResponse['data'].map((x) => StaffPayout.fromJson(x)),
-            );
-            filteredPayouts.value = payouts;
-            calculateGrandTotal();
-            print(
-                'Successfully loaded ${payouts.length} payouts from fallback endpoint');
-          } else {
-            payouts.clear();
-            filteredPayouts.clear();
-            calculateGrandTotal();
-            print('No data from fallback endpoint either');
-          }
-        } catch (fallbackError) {
-          print('Fallback endpoint also failed: $fallbackError');
-          payouts.clear();
-          filteredPayouts.clear();
-          calculateGrandTotal();
-        }
+        await tryFallbackEndpoint(loginUser.salonId ?? '');
       }
     } catch (e) {
       print('Error fetching staff payout data: $e');
@@ -209,6 +227,42 @@ class StatffearningReportcontroller extends GetxController {
       calculateGrandTotal();
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  // Try fallback endpoint
+  Future<void> tryFallbackEndpoint(String salonId) async {
+    try {
+      final fallbackResponse = await dioClient.getData(
+        '${Apis.baseUrl}${Endpoints.getcommition}$salonId',
+        (json) => json,
+      );
+
+      print('Fallback response: ${fallbackResponse.toString()}');
+
+      if (fallbackResponse != null &&
+          fallbackResponse['success'] == true &&
+          fallbackResponse['data'] != null) {
+        print('Fallback success, processing data...');
+
+        final parsedFallbackPayouts =
+            safeParsePayouts(fallbackResponse['data']);
+        payouts.value = parsedFallbackPayouts;
+        filteredPayouts.value = payouts;
+        calculateGrandTotal();
+        print(
+            'Successfully loaded ${payouts.length} payouts from fallback endpoint');
+      } else {
+        print('No data from fallback endpoint either');
+        payouts.clear();
+        filteredPayouts.clear();
+        calculateGrandTotal();
+      }
+    } catch (fallbackError) {
+      print('Fallback endpoint also failed: $fallbackError');
+      payouts.clear();
+      filteredPayouts.clear();
+      calculateGrandTotal();
     }
   }
 
@@ -252,7 +306,7 @@ class StatffearningReportcontroller extends GetxController {
         sheet.cell(CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: row))
           ..value = payout.paymentType;
         sheet.cell(CellIndex.indexByColumnRow(columnIndex: 5, rowIndex: row))
-          ..value ="₹${payout.totalPay.toString()}";
+          ..value = "₹${payout.totalPay.toString()}";
       }
       final totalRow = dataToExport.length + 1;
       sheet.cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: totalRow))

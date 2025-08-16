@@ -44,7 +44,8 @@ class InhouseproductController extends GetxController {
         '${Apis.baseUrl}${Endpoints.inHouseProduct}?salon_id=${loginUser.salonId}',
         (json) => json,
       );
-
+      print(
+          "==============> ${Apis.baseUrl}${Endpoints.inHouseProduct}?salon_id=${loginUser.salonId}");
       if (response != null && response['data'] != null) {
         final List<dynamic> dataList = response['data'];
         inhouseProducts.value =

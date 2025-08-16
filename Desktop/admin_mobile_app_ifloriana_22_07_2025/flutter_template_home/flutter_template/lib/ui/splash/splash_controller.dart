@@ -3,7 +3,7 @@ import 'package:flutter_template/main.dart';
 import 'package:get/get.dart';
 import '../../route/app_route.dart';
 import '../../wiget/custome_snackbar.dart';
-import '../drawer/staffPayoutRepoer/staffPayoutReportScreen.dart';
+import '../inhouse/get/inhouseProduct_screen.dart';
 
 class SplashController extends GetxController {
   @override
@@ -19,7 +19,7 @@ class SplashController extends GetxController {
         String? managerAccessToken = managerUser?.token;
 
         if (accessToken != null && accessToken.isNotEmpty) {
-          Get.to(Staffpayoutreportscreen());
+          Get.to(InhouseproductScreen());
           // Get.offNamed(Routes.drawerScreen); // Regular user
         } else if (managerAccessToken != null &&
             managerAccessToken.isNotEmpty) {
