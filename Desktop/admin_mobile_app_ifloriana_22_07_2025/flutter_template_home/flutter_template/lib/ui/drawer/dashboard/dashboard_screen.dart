@@ -20,7 +20,110 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-          appBar: CustomAppBar(title: "Dashboard"),
+          appBar: PreferredSize(
+            preferredSize: Size.fromHeight(70.h),
+            child: CustomAppBar(
+              title: "Dashboard",
+              actions: [
+                PopupMenuButton<String>(
+                  onSelected: (value) async {
+                    if (value == 'date') {
+                      final DateTime? picked = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2101),
+                      );
+                      if (picked != null) {
+                        // Handle single date selection
+                        final range = DateTimeRange(
+                          start: picked,
+                          end: picked,
+                        );
+                        controller.setDateRange(range);
+                      }
+                    } else if (value == 'range') {
+                      final DateTimeRange? picked = await showDateRangePicker(
+                        context: context,
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2101),
+                        initialDateRange: controller.selectedDateRange.value,
+                      );
+                      if (picked != null) {
+                        controller.setDateRange(picked);
+                      }
+                    } else if (value == 'branch') {
+                      _showBranchSelectionDialog(context);
+                    } else if (value == 'clear') {
+                      controller.selectedBranch.value = null;
+                      controller.selectedDateRange.value = null;
+                      controller.CalllApis();
+                    }
+                  },
+                  itemBuilder: (BuildContext context) =>
+                      <PopupMenuEntry<String>>[
+                    const PopupMenuItem<String>(
+                      value: 'date',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.calendar_today,
+                            size: 16,
+                            color: grey,
+                          ),
+                          SizedBox(width: 8),
+                          Text('Filter by Date'),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: 'range',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.date_range,
+                            size: 16,
+                            color: grey,
+                          ),
+                          SizedBox(width: 8),
+                          Text('Filter by Date Range'),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: 'branch',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.business,
+                            size: 16,
+                            color: grey,
+                          ),
+                          SizedBox(width: 8),
+                          Text('Select Branch'),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuDivider(),
+                    const PopupMenuItem<String>(
+                      value: 'clear',
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.clear_all,
+                            size: 16,
+                            color: grey,
+                          ),
+                          SizedBox(width: 8),
+                          Text('Clear All Filters'),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
           body: RefreshIndicator(
             child: SingleChildScrollView(
               child: Container(
@@ -29,8 +132,9 @@ class DashboardScreen extends StatelessWidget {
                   child: Column(
                     spacing: 10,
                     children: [
-                      _buildBranchDropdown(),
-                      _buildDateRangePicker(context),
+                      // _buildBranchDropdown(),
+                      // _buildDateRangePicker(context),
+                      // _buildFilterStatus(),
                       Obx(() => performce_widget(controller)),
                       Obx(() => lineChart(controller)),
                       Obx(() => upcomming_booking(controller)),
@@ -159,6 +263,111 @@ class DashboardScreen extends StatelessWidget {
         ),
       );
     });
+  }
+
+  // Add a method to show current filter status
+  Widget _buildFilterStatus() {
+    return Obx(() {
+      final hasBranchFilter = controller.selectedBranch.value != null;
+      final hasDateFilter = controller.selectedDateRange.value != null;
+
+      if (!hasBranchFilter && !hasDateFilter) {
+        return SizedBox.shrink();
+      }
+
+      return Container(
+        margin: EdgeInsets.only(bottom: 10.h),
+        padding: EdgeInsets.all(8.h),
+        decoration: BoxDecoration(
+          color: primaryColor.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: primaryColor.withOpacity(0.3)),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.filter_list, color: primaryColor, size: 16),
+            SizedBox(width: 8.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (hasBranchFilter)
+                    Text(
+                      'Branch: ${controller.selectedBranch.value?.name ?? ''}',
+                      style: TextStyle(
+                        color: primaryColor,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12.sp,
+                      ),
+                    ),
+                  if (hasDateFilter)
+                    Text(
+                      'Date: ${DateFormat('yyyy-MM-dd').format(controller.selectedDateRange.value!.start)} - ${DateFormat('yyyy-MM-dd').format(controller.selectedDateRange.value!.end)}',
+                      style: TextStyle(
+                        color: primaryColor,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 12.sp,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            IconButton(
+              icon: Icon(Icons.clear, color: primaryColor, size: 16),
+              onPressed: () {
+                controller.selectedBranch.value = null;
+                controller.selectedDateRange.value = null;
+                controller.CalllApis();
+              },
+              tooltip: 'Clear Filters',
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  // Add branch selection dialog
+  void _showBranchSelectionDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Select Branch'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Obx(() => ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: controller.branchList.length,
+                  itemBuilder: (context, index) {
+                    final branch = controller.branchList[index];
+                    final isSelected =
+                        controller.selectedBranch.value?.id == branch.id;
+
+                    return ListTile(
+                      title: Text(branch.name ?? ''),
+                      trailing: isSelected
+                          ? Icon(Icons.check, color: primaryColor)
+                          : null,
+                      onTap: () {
+                        controller.selectedBranch.value = branch;
+                        controller.getDashbordData();
+                        controller.getChartData();
+                        Navigator.of(context).pop();
+                      },
+                    );
+                  },
+                )),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget lineChart(DashboardController controller) {
