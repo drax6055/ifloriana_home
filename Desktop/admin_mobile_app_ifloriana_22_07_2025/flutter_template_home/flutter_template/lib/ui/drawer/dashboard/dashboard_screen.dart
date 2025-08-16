@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_template/utils/app_images.dart';
 import 'package:flutter_template/utils/colors.dart';
 import 'package:flutter_template/utils/custom_text_styles.dart';
+import 'package:flutter_template/wiget/appbar/commen_appbar.dart';
 import 'package:flutter_template/wiget/custome_text.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -19,33 +20,34 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+          appBar: CustomAppBar(title: "Dashboard"),
           body: RefreshIndicator(
-        child: SingleChildScrollView(
-          child: Container(
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                spacing: 10,
-                children: [
-                  _buildBranchDropdown(),
-                  _buildDateRangePicker(context),
-                  Obx(() => performce_widget(controller)),
-                  Obx(() => lineChart(controller)),
-                  Obx(() => upcomming_booking(controller)),
-                  Obx(() => combinedChart(controller)),
-                  Obx(() => total_revenue(controller)),
-                  SizedBox(height: 10.h),
-                ],
+            child: SingleChildScrollView(
+              child: Container(
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    spacing: 10,
+                    children: [
+                      _buildBranchDropdown(),
+                      _buildDateRangePicker(context),
+                      Obx(() => performce_widget(controller)),
+                      Obx(() => lineChart(controller)),
+                      Obx(() => upcomming_booking(controller)),
+                      Obx(() => combinedChart(controller)),
+                      Obx(() => total_revenue(controller)),
+                      SizedBox(height: 10.h),
+                    ],
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
-        onRefresh: () async {
-          controller.selectedBranch.value = null;
-          controller.selectedDateRange.value = null;
-          controller.CalllApis();
-        },
-      )),
+            onRefresh: () async {
+              controller.selectedBranch.value = null;
+              controller.selectedDateRange.value = null;
+              controller.CalllApis();
+            },
+          )),
     );
   }
 
