@@ -9,6 +9,7 @@ import 'package:flutter_template/wiget/custome_text.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+import '../drawer_screen.dart';
 import 'dashboard_controller.dart';
 import 'package:flutter_template/ui/drawer/dashboard/upcoming_bookings_screen.dart';
 import 'package:flutter_template/network/model/dashboard_model.dart';
@@ -124,6 +125,7 @@ class DashboardScreen extends StatelessWidget {
               ],
             ),
           ),
+           drawer: DrawerScreen(), 
           body: RefreshIndicator(
             child: SingleChildScrollView(
               child: Container(
