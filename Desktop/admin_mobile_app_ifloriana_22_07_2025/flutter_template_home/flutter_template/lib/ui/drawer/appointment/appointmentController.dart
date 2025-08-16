@@ -585,7 +585,7 @@ class AppointmentController extends GetxController {
 
       pdf.addPage(
         pw.MultiPage(
-          pageFormat: pw.PdfPageFormat.a4,
+          pageFormat: pw.PdfPageFormat.a4.portrait,
           margin: pw.EdgeInsets.all(20),
           theme: pw.ThemeData.withFont(
             base: ttf,

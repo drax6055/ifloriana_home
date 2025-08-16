@@ -211,7 +211,7 @@ class StaffServiceReportController extends GetxController {
 
       pdf.addPage(
         pw.MultiPage(
-          pageFormat: PdfPageFormat.a4,
+          pageFormat: PdfPageFormat.a4.portrait,
           theme: pw.ThemeData.withFont(
             base: ttf,
             bold: ttf,
