@@ -125,7 +125,7 @@ class DashboardScreen extends StatelessWidget {
               ],
             ),
           ),
-           drawer: DrawerScreen(), 
+          drawer: DrawerScreen(),
           body: RefreshIndicator(
             child: SingleChildScrollView(
               child: Container(
@@ -548,11 +548,14 @@ class DashboardScreen extends StatelessWidget {
                       Icons.account_circle,
                       size: 35.h,
                     ),
-                    trailing: Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      size: 15.h,
-                      color: primaryColor,
-                    ),
+                    trailing: GestureDetector(
+                        onTap: () => Get.to(() => UpcomingBookingsScreen(
+                            upcomingAppointments: items)),
+                        child: Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          size: 15.h,
+                          color: primaryColor,
+                        )),
                     title: CustomTextWidget(
                         text: item.customerName ?? '-',
                         textStyle: CustomTextStyles.textFontBold(

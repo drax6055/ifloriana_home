@@ -21,8 +21,8 @@ class SplashController extends GetxController {
         String? managerAccessToken = managerUser?.token;
 
         if (accessToken != null && accessToken.isNotEmpty) {
-          Get.to(Appointmentscreen());
-          // Get.offNamed(Routes.drawerScreen); // Regular user
+          // Get.to(Appointmentscreen());
+          Get.offNamed(Routes.dashboardScreen); // Regular user
         } else if (managerAccessToken != null &&
             managerAccessToken.isNotEmpty) {
           Get.offNamed(Routes.managerDashboard); // Manager user
