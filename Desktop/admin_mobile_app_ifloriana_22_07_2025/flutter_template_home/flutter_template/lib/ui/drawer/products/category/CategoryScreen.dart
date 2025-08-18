@@ -15,6 +15,7 @@ import '../../../../wiget/appbar/commen_appbar.dart';
 import '../../../../wiget/custome_text.dart';
 import '../../../../wiget/loading.dart';
 import '../../../../network/model/category_model.dart' as model;
+import '../../drawer_screen.dart';
 
 class Categoryscreen extends StatelessWidget {
   Categoryscreen({super.key});
@@ -32,6 +33,7 @@ class Categoryscreen extends StatelessWidget {
       appBar: CustomAppBar(
         title: 'Product Categories',
       ),
+            drawer: DrawerScreen(),
       body: RefreshIndicator(
           color: primaryColor,
           onRefresh: () async {

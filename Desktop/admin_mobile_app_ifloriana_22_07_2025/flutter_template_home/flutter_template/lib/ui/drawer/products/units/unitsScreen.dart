@@ -11,6 +11,7 @@ import '../../../../utils/validation.dart';
 import '../../../../wiget/Custome_button.dart';
 import '../../../../wiget/Custome_textfield.dart';
 import '../../../../wiget/custome_text.dart';
+import '../../drawer_screen.dart';
 
 class Unitsscreen extends StatelessWidget {
   Unitsscreen({super.key});
@@ -19,6 +20,7 @@ class Unitsscreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: "Units"),
+            drawer: DrawerScreen(),
       body: Obx(() {
         if (getController.unitsList.isEmpty) {
           return Center(child: Text('No units found.'));

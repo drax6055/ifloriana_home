@@ -46,7 +46,7 @@ abstract class Routes {
       "/CustomerMembershipReportScreen";
 
   static const DailybookingScreen = "/DailybookingScreen";
-    static const OrderReportScreen = "/OrderReportScreen";
+  static const OrderReportScreen = "/OrderReportScreen";
 
   static const OverallBookingScreen = "/OverallBookingScreen";
 
@@ -54,5 +54,17 @@ abstract class Routes {
 
   static const StaffServiceReportScreen = "/StaffServiceReportScreen";
 
+  static const ProductListScreen = "/ProductListScreen";
+  static const Getbrandsscreen = "/Getbrandsscreen";
+  static const Categoryscreen = "/Categoryscreen";
+  static const Subcategoryscreen = "/Subcategoryscreen";
+  static const Unitsscreen = "/Unitsscreen";
+  static const Tagsscreen = "/Tagsscreen";
+  static const VariationGetscreen = "/VariationGetscreen";
+  static const InhouseproductScreen = "/InhouseproductScreen";
 
+
+  static const Statffearningscreen = "/Statffearningscreen";
+
+    static const CommissionListScreen = "/CommissionListScreen";
 }

@@ -19,6 +19,7 @@ import '../../../../wiget/appbar/commen_appbar.dart';
 import '../../../../wiget/loading.dart';
 import '../../../../network/model/brand.dart';
 import '../../../../wiget/custome_snackbar.dart';
+import '../../drawer_screen.dart';
 
 class Getbrandsscreen extends StatelessWidget {
   Getbrandsscreen({super.key});
@@ -38,6 +39,7 @@ class Getbrandsscreen extends StatelessWidget {
       appBar: CustomAppBar(
         title: 'Brands',
       ),
+            drawer: DrawerScreen(),
       body: RefreshIndicator(
           color: primaryColor,
           onRefresh: () async {

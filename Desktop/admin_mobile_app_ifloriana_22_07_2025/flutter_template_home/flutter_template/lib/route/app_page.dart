@@ -28,8 +28,15 @@ import '../ui/buy_product/buy_product_screen.dart';
 import '../ui/drawer/appointment/appointmentScreen.dart';
 import '../ui/drawer/branchPackages/getBranchPackagesScreen.dart';
 import '../ui/drawer/branches/getBranchesScreen.dart';
+import '../ui/drawer/commission/commission_list_screen.dart';
 import '../ui/drawer/dashboard/dashboard_screen.dart';
+import '../ui/drawer/products/Tags/tagsScreen.dart';
 import '../ui/drawer/products/allProducts/addProductsScreen.dart';
+import '../ui/drawer/products/brand/getBrandsScreen.dart';
+import '../ui/drawer/products/category/CategoryScreen.dart';
+import '../ui/drawer/products/subcategory/subcategoryScreen.dart';
+import '../ui/drawer/products/units/unitsScreen.dart';
+import '../ui/drawer/products/variations/get/variationGetScreen.dart';
 import '../ui/drawer/products/variations/variationScreen.dart';
 import '../ui/drawer/reports/customerMembershipReport/customer_membership_report_screen.dart';
 import '../ui/drawer/reports/customerPackageReport/customer_package_report_screen.dart';
@@ -37,7 +44,9 @@ import '../ui/drawer/reports/dailyBooking/dailyBooking_screen.dart';
 import '../ui/drawer/reports/orderReport/order_report_screen.dart';
 import '../ui/drawer/reports/overallBooking/overall_booking_screen.dart';
 import '../ui/drawer/reports/staffServiceReport/staff_service_report_screen.dart';
+import '../ui/drawer/staffEarnings/statffEarningScreen.dart';
 import '../ui/drawer/staffPayoutRepoer/staffPayoutReportScreen.dart';
+import '../ui/inhouse/get/inhouseProduct_screen.dart';
 import '../ui/splash/splash_screen.dart';
 import 'app_route.dart';
 import 'package:flutter_template/ui/drawer/products/product_list/product_list_screen.dart';
@@ -207,5 +216,62 @@ class AppPages {
         name: Routes.StaffServiceReportScreen,
         page: () => StaffServiceReportScreen(),
         transition: Transition.rightToLeft),
+
+        
+
+
+
+
+
+    GetPage(
+        name: Routes.ProductListScreen,
+        page: () => ProductListScreen(),
+        transition: Transition.rightToLeft),
+        
+    GetPage(
+        name: Routes.Getbrandsscreen,
+        page: () => Getbrandsscreen(),
+        transition: Transition.rightToLeft),
+        
+            GetPage(
+        name: Routes.Categoryscreen,
+        page: () => Categoryscreen(),
+        transition: Transition.rightToLeft),
+        
+            GetPage(
+        name: Routes.Subcategoryscreen,
+        page: () => Subcategoryscreen(),
+        transition: Transition.rightToLeft),
+        
+            GetPage(
+        name: Routes.Unitsscreen,
+        page: () => Unitsscreen(),
+        transition: Transition.rightToLeft),
+        
+            GetPage(
+        name: Routes.Tagsscreen,
+        page: () => Tagsscreen(),
+        transition: Transition.rightToLeft),
+        
+            GetPage(
+        name: Routes.VariationGetscreen,
+        page: () => VariationGetscreen(),
+        transition: Transition.rightToLeft),
+        
+    GetPage(
+        name: Routes.InhouseproductScreen,
+        page: () => InhouseproductScreen(),
+        transition: Transition.rightToLeft),
+
+          GetPage(
+        name: Routes.Statffearningscreen,
+        page: () => Statffearningscreen(),
+        transition: Transition.rightToLeft),
+
+            GetPage(
+        name: Routes.CommissionListScreen,
+        page: () => CommissionListScreen(),
+        transition: Transition.rightToLeft),
+
   ];
 }

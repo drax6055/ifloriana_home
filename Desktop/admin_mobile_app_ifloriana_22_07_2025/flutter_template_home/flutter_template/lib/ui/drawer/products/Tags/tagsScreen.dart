@@ -10,6 +10,7 @@ import '../../../../../wiget/Custome_button.dart';
 import '../../../../../wiget/Custome_textfield.dart';
 import '../../../../../wiget/custome_text.dart';
 import '../../../../wiget/appbar/commen_appbar.dart';
+import '../../drawer_screen.dart';
 
 class Tagsscreen extends StatelessWidget {
   Tagsscreen({super.key});
@@ -19,6 +20,7 @@ class Tagsscreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: "Product SubCategories"),
+            drawer: DrawerScreen(),
       body: RefreshIndicator(
         color: primaryColor,
         onRefresh: () async {

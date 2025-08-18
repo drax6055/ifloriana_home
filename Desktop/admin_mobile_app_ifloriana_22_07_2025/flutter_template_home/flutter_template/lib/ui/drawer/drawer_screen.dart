@@ -98,36 +98,76 @@ class DrawerScreen extends StatelessWidget {
             DrawerItem(
                 title: 'All Products',
                 icon: Icons.account_box,
-                route: Routes.CustomerPackageReportScreen),
+                route: Routes.ProductListScreen),
             DrawerItem(
                 title: 'Brands',
                 icon: Icons.account_box,
-                route: Routes.CustomerPackageReportScreen),
+                route: Routes.Getbrandsscreen),
             DrawerItem(
                 title: 'Category',
                 icon: Icons.account_box,
-                route: Routes.CustomerPackageReportScreen),
+                route: Routes.Categoryscreen),
             DrawerItem(
                 title: 'Sub Category',
                 icon: Icons.account_box,
-                route: Routes.CustomerPackageReportScreen),
+                route: Routes.Subcategoryscreen),
             DrawerItem(
                 title: 'Units',
                 icon: Icons.account_box,
-                route: Routes.CustomerPackageReportScreen),
+                route: Routes.Unitsscreen),
             DrawerItem(
                 title: 'Tags',
                 icon: Icons.account_box,
-                route: Routes.CustomerPackageReportScreen),
+                route: Routes.Tagsscreen),
             DrawerItem(
                 title: 'Product Variation',
                 icon: Icons.account_box,
-                route: Routes.CustomerPackageReportScreen),
+                route: Routes.VariationGetscreen),
             DrawerItem(
                 title: 'Product Cunsumption',
                 icon: Icons.account_box,
-                route: Routes.CustomerPackageReportScreen),
+                route: Routes.InhouseproductScreen),
           ]),
+
+      DrawerItem(
+          title: 'Finance',
+          icon: Icons.account_circle_sharp,
+          route: '',
+          subItems: [
+            DrawerItem(
+                title: 'Tax', icon: Icons.account_box, route: Routes.addtex),
+            DrawerItem(
+                title: 'Staff Earning',
+                icon: Icons.account_box,
+                route: Routes.Statffearningscreen),
+            DrawerItem(
+                title: 'Commition',
+                icon: Icons.account_box,
+                route: Routes.CommissionListScreen),
+            DrawerItem(
+                title: 'Coupons',
+                icon: Icons.account_box,
+                route: Routes.getCoupons),
+          ]),
+
+      DrawerItem(
+          title: 'Users',
+          icon: Icons.account_circle_sharp,
+          route: '',
+          subItems: [
+            DrawerItem(
+                title: 'Staff Earning',
+                icon: Icons.account_box,
+                route: Routes.Statffearningscreen),
+            DrawerItem(
+                title: 'Commition',
+                icon: Icons.account_box,
+                route: Routes.CommissionListScreen),
+            DrawerItem(
+                title: 'Coupons',
+                icon: Icons.account_box,
+                route: Routes.getCoupons),
+          ])
       // DrawerItem(
       //   title: 'Logout',
       //   icon: Icons.logout,

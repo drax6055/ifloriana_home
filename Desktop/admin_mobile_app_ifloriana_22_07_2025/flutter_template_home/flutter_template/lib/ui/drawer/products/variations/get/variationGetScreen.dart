@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_template/ui/drawer/drawer_screen.dart';
 import 'package:flutter_template/ui/drawer/products/variations/get/variationGetController.dart';
 import 'package:get/get.dart';
 import '../../../../../route/app_route.dart';
@@ -18,6 +19,7 @@ class VariationGetscreen extends StatelessWidget {
       appBar: CustomAppBar(
         title: 'Variations',
       ),
+      drawer: DrawerScreen(),
       body: Padding(
         padding: EdgeInsets.all(10),
         child: RefreshIndicator(

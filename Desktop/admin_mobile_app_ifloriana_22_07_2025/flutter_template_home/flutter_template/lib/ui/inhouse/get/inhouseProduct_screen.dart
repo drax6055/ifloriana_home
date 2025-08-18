@@ -7,6 +7,7 @@ import '../../../wiget/appbar/drawer_appbar.dart';
 import '../../../wiget/loading.dart';
 import '../../../wiget/custome_snackbar.dart';
 import '../../../network/model/inhouseProduct_model.dart';
+import '../../drawer/drawer_screen.dart';
 import '../post/addInhouseProduct_screen.dart';
 import 'inhouseProduct_controller.dart';
 
@@ -196,6 +197,7 @@ class InhouseproductScreen extends StatelessWidget {
           );
         }),
       ),
+            drawer: DrawerScreen(),
       body: Column(
         children: [
           Expanded(

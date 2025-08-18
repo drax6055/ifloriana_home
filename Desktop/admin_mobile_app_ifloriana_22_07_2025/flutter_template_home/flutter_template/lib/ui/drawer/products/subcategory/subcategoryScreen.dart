@@ -19,6 +19,8 @@ import '../../../../network/model/productSubCategory.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
+import '../../drawer_screen.dart';
+
 class Subcategoryscreen extends StatelessWidget {
   Subcategoryscreen({super.key});
   final Subcategorycontroller getController = Get.put(Subcategorycontroller());
@@ -29,6 +31,7 @@ class Subcategoryscreen extends StatelessWidget {
       appBar: CustomAppBar(
         title: 'Sub Categories',
       ),
+            drawer: DrawerScreen(),
       body: Container(
           child: Obx(
         () => getController.isLoading.value
