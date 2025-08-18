@@ -51,6 +51,18 @@ class Newappointmentscreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Obx(() => Text(
+              nodeTitles[getController.currentStep.value],
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20.sp,
+                fontWeight: FontWeight.bold,
+              ),
+            )),
+        backgroundColor: primaryColor,
+        iconTheme: IconThemeData(color: white),
+      ),
       body: Form(
         key: _formKey,
         child: Column(
@@ -89,16 +101,6 @@ class Newappointmentscreen extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(height: 20.h),
-            Obx(() => Text(
-                  nodeTitles[getController.currentStep.value],
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
-                )),
-            SizedBox(height: 2.h),
             Obx(() => StepProgress(
                   totalSteps: nodeTitles.length,
                   currentStep: getController.currentStep.value,
@@ -180,7 +182,7 @@ class Newappointmentscreen extends StatelessWidget {
       final branchList = getController.branches;
       return GridView.builder(
         shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
+        // physics: NeverScrollableScrollPhysics(),
         itemCount: branchList.length,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
@@ -290,7 +292,7 @@ class Newappointmentscreen extends StatelessWidget {
       }
       return GridView.builder(
         shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
+        // physics: NeverScrollableScrollPhysics(),
         itemCount: serviceList.length,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
@@ -395,7 +397,7 @@ class Newappointmentscreen extends StatelessWidget {
       }
       return GridView.builder(
         shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
+        // physics: NeverScrollableScrollPhysics(),
         itemCount: staffList.length,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,

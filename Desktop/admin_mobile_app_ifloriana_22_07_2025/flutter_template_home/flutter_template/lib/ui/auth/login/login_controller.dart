@@ -46,7 +46,7 @@ class LoginController extends GetxController {
         },
         loadingWidget: const Center(child: CustomLoadingAvatar()),
       );
-      Get.offNamed(Routes.drawerScreen);
+      Get.offNamed(Routes.dashboardScreen);
     } catch (e) {
       CustomSnackbar.showError('Error', e.toString());
     }

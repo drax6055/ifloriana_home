@@ -200,6 +200,8 @@ class PaymentSummaryState {
 
 class AppointmentController extends GetxController {
   var appointments = <Appointment>[].obs;
+  var currentPage = 1;
+  var hasMore = true;
   var filteredAppointments = <Appointment>[].obs;
   var isLoading = false.obs;
   var taxes = <TaxModel>[].obs;

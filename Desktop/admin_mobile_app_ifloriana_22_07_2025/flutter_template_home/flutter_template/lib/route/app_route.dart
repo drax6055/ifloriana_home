@@ -20,10 +20,10 @@ abstract class Routes {
   static const addCoupon = '/AddCouponScreen';
 
   static const addSubcategory = '/Subcategotyscreen';
-
+  static const appointment = '/Appointmentscreen';
   static const postBranchs = "/Postbranchesscreen";
   static const getBranches = "/Getbranchesscreen";
-
+  static const addNewCategotyScreen = "/AddNewCategotyScreen";
   static const managerScreen = "/Managerscreen";
 
   static const getManager = "/Getmanagerscreen";
@@ -37,11 +37,9 @@ abstract class Routes {
   static const branchmembershipaddscreen = "/Branchmembershipaddscreen";
   static const placeOrder = "/BuyProductScreen";
   static const editCustomer = '/EditCustomerScreen';
-    static const addProductScreen =  '/AddProductScreen';
+  static const addProductScreen = '/AddProductScreen';
 
-
-
-
-
-    static const managerDashboard = '/ManagerDashboard';
+  static const managerDashboard = '/ManagerDashboard';
+  static const GetBranchPackagesScreen = "/GetBranchPackagesScreen";
+  static const CustomerPackageReportScreen = "/CustomerPackageReportScreen";
 }

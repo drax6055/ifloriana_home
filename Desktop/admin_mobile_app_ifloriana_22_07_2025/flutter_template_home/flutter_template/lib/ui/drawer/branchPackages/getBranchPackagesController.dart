@@ -50,6 +50,7 @@ class GetBranchPackagesController extends GetxController {
         packages.removeWhere((package) => package.id == packageId);
         CustomSnackbar.showSuccess('Success', 'Package deleted successfully');
       }
+      getBranchPackages();
     } catch (e) {
       CustomSnackbar.showError('Error', 'Failed to delete package: $e');
     } finally {

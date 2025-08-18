@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_template/ui/drawer/drawer_screen.dart';
 import 'package:flutter_template/ui/drawer/services/subCategory/subCategoryController.dart';
 import 'package:flutter_template/utils/colors.dart';
 import 'package:flutter_template/utils/custom_text_styles.dart';
@@ -20,6 +21,7 @@ class Subcategotyscreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: "Sub Category"),
+      drawer: DrawerScreen(),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Obx(() {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_template/network/model/dashboard_model.dart';
 import 'package:flutter_template/utils/colors.dart';
 import 'package:flutter_template/utils/custom_text_styles.dart';
+import 'package:flutter_template/wiget/appbar/commen_appbar.dart';
 import 'package:flutter_template/wiget/custome_text.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
@@ -14,9 +15,8 @@ class UpcomingBookingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('All Upcoming Bookings'),
-        backgroundColor: primaryColor,
+      appBar: CustomAppBar(
+        title: 'All Upcoming Bookings',
       ),
       body: Padding(
         padding: const EdgeInsets.all(10),

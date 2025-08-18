@@ -49,6 +49,8 @@ class CustomerPackageReportController extends GetxController {
 
         applyFilters();
       }
+      print(
+          "===========> {${Apis.baseUrl}${Endpoints.customers}?salon_id=${loginUser!.salonId}}");
     } catch (e) {
       CustomSnackbar.showError(
           'Error', 'Failed to fetch customer packages: $e');

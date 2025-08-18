@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_template/ui/drawer/appointment/addNewAppointment/newAppointmentScreen.dart'
+    show Newappointmentscreen;
 import 'package:flutter_template/ui/drawer/appointment/appointmentController.dart';
 import 'package:flutter_template/ui/drawer/appointment/payment_sheet.dart';
 import 'package:flutter_template/utils/colors.dart';
@@ -7,6 +9,7 @@ import 'package:get/get.dart';
 
 import '../../../wiget/appbar/commen_appbar.dart';
 import '../../../wiget/loading.dart';
+import '../drawer_screen.dart';
 
 class Appointmentscreen extends StatelessWidget {
   Appointmentscreen({super.key});
@@ -14,345 +17,353 @@ class Appointmentscreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(70.h),
-          child: CustomAppBar(
-            title: 'Appointments',
-            backgroundColor: primaryColor,
-            actions: [
-              PopupMenuButton<String>(
-                onSelected: (value) async {
-                  if (value == 'date') {
-                    final DateTime? picked = await showDatePicker(
-                      context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2101),
-                    );
-                    if (picked != null) {
-                      getController.selectDate(picked);
-                    }
-                  } else if (value == 'range') {
-                    final DateTimeRange? picked = await showDateRangePicker(
-                      context: context,
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2101),
-                    );
-                    if (picked != null) {
-                      getController.selectDateRange(picked);
-                    }
-                  } else if (value == 'sort_asc') {
-                    getController.setSortOrder('asc');
-                  } else if (value == 'sort_desc') {
-                    getController.setSortOrder('desc');
-                  } else if (value == 'clear') {
-                    getController.clearFilters();
-                  } else if (value == 'export') {
-                    _showExportDialog(context, getController);
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(70.h),
+        child: CustomAppBar(
+          title: 'Appointments',
+          backgroundColor: primaryColor,
+          actions: [
+            PopupMenuButton<String>(
+              onSelected: (value) async {
+                if (value == 'date') {
+                  final DateTime? picked = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2101),
+                  );
+                  if (picked != null) {
+                    getController.selectDate(picked);
                   }
-                },
-                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                  const PopupMenuItem<String>(
-                    value: 'date',
-                    child: Text('Filter by Date'),
-                  ),
-                  const PopupMenuItem<String>(
-                    value: 'range',
-                    child: Text('Filter by Date Range'),
-                  ),
-                  const PopupMenuDivider(),
-                  const PopupMenuItem<String>(
-                    value: 'sort_asc',
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.arrow_upward,
-                          size: 16,
-                          color: grey,
-                        ),
-                        SizedBox(width: 8),
-                        Text('Sort Oldest First'),
-                      ],
-                    ),
-                  ),
-                  const PopupMenuItem<String>(
-                    value: 'sort_desc',
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.arrow_downward,
-                          size: 16,
-                          color: grey,
-                        ),
-                        SizedBox(width: 8),
-                        Text('Sort Newest First'),
-                      ],
-                    ),
-                  ),
-                  const PopupMenuDivider(),
-                  const PopupMenuItem<String>(
-                    value: 'export',
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.file_download,
-                          size: 16,
-                          color: grey,
-                        ),
-                        SizedBox(width: 8),
-                        Text('Export Data'),
-                      ],
-                    ),
-                  ),
-                  const PopupMenuDivider(),
-                  const PopupMenuItem<String>(
-                    value: 'clear',
-                    child: Text('Clear Filters'),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        body: Container(
-          child: Obx(() {
-            if (getController.isLoading.value) {
-              return Center(child: CustomLoadingAvatar());
-            }
-            if (getController.appointments.isEmpty) {
-              return Center(
-                  child: Text('No appointments found',
-                      style: TextStyle(color: Colors.black)));
-            }
-            if (getController.filteredAppointments.isEmpty) {
-              return const Center(
-                  child:
-                      Text('No appointments found with the current filters.'));
-            }
-            return SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                    // headingRowColor: MaterialStateProperty.all(secondaryColor),
-                    columns: const [
-                      DataColumn(
-                          label: Text('Date & Time',
-                              style: TextStyle(color: Colors.black))),
-                      DataColumn(
-                          label: Text('Client',
-                              style: TextStyle(color: Colors.black))),
-                      DataColumn(
-                          label: Text('Amount',
-                              style: TextStyle(color: Colors.black))),
-                      DataColumn(
-                          label: Text('Staff Name',
-                              style: TextStyle(color: Colors.black))),
-                      DataColumn(
-                          label: Text('Services',
-                              style: TextStyle(color: Colors.black))),
-                      DataColumn(
-                          label: Text('Membership',
-                              style: TextStyle(color: Colors.black))),
-                      DataColumn(
-                          label: Text('Package',
-                              style: TextStyle(color: Colors.black))),
-                      DataColumn(
-                          label: Text('Status',
-                              style: TextStyle(color: Colors.black))),
-                      DataColumn(
-                          label: Text('Payment Status',
-                              style: TextStyle(color: Colors.black))),
-                      DataColumn(
-                          label: Text('Action',
-                              style: TextStyle(color: Colors.black))),
+                } else if (value == 'range') {
+                  final DateTimeRange? picked = await showDateRangePicker(
+                    context: context,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2101),
+                  );
+                  if (picked != null) {
+                    getController.selectDateRange(picked);
+                  }
+                } else if (value == 'sort_asc') {
+                  getController.setSortOrder('asc');
+                } else if (value == 'sort_desc') {
+                  getController.setSortOrder('desc');
+                } else if (value == 'clear') {
+                  getController.clearFilters();
+                } else if (value == 'export') {
+                  _showExportDialog(context, getController);
+                }
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                const PopupMenuItem<String>(
+                  value: 'date',
+                  child: Text('Filter by Date'),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'range',
+                  child: Text('Filter by Date Range'),
+                ),
+                const PopupMenuDivider(),
+                const PopupMenuItem<String>(
+                  value: 'sort_asc',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.arrow_upward,
+                        size: 16,
+                        color: grey,
+                      ),
+                      SizedBox(width: 8),
+                      Text('Sort Oldest First'),
                     ],
-                    rows: getController.filteredAppointments.map((a) {
-                      return DataRow(cells: [
-                        DataCell(Text('${a.date} - ${a.time}',
-                            style: TextStyle(color: Colors.black))),
-                        DataCell(Row(
-                          children: [
-                            // CircleAvatar(
-                            //   backgroundImage: a.clientImage != null &&
-                            //           a.clientImage!.isNotEmpty
-                            //       ? NetworkImage(a.clientImage!)
-                            //       : null,
-                            //   child: (a.clientImage == null ||
-                            //           a.clientImage!.isEmpty)
-                            //       ? Icon(Icons.person, color: Colors.black)
-                            //       : null,
-                            // ),
-                            // SizedBox(width: 8),
-                            Flexible(
-                                child: Text(a.clientName,
-                                    style: TextStyle(color: Colors.black))),
-                          ],
-                        )),
-                        DataCell(Text('₹ ${a.amount}',
-                            style: TextStyle(color: Colors.black))),
-                        DataCell(Row(
-                          children: [
-                            // CircleAvatar(
-                            //   backgroundImage: a.staffImage != null &&
-                            //           a.staffImage!.isNotEmpty
-                            //       ? NetworkImage(a.staffImage!)
-                            //       : null,
-                            //   child: (a.staffImage == null ||
-                            //           a.staffImage!.isEmpty)
-                            //       ? Icon(Icons.person, color: Colors.black)
-                            //       : null,
-                            // ),
-                            // SizedBox(width: 8),
-                            Flexible(
-                                child: Text(a.staffName,
-                                    style: TextStyle(color: Colors.black))),
-                          ],
-                        )),
-                        DataCell(Text(a.serviceName,
-                            style: TextStyle(color: Colors.black))),
-                        DataCell(a.membership == '-'
-                            ? Text('-', style: TextStyle(color: Colors.black))
-                            : Chip(
-                                label: Text(
-                                  'Yes',
-                                  style: TextStyle(color: white),
-                                ),
-                                backgroundColor: Colors.grey[700],
-                                labelStyle: TextStyle(color: Colors.black))),
-                        DataCell(a.package == '-'
-                            ? Text('-', style: TextStyle(color: Colors.black))
-                            : Chip(
-                                label: Text(
-                                  'Yes',
-                                  style: TextStyle(color: white),
-                                ),
-                                backgroundColor: Colors.grey[700],
-                                labelStyle: TextStyle(color: Colors.black))),
-                        DataCell(
-                          GestureDetector(
-                              onTap: () {
-                                if (a.status.toLowerCase() == 'upcoming' ||
-                                    a.status.toLowerCase() == 'check in')
-                                  _showCancelAppointmentDialog(context, a);
-                              },
-                              child: Chip(
-                                label: Text(
-                                  a.status.toLowerCase() == 'upcoming'
-                                      ? 'Upcoming'
-                                      : a.status.toLowerCase() == 'cancelled'
-                                          ? 'Cancelled'
-                                          : a.status.toLowerCase() == 'check in'
-                                              ? 'Check In'
-                                              : 'Check-out',
-                                  style: TextStyle(color: Colors.black),
-                                ),
-                                backgroundColor: a.status.toLowerCase() ==
-                                        'upcoming'
-                                    ? const Color.fromARGB(255, 166, 94, 179)
-                                    : a.status.toLowerCase() == 'cancelled'
-                                        ? const Color.fromARGB(255, 243, 88, 77)
-                                        : a.status.toLowerCase() == 'check in'
-                                            ? Colors.yellow
-                                            : Colors.green,
-                              )),
-                        ),
-                        DataCell(
-                          GestureDetector(
-                            onTap: a.paymentStatus != 'Paid'
-                                ? () {
-                                    final controller = getController;
-                                    // Set initial values for the payment summary state
-                                    controller.paymentSummaryState.tips.value =
-                                        '0';
-                                    controller.paymentSummaryState.paymentMethod
-                                        .value = 'UPI';
-                                    controller.paymentSummaryState.selectedTax
-                                            .value =
-                                        controller.taxes.isNotEmpty
-                                            ? controller.taxes.first
-                                            : null;
-                                    controller.paymentSummaryState.couponCode
-                                        .value = '';
-                                    controller.paymentSummaryState.appliedCoupon
-                                        .value = null;
-                                    controller.paymentSummaryState
-                                        .addAdditionalDiscount.value = false;
-                                    controller.paymentSummaryState.discountType
-                                        .value = 'percentage';
-                                    controller.paymentSummaryState.discountValue
-                                        .value = '0';
-                                    // Calculate initial grand total
-                                    controller.calculateGrandTotal(
-                                      servicePrice: a.amount.toDouble(),
-                                      memberDiscount:
-                                          a.branchMembershipDiscount ?? 0.0,
-                                      taxValue: controller.taxes.isNotEmpty
-                                          ? controller.taxes.first.value *
-                                              a.amount /
-                                              100
-                                          : 0.0,
-                                      tip: 0.0,
-                                    );
-                                   Get.to(() => PaymentSummaryScreen(a: a));
-                                  }
-                                : null,
-                            child: Chip(
-                              label: Text(a.paymentStatus,
-                                  style: TextStyle(color: Colors.black)),
-                              backgroundColor: a.paymentStatus == 'Paid'
-                                  ? Colors.green
-                                  : Colors.yellow,
-                            ),
-                          ),
-                        ),
-                        DataCell(Row(
-                          children: [
-                            IconButton(
-                              icon: Icon(Icons.receipt,
-                                  color: a.paymentStatus == 'Paid'
-                                      ? primaryColor
-                                      : Colors.grey),
-                              onPressed: a.paymentStatus == 'Paid'
-                                  ? () async {
-                                      await getController
-                                          .openAppointmentPdf(a.appointmentId);
-                                    }
-                                  : null,
-                            ),
-                            // IconButton(
-                            //   icon: Icon(Icons.edit_outlined,
-                            //       color: primaryColor),
-                            //   onPressed: () {},
-                            // ),
-                            // Show cancel button only for upcoming or check in appointments
-                            // if (a.status.toLowerCase() == 'upcoming' ||
-                            //     a.status.toLowerCase() == 'check in')
-                            //   IconButton(
-                            //     icon: Icon(Icons.cancel_outlined,
-                            //         color: Colors.red),
-                            //     onPressed: () {
-                            //       _showCancelAppointmentDialog(context, a);
-                            //     },
-                            //   ),
-                            IconButton(
-                              icon: Icon(Icons.delete_outline,
-                                  color: primaryColor),
-                              onPressed: () {
-                                _showDeleteAppointmentDialog(context, a);
-                              },
-                            ),
-                          ],
-                        )),
-                      ]);
-                    }).toList(),
-                  )),
-            );
-          }),
+                  ),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'sort_desc',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.arrow_downward,
+                        size: 16,
+                        color: grey,
+                      ),
+                      SizedBox(width: 8),
+                      Text('Sort Newest First'),
+                    ],
+                  ),
+                ),
+                const PopupMenuDivider(),
+                const PopupMenuItem<String>(
+                  value: 'export',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.file_download,
+                        size: 16,
+                        color: grey,
+                      ),
+                      SizedBox(width: 8),
+                      Text('Export Data'),
+                    ],
+                  ),
+                ),
+                const PopupMenuDivider(),
+                const PopupMenuItem<String>(
+                  value: 'clear',
+                  child: Text('Clear Filters'),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
+      drawer: DrawerScreen(),
+      body: Container(
+        
+        child: Obx(() {
+          if (getController.isLoading.value) {
+            return Center(child: CustomLoadingAvatar());
+          }
+          if (getController.appointments.isEmpty) {
+            return Center(
+                child: Text('No appointments found',
+                    style: TextStyle(color: Colors.black)));
+          }
+          if (getController.filteredAppointments.isEmpty) {
+            return const Center(
+                child: Text('No appointments found with the current filters.'));
+          }
+          return SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: DataTable(
+                  // headingRowColor: MaterialStateProperty.all(secondaryColor),
+                  columns: const [
+                    DataColumn(
+                        label: Text('Date & Time',
+                            style: TextStyle(color: Colors.black))),
+                    DataColumn(
+                        label: Text('Client',
+                            style: TextStyle(color: Colors.black))),
+                    DataColumn(
+                        label: Text('Amount',
+                            style: TextStyle(color: Colors.black))),
+                    DataColumn(
+                        label: Text('Staff Name',
+                            style: TextStyle(color: Colors.black))),
+                    DataColumn(
+                        label: Text('Services',
+                            style: TextStyle(color: Colors.black))),
+                    DataColumn(
+                        label: Text('Membership',
+                            style: TextStyle(color: Colors.black))),
+                    DataColumn(
+                        label: Text('Package',
+                            style: TextStyle(color: Colors.black))),
+                    DataColumn(
+                        label: Text('Status',
+                            style: TextStyle(color: Colors.black))),
+                    DataColumn(
+                        label: Text('Payment Status',
+                            style: TextStyle(color: Colors.black))),
+                    DataColumn(
+                        label: Text('Action',
+                            style: TextStyle(color: Colors.black))),
+                  ],
+                  rows: getController.filteredAppointments.map((a) {
+                    return DataRow(cells: [
+                      DataCell(Text('${a.date} - ${a.time}',
+                          style: TextStyle(color: Colors.black))),
+                      DataCell(Row(
+                        children: [
+                          // CircleAvatar(
+                          //   backgroundImage: a.clientImage != null &&
+                          //           a.clientImage!.isNotEmpty
+                          //       ? NetworkImage(a.clientImage!)
+                          //       : null,
+                          //   child: (a.clientImage == null ||
+                          //           a.clientImage!.isEmpty)
+                          //       ? Icon(Icons.person, color: Colors.black)
+                          //       : null,
+                          // ),
+                          // SizedBox(width: 8),
+                          Flexible(
+                              child: Text(a.clientName,
+                                  style: TextStyle(color: Colors.black))),
+                        ],
+                      )),
+                      DataCell(Text('₹ ${a.amount}',
+                          style: TextStyle(color: Colors.black))),
+                      DataCell(Row(
+                        children: [
+                          // CircleAvatar(
+                          //   backgroundImage: a.staffImage != null &&
+                          //           a.staffImage!.isNotEmpty
+                          //       ? NetworkImage(a.staffImage!)
+                          //       : null,
+                          //   child: (a.staffImage == null ||
+                          //           a.staffImage!.isEmpty)
+                          //       ? Icon(Icons.person, color: Colors.black)
+                          //       : null,
+                          // ),
+                          // SizedBox(width: 8),
+                          Flexible(
+                              child: Text(a.staffName,
+                                  style: TextStyle(color: Colors.black))),
+                        ],
+                      )),
+                      DataCell(Text(a.serviceName,
+                          style: TextStyle(color: Colors.black))),
+                      DataCell(a.membership == '-'
+                          ? Text('-', style: TextStyle(color: Colors.black))
+                          : Chip(
+                              label: Text(
+                                'Yes',
+                                style: TextStyle(color: white),
+                              ),
+                              backgroundColor: Colors.grey[700],
+                              labelStyle: TextStyle(color: Colors.black))),
+                      DataCell(a.package == '-'
+                          ? Text('-', style: TextStyle(color: Colors.black))
+                          : Chip(
+                              label: Text(
+                                'Yes',
+                                style: TextStyle(color: white),
+                              ),
+                              backgroundColor: Colors.grey[700],
+                              labelStyle: TextStyle(color: Colors.black))),
+                      DataCell(
+                        GestureDetector(
+                            onTap: () {
+                              if (a.status.toLowerCase() == 'upcoming' ||
+                                  a.status.toLowerCase() == 'check in')
+                                _showCancelAppointmentDialog(context, a);
+                            },
+                            child: Chip(
+                              label: Text(
+                                a.status.toLowerCase() == 'upcoming'
+                                    ? 'Upcoming'
+                                    : a.status.toLowerCase() == 'cancelled'
+                                        ? 'Cancelled'
+                                        : a.status.toLowerCase() == 'check in'
+                                            ? 'Check In'
+                                            : 'Check-out',
+                                style: TextStyle(color: Colors.black),
+                              ),
+                              backgroundColor: a.status.toLowerCase() ==
+                                      'upcoming'
+                                  ? const Color.fromARGB(255, 166, 94, 179)
+                                  : a.status.toLowerCase() == 'cancelled'
+                                      ? const Color.fromARGB(255, 243, 88, 77)
+                                      : a.status.toLowerCase() == 'check in'
+                                          ? Colors.yellow
+                                          : Colors.green,
+                            )),
+                      ),
+                      DataCell(
+                        GestureDetector(
+                          onTap: a.paymentStatus != 'Paid'
+                              ? () {
+                                  final controller = getController;
+                                  // Set initial values for the payment summary state
+                                  controller.paymentSummaryState.tips.value =
+                                      '0';
+                                  controller.paymentSummaryState.paymentMethod
+                                      .value = 'UPI';
+                                  controller.paymentSummaryState.selectedTax
+                                          .value =
+                                      controller.taxes.isNotEmpty
+                                          ? controller.taxes.first
+                                          : null;
+                                  controller.paymentSummaryState.couponCode
+                                      .value = '';
+                                  controller.paymentSummaryState.appliedCoupon
+                                      .value = null;
+                                  controller.paymentSummaryState
+                                      .addAdditionalDiscount.value = false;
+                                  controller.paymentSummaryState.discountType
+                                      .value = 'percentage';
+                                  controller.paymentSummaryState.discountValue
+                                      .value = '0';
+                                  // Calculate initial grand total
+                                  controller.calculateGrandTotal(
+                                    servicePrice: a.amount.toDouble(),
+                                    memberDiscount:
+                                        a.branchMembershipDiscount ?? 0.0,
+                                    taxValue: controller.taxes.isNotEmpty
+                                        ? controller.taxes.first.value *
+                                            a.amount /
+                                            100
+                                        : 0.0,
+                                    tip: 0.0,
+                                  );
+                                  Get.to(() => PaymentSummaryScreen(a: a));
+                                }
+                              : null,
+                          child: Chip(
+                            label: Text(a.paymentStatus,
+                                style: TextStyle(color: Colors.black)),
+                            backgroundColor: a.paymentStatus == 'Paid'
+                                ? Colors.green
+                                : Colors.yellow,
+                          ),
+                        ),
+                      ),
+                      DataCell(Row(
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.receipt,
+                                color: a.paymentStatus == 'Paid'
+                                    ? primaryColor
+                                    : Colors.grey),
+                            onPressed: a.paymentStatus == 'Paid'
+                                ? () async {
+                                    await getController
+                                        .openAppointmentPdf(a.appointmentId);
+                                  }
+                                : null,
+                          ),
+                          // IconButton(
+                          //   icon: Icon(Icons.edit_outlined,
+                          //       color: primaryColor),
+                          //   onPressed: () {},
+                          // ),
+                          // Show cancel button only for upcoming or check in appointments
+                          // if (a.status.toLowerCase() == 'upcoming' ||
+                          //     a.status.toLowerCase() == 'check in')
+                          //   IconButton(
+                          //     icon: Icon(Icons.cancel_outlined,
+                          //         color: Colors.red),
+                          //     onPressed: () {
+                          //       _showCancelAppointmentDialog(context, a);
+                          //     },
+                          //   ),
+                          IconButton(
+                            icon:
+                                Icon(Icons.delete_outline, color: primaryColor),
+                            onPressed: () {
+                              _showDeleteAppointmentDialog(context, a);
+                            },
+                          ),
+                        ],
+                      )),
+                    ]);
+                  }).toList(),
+                )),
+          );
+        }),
+      ),
+      floatingActionButton: FloatingActionButton(
+          backgroundColor: primaryColor,
+          child: Icon(
+            Icons.add,
+            color: white,
+          ),
+          onPressed: () {
+            Get.to(() => Newappointmentscreen());
+          }),
     );
   }
 

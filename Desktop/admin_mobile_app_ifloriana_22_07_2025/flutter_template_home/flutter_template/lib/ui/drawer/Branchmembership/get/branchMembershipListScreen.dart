@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_template/ui/drawer/drawer_screen.dart';
 import 'package:flutter_template/utils/colors.dart';
 import 'package:flutter_template/wiget/appbar/commen_appbar.dart';
 import 'package:get/get.dart';
@@ -20,6 +21,7 @@ class BranchMembershipListScreen extends StatelessWidget {
       appBar: CustomAppBar(
         title: 'Branch Memberships',
       ),
+      drawer: DrawerScreen(),
       body: RefreshIndicator(child: Obx(() {
         if (controller.isLoading.value) {
           return Center(child: CustomLoadingAvatar());

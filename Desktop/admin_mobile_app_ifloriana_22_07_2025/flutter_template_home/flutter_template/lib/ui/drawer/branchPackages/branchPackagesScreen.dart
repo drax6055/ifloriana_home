@@ -85,7 +85,7 @@ class DynamicInputScreen extends StatelessWidget {
                                   ),
                                 ],
                               ),
-                              DropdownButtonFormField<Service>(
+                              DropdownButtonFormField<Service>( 
                                 value: data.selectedService.value,
                                 items: controller.serviceList
                                     .map((service) => DropdownMenuItem(

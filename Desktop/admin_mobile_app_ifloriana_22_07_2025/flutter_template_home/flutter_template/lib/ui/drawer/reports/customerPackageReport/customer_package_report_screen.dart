@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_template/ui/drawer/drawer_screen.dart';
 import 'package:flutter_template/ui/drawer/reports/customerPackageReport/customer_package_report_controller.dart';
 import 'package:flutter_template/utils/colors.dart';
 import 'package:get/get.dart';
@@ -9,12 +10,12 @@ import '../../../../wiget/loading.dart';
 import '../../../../network/network_const.dart';
 
 class CustomerPackageReportScreen extends StatelessWidget {
-  const CustomerPackageReportScreen({super.key});
-
+ CustomerPackageReportScreen({super.key});
+  final CustomerPackageReportController controller =
+      Get.put(CustomerPackageReportController());
   @override
   Widget build(BuildContext context) {
-    final CustomerPackageReportController controller =
-        Get.put(CustomerPackageReportController());
+   
     final RxBool isSearching = false.obs;
     final TextEditingController searchController = TextEditingController();
 
@@ -152,6 +153,7 @@ class CustomerPackageReportScreen extends StatelessWidget {
             );
           }),
         ),
+        drawer: DrawerScreen(),
         body: Obx(() {
           if (controller.isLoading.value) {
             return const Center(child: CustomLoadingAvatar());

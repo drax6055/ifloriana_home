@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import '../../../../network/model/branch_model.dart';
 import '../../../../wiget/Custome_button.dart';
 import '../../../../wiget/appbar/commen_appbar.dart';
+import '../../drawer_screen.dart';
 import 'getBranchesController.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../network/network_const.dart';
@@ -180,6 +181,7 @@ class _EditBranchScreenState extends State<EditBranchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: 'Edit Branch'),
+       drawer: DrawerScreen(),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.r),
         child: Form(

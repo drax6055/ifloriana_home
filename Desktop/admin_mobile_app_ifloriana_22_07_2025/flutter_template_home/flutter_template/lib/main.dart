@@ -18,7 +18,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: "assets/.env");
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    systemNavigationBarColor: primaryColor, 
+    systemNavigationBarColor: primaryColor,
     statusBarColor: primaryColor,
   ));
   SystemChrome.setPreferredOrientations([
