@@ -19,141 +19,139 @@ class DashboardScreen extends StatelessWidget {
   final DashboardController controller = Get.put(DashboardController());
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-          appBar: PreferredSize(
-            preferredSize: Size.fromHeight(70.h),
-            child: CustomAppBar(
-              title: "Dashboard",
-              actions: [
-                PopupMenuButton<String>(
-                  onSelected: (value) async {
-                    if (value == 'date') {
-                      final DateTime? picked = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime(2101),
-                      );
-                      if (picked != null) {
-                        // Handle single date selection
-                        final range = DateTimeRange(
-                          start: picked,
-                          end: picked,
-                        );
-                        controller.setDateRange(range);
-                      }
-                    } else if (value == 'range') {
-                      final DateTimeRange? picked = await showDateRangePicker(
-                        context: context,
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime(2101),
-                        initialDateRange: controller.selectedDateRange.value,
-                      );
-                      if (picked != null) {
-                        controller.setDateRange(picked);
-                      }
-                    } else if (value == 'branch') {
-                      _showBranchSelectionDialog(context);
-                    } else if (value == 'clear') {
-                      controller.selectedBranch.value = null;
-                      controller.selectedDateRange.value = null;
-                      controller.CalllApis();
-                    }
-                  },
-                  itemBuilder: (BuildContext context) =>
-                      <PopupMenuEntry<String>>[
-                    const PopupMenuItem<String>(
-                      value: 'date',
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.calendar_today,
-                            size: 16,
-                            color: grey,
-                          ),
-                          SizedBox(width: 8),
-                          Text('Filter by Date'),
-                        ],
-                      ),
-                    ),
-                    const PopupMenuItem<String>(
-                      value: 'range',
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.date_range,
-                            size: 16,
-                            color: grey,
-                          ),
-                          SizedBox(width: 8),
-                          Text('Filter by Date Range'),
-                        ],
-                      ),
-                    ),
-                    const PopupMenuItem<String>(
-                      value: 'branch',
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.business,
-                            size: 16,
-                            color: grey,
-                          ),
-                          SizedBox(width: 8),
-                          Text('Select Branch'),
-                        ],
-                      ),
-                    ),
-                    const PopupMenuDivider(),
-                    const PopupMenuItem<String>(
-                      value: 'clear',
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.clear_all,
-                            size: 16,
-                            color: grey,
-                          ),
-                          SizedBox(width: 8),
-                          Text('Clear All Filters'),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          drawer: DrawerScreen(),
-          body: RefreshIndicator(
-            child: SingleChildScrollView(
-              child: Container(
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Column(
-                    spacing: 10,
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(70.h),
+        child: CustomAppBar(
+          title: "Dashboard",
+          actions: [
+            PopupMenuButton<String>(
+              onSelected: (value) async {
+                if (value == 'date') {
+                  final DateTime? picked = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2101),
+                  );
+                  if (picked != null) {
+                    // Handle single date selection
+                    final range = DateTimeRange(
+                      start: picked,
+                      end: picked,
+                    );
+                    controller.setDateRange(range);
+                  }
+                } else if (value == 'range') {
+                  final DateTimeRange? picked = await showDateRangePicker(
+                    context: context,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2101),
+                    initialDateRange: controller.selectedDateRange.value,
+                  );
+                  if (picked != null) {
+                    controller.setDateRange(picked);
+                  }
+                } else if (value == 'branch') {
+                  _showBranchSelectionDialog(context);
+                } else if (value == 'clear') {
+                  controller.selectedBranch.value = null;
+                  controller.selectedDateRange.value = null;
+                  controller.CalllApis();
+                }
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                const PopupMenuItem<String>(
+                  value: 'date',
+                  child: Row(
                     children: [
-                      // _buildBranchDropdown(),
-                      // _buildDateRangePicker(context),
-                      // _buildFilterStatus(),
-                      Obx(() => performce_widget(controller)),
-                      Obx(() => lineChart(controller)),
-                      Obx(() => upcomming_booking(controller)),
-                      Obx(() => combinedChart(controller)),
-                      Obx(() => total_revenue(controller)),
-                      SizedBox(height: 10.h),
+                      Icon(
+                        Icons.calendar_today,
+                        size: 16,
+                        color: grey,
+                      ),
+                      SizedBox(width: 8),
+                      Text('Filter by Date'),
                     ],
                   ),
                 ),
+                const PopupMenuItem<String>(
+                  value: 'range',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.date_range,
+                        size: 16,
+                        color: grey,
+                      ),
+                      SizedBox(width: 8),
+                      Text('Filter by Date Range'),
+                    ],
+                  ),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'branch',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.business,
+                        size: 16,
+                        color: grey,
+                      ),
+                      SizedBox(width: 8),
+                      Text('Select Branch'),
+                    ],
+                  ),
+                ),
+                const PopupMenuDivider(),
+                const PopupMenuItem<String>(
+                  value: 'clear',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.clear_all,
+                        size: 16,
+                        color: grey,
+                      ),
+                      SizedBox(width: 8),
+                      Text('Clear All Filters'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      drawer: DrawerScreen(),
+      body: RefreshIndicator(
+        child: SingleChildScrollView(
+          child: Container(
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                spacing: 10,
+                children: [
+                  // _buildBranchDropdown(),
+                  // _buildDateRangePicker(context),
+                  // _buildFilterStatus(),
+                  Obx(() => performce_widget(controller)),
+                  Obx(() => lineChart(controller)),
+                  Obx(() => upcomming_booking(controller)),
+                  Obx(() => combinedChart(controller)),
+                  Obx(() => total_revenue(controller)),
+                  SizedBox(height: 10.h),
+                ],
               ),
             ),
-            onRefresh: () async {
-              controller.selectedBranch.value = null;
-              controller.selectedDateRange.value = null;
-              controller.CalllApis();
-            },
-          )),
+          ),
+        ),
+        onRefresh: () async {
+          controller.selectedBranch.value = null;
+          controller.selectedDateRange.value = null;
+          controller.CalllApis();
+        },
+      ),
     );
   }
 

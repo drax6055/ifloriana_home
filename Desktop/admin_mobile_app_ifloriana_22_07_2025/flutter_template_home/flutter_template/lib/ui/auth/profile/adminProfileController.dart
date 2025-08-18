@@ -1,9 +1,8 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_template/main.dart';
-import 'package:flutter_template/network/model/getAdminDetails.dart';
+
 import 'package:flutter_template/network/network_const.dart';
-import 'package:flutter_template/route/app_route.dart';
+
 import 'package:flutter_template/wiget/custome_snackbar.dart';
 import 'package:get/get.dart';
 
@@ -80,14 +79,13 @@ class Adminprofilecontroller extends GetxController {
 
     try {
       final loginUser = await prefs.getUser();
-      final response = await dioClient.putData(
+      await dioClient.putData(
         '${Apis.baseUrl}${Endpoints.get_register_details}${loginUser?.adminId}',
         data,
         (json) => (json),
       );
       await prefs.onLogout();
     } catch (e) {
-      print('==> here Error: $e');
       CustomSnackbar.showError('Error', e.toString());
     }
   }
@@ -108,11 +106,9 @@ class Adminprofilecontroller extends GetxController {
         (json) => json,
       );
 
-      print("===> ${changeData.toString()}");
       CustomSnackbar.showSuccess('Success', 'password update  successfully');
       await prefs.onLogout();
     } catch (e) {
-      print('==> Add Staff Error: $e');
       CustomSnackbar.showError('Error', e.toString());
     }
   }

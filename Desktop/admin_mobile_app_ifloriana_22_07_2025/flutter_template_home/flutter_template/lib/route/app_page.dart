@@ -14,6 +14,7 @@ import 'package:flutter_template/ui/drawer/drawer_screen.dart';
 import 'package:flutter_template/ui/drawer/manager/addManager/managerScreen.dart';
 import 'package:flutter_template/ui/drawer/manager/getManager/getmanagerScreen.dart';
 import 'package:flutter_template/ui/drawer/services/addServices/addservicesScreen.dart';
+import 'package:flutter_template/ui/drawer/services/categotys/addNewServicesScreen.dart';
 import 'package:flutter_template/ui/drawer/services/subCategory/subCategotySCreen.dart';
 
 import 'package:flutter_template/ui/drawer/staff/addNewStaffScreen.dart';
@@ -25,6 +26,7 @@ import 'package:get/get.dart';
 import '../manager_ui/dashboard/dashboardScreen.dart';
 import '../ui/auth/forgot/forgot_screen.dart';
 import '../ui/buy_product/buy_product_screen.dart';
+import '../ui/drawer/appointment/appointmentScreen.dart';
 import '../ui/drawer/dashboard/dashboard_screen.dart';
 import '../ui/drawer/products/allProducts/addProductsScreen.dart';
 import '../ui/drawer/products/variations/variationScreen.dart';
@@ -69,10 +71,10 @@ class AppPages {
         name: Routes.forgotScreen,
         page: () => ForgotScreen(),
         transition: Transition.rightToLeft),
-    // GetPage(
-    //     name: Routes.updateSalonScreen,
-    //     page: () => UpdatesalonScreen(),
-    //     transition: Transition.rightToLeft),
+    GetPage(
+        name: Routes.appointment,
+        page: () => Appointmentscreen(),
+        transition: Transition.rightToLeft),
     GetPage(
       name: Routes.adminprofilescreen,
       page: () => Adminprofilescreen(),
@@ -80,6 +82,10 @@ class AppPages {
     GetPage(
         name: Routes.addNewStaff,
         page: () => Addnewstaffscreen(),
+        transition: Transition.rightToLeft),
+    GetPage(
+        name: Routes.addNewCategotyScreen,
+        page: () => AddNewCategotyScreen(),
         transition: Transition.rightToLeft),
     GetPage(
         name: Routes.addService,

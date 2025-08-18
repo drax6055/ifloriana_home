@@ -11,23 +11,20 @@ import 'package:flutter_template/route/app_route.dart';
 import 'package:flutter_template/wiget/appbar/commen_appbar.dart';
 
 class GetBranchesScreen extends StatelessWidget {
-  const GetBranchesScreen({super.key});
-
+ GetBranchesScreen({super.key});
+  final Getbranchescontroller getController = Get.put(Getbranchescontroller());
   void _showDeleteConfirmation(BuildContext context, Getbranchescontroller controller, String branchId, String branchName) {
     controller.deleteBranch(branchId);
   }
 
   @override
   Widget build(BuildContext context) {
-    final Getbranchescontroller getController = Get.put(Getbranchescontroller());
-
     return  Scaffold(
       appBar: CustomAppBar(title: 'Branches'),
-        body: Obx(() {
+      body: Obx(() {
           if (getController.isLoading.value) {
             return const Center(child: CustomLoadingAvatar());
           }
-
           if (getController.branches.isEmpty) {
             return Center(
               child: Text(

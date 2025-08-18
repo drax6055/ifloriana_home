@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../../main.dart';
 import '../../../../network/network_const.dart';
 import '../../../../wiget/custome_snackbar.dart';
+import '../appointmentController.dart';
 
 class BranchModel {
   final String id;
@@ -385,6 +386,8 @@ class Newappointmentcontroller extends GetxController {
       isBookingLoading.value = false;
       // Go to confirmation step
       currentStep.value = 5;
+      Get.back();
+      Get.put(AppointmentController()).getAppointment();
     } catch (e) {
       isBookingLoading.value = false;
       CustomSnackbar.showError('Error', 'Failed to add booking: $e');
