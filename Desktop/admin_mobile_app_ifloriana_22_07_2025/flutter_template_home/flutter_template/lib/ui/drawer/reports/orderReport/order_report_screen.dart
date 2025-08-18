@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import '../../../../network/network_const.dart';
 import '../../../../wiget/appbar/commen_appbar.dart';
 import '../../../../wiget/loading.dart';
+import '../../drawer_screen.dart';
 
 class OrderReportScreen extends StatelessWidget {
   const OrderReportScreen({super.key});
@@ -182,6 +183,7 @@ class OrderReportScreen extends StatelessWidget {
             );
           }),
         ),
+          drawer: DrawerScreen(),
         body: Column(
           children: [
             Expanded(

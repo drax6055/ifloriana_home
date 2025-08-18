@@ -3,6 +3,7 @@ import 'package:flutter_template/main.dart';
 import 'package:get/get.dart';
 import '../../route/app_route.dart';
 import '../../wiget/custome_snackbar.dart';
+import '../drawer/customers/customersScreen.dart';
 import '../drawer/reports/customerMembershipReport/customer_membership_report_screen.dart';
 
 class SplashController extends GetxController {
@@ -19,8 +20,8 @@ class SplashController extends GetxController {
         String? managerAccessToken = managerUser?.token;
 
         if (accessToken != null && accessToken.isNotEmpty) {
-          Get.to(CustomerScreen());
-          // Get.offNamed(Routes.dashboardScreen); // Regular user
+          // Get.to(CustomerMembershipReportScreen());
+          Get.offNamed(Routes.dashboardScreen); // Regular user
         } else if (managerAccessToken != null &&
             managerAccessToken.isNotEmpty) {
           Get.offNamed(Routes.managerDashboard); // Manager user

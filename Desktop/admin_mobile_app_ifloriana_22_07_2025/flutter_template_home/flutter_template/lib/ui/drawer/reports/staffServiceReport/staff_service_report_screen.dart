@@ -7,6 +7,8 @@ import 'package:flutter_template/utils/colors.dart';
 import 'package:flutter_template/wiget/loading.dart';
 import 'package:get/get.dart';
 
+import '../../drawer_screen.dart';
+
 class StaffServiceReportScreen extends StatelessWidget {
   const StaffServiceReportScreen({super.key});
 
@@ -123,6 +125,7 @@ class StaffServiceReportScreen extends StatelessWidget {
             );
           }),
         ),
+        drawer: DrawerScreen(),
         body: Obx(() {
           if (controller.isLoading.value) {
             return const Center(child: CustomLoadingAvatar());
@@ -153,26 +156,27 @@ class StaffServiceReportScreen extends StatelessWidget {
                           controller.filteredStaffServiceReports.map((report) {
                         return DataRow(cells: [
                           DataCell(
-                            Row(
-                              children: [
-                                // Conditional display of staff image or fallback icon
-                                report.staffImage != null &&
-                                        report.staffImage!.isNotEmpty
-                                    ? CircleAvatar(
-                                        backgroundImage: NetworkImage(
-                                            '${Apis.pdfUrl}${report.staffImage!}'),
-                                      )
-                                    : const CircleAvatar(
-                                        backgroundColor: secondaryColor,
-                                        child: Icon(
-                                          Icons.person,
-                                          color: black,
-                                        ), // Fallback icon
-                                      ),
-                                const SizedBox(width: 8),
-                                Text(report.staffName ?? 'N/A'),
-                              ],
-                            ),
+                            Text(report.staffName ?? 'N/A'),
+                            // Row(
+                            //   children: [
+                            //     // Conditional display of staff image or fallback icon
+                            //     report.staffImage != null &&
+                            //             report.staffImage!.isNotEmpty
+                            //         ? CircleAvatar(
+                            //             backgroundImage: NetworkImage(
+                            //                 '${Apis.pdfUrl}${report.staffImage!}'),
+                            //           )
+                            //         : const CircleAvatar(
+                            //             backgroundColor: secondaryColor,
+                            //             child: Icon(
+                            //               Icons.person,
+                            //               color: black,
+                            //             ), // Fallback icon
+                            //           ),
+                            //     const SizedBox(width: 8),
+                            //     Text(report.staffName ?? 'N/A'),
+                            //   ],
+                            // ),
                           ),
                           DataCell(Text(report.services?.toString() ?? '0')),
                           DataCell(Text(

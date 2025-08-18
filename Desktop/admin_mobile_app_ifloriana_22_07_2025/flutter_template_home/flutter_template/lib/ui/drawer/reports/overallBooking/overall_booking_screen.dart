@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import '../../../../network/network_const.dart';
 import '../../../../wiget/appbar/commen_appbar.dart';
 import '../../../../wiget/loading.dart';
+import '../../drawer_screen.dart';
 
 class OverallBookingScreen extends StatelessWidget {
   const OverallBookingScreen({super.key});
@@ -168,6 +169,7 @@ class OverallBookingScreen extends StatelessWidget {
             );
           }),
         ),
+          drawer: DrawerScreen(),
         body: Column(
           children: [
             Expanded(

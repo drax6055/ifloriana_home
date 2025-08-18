@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import '../../../wiget/Custome_button.dart';
 import '../../../wiget/appbar/commen_appbar.dart';
 import '../../../wiget/loading.dart';
+import '../drawer_screen.dart';
 import 'statffEarningController.dart';
 import '../../../network/network_const.dart';
 
@@ -70,6 +71,7 @@ class Statffearningscreen extends StatelessWidget {
             );
           }),
         ),
+          drawer: DrawerScreen(),
         body: Obx(() {
           if (getController.isLoading.value) {
             return Center(child: CustomLoadingAvatar());

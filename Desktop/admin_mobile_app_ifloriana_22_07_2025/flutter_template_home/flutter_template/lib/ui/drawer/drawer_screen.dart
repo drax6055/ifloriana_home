@@ -54,11 +54,80 @@ class DrawerScreen extends StatelessWidget {
           title: 'Membership',
           icon: Icons.account_box,
           route: Routes.addBranchMembership),
-      DrawerItem(
-          title: 'Customer Package',
-          icon: Icons.account_box,
-          route: Routes.CustomerPackageReportScreen),
 
+      DrawerItem(
+          title: 'Reports',
+          icon: Icons.account_circle_sharp,
+          route: '', // parent doesn’t navigate
+          subItems: [
+            DrawerItem(
+                title: 'Daily Booking',
+                icon: Icons.account_box,
+                route: Routes.DailybookingScreen),
+            DrawerItem(
+                title: 'Order Report',
+                icon: Icons.account_box,
+                route: Routes.OrderReportScreen),
+            DrawerItem(
+                title: 'Overall Booking',
+                icon: Icons.account_box,
+                route: Routes.OverallBookingScreen),
+            DrawerItem(
+                title: 'Staff Payout',
+                icon: Icons.account_box,
+                route: Routes.Staffpayoutreportscreen),
+            DrawerItem(
+                title: 'Staff Service',
+                icon: Icons.account_box,
+                route: Routes.StaffServiceReportScreen),
+            DrawerItem(
+                title: 'Customer Package',
+                icon: Icons.account_box,
+                route: Routes.CustomerPackageReportScreen),
+            DrawerItem(
+                title: 'Customer Membership',
+                icon: Icons.account_box,
+                route: Routes.CustomerMembershipReportScreen),
+          ]),
+
+      DrawerItem(
+          title: 'Products',
+          icon: Icons.account_circle_sharp,
+          route: '',
+          subItems: [
+            DrawerItem(
+                title: 'All Products',
+                icon: Icons.account_box,
+                route: Routes.CustomerPackageReportScreen),
+            DrawerItem(
+                title: 'Brands',
+                icon: Icons.account_box,
+                route: Routes.CustomerPackageReportScreen),
+            DrawerItem(
+                title: 'Category',
+                icon: Icons.account_box,
+                route: Routes.CustomerPackageReportScreen),
+            DrawerItem(
+                title: 'Sub Category',
+                icon: Icons.account_box,
+                route: Routes.CustomerPackageReportScreen),
+            DrawerItem(
+                title: 'Units',
+                icon: Icons.account_box,
+                route: Routes.CustomerPackageReportScreen),
+            DrawerItem(
+                title: 'Tags',
+                icon: Icons.account_box,
+                route: Routes.CustomerPackageReportScreen),
+            DrawerItem(
+                title: 'Product Variation',
+                icon: Icons.account_box,
+                route: Routes.CustomerPackageReportScreen),
+            DrawerItem(
+                title: 'Product Cunsumption',
+                icon: Icons.account_box,
+                route: Routes.CustomerPackageReportScreen),
+          ]),
       // DrawerItem(
       //   title: 'Logout',
       //   icon: Icons.logout,
@@ -113,21 +182,25 @@ class DrawerScreen extends StatelessWidget {
                     textStyle: CustomTextStyles.textFontMedium(size: 13.sp),
                   ),
                   children: item.subItems.map((sub) {
-                    return ListTile(
-                      dense: true,
-                      leading: Icon(sub.icon, size: 16.sp),
-                      title: CustomTextWidget(
-                        text: sub.title,
-                        textStyle: CustomTextStyles.textFontMedium(size: 12.sp),
+                    return Padding(
+                      padding: EdgeInsets.only(left: 15.w),
+                      child: ListTile(
+                        dense: true,
+                        leading: Icon(sub.icon, size: 16.sp),
+                        title: CustomTextWidget(
+                          text: sub.title,
+                          textStyle:
+                              CustomTextStyles.textFontMedium(size: 12.sp),
+                        ),
+                        onTap: () async {
+                          Navigator.pop(context);
+                          if (sub.isLogout) {
+                            await getController.onLogoutPress();
+                          } else {
+                            Get.offAllNamed(sub.route);
+                          }
+                        },
                       ),
-                      onTap: () async {
-                        Navigator.pop(context);
-                        if (sub.isLogout) {
-                          await getController.onLogoutPress();
-                        } else {
-                          Get.offAllNamed(sub.route);
-                        }
-                      },
                     );
                   }).toList(),
                 ),

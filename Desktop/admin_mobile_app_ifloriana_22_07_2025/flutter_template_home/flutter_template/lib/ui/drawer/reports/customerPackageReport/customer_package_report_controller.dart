@@ -175,7 +175,7 @@ class CustomerPackageReportController extends GetxController {
             : null;
 
         if (aDate == null && bDate == null) return 0;
-        if (aDate == null) return 1; // null dates go to the end
+        if (aDate == null) return 1; 
         if (bDate == null) return -1;
 
         return bDate.compareTo(aDate);

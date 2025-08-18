@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_template/ui/drawer/drawer_screen.dart';
 import 'package:get/get.dart';
 import '../../../../utils/colors.dart';
 import '../../../../wiget/appbar/commen_appbar.dart'; // Import CustomAppBar
@@ -161,6 +162,7 @@ class DailybookingScreen extends StatelessWidget {
             );
           }),
         ),
+        drawer: DrawerScreen(),
         body: Column(
           children: [
             Expanded(

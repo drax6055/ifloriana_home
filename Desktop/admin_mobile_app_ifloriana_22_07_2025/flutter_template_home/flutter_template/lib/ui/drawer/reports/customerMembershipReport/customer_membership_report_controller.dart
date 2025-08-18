@@ -42,7 +42,7 @@ class Customer {
     );
   }
 }
-class CustomerController extends GetxController {
+class CustomerMembershipReportController extends GetxController {
   var customers = <Customer>[].obs;
   var isLoading = false.obs;
   var page = 1;

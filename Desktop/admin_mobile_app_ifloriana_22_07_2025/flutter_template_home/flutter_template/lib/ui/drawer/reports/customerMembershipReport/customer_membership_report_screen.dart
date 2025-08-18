@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_template/ui/drawer/drawer_screen.dart';
 import 'package:flutter_template/ui/drawer/reports/customerMembershipReport/customer_membership_report_controller.dart';
 import 'package:get/get.dart';
 
 import '../../../../wiget/appbar/commen_appbar.dart';
+import '../../../../wiget/loading.dart';
 
-class CustomerScreen extends StatefulWidget {
+class CustomerMembershipReportScreen extends StatefulWidget {
   @override
-  _CustomerScreenState createState() => _CustomerScreenState();
+  _CustomerMembershipReportScreenState createState() =>
+      _CustomerMembershipReportScreenState();
 }
 
-class _CustomerScreenState extends State<CustomerScreen> {
-  final CustomerController controller = Get.put(CustomerController());
+class _CustomerMembershipReportScreenState
+    extends State<CustomerMembershipReportScreen> {
+  final controller = Get.put(CustomerMembershipReportController());
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -32,9 +36,10 @@ class _CustomerScreenState extends State<CustomerScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: "Customers  Membership"),
+      drawer: DrawerScreen(),
       body: Obx(() {
         if (controller.customers.isEmpty && controller.isLoading.value) {
-          return Center(child: CircularProgressIndicator());
+          return Center(child: CustomLoadingAvatar());
         }
 
         return ListView.builder(
@@ -65,7 +70,7 @@ class _CustomerScreenState extends State<CustomerScreen> {
               return Center(
                   child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: CircularProgressIndicator(),
+                child: CustomLoadingAvatar(),
               ));
             }
           },

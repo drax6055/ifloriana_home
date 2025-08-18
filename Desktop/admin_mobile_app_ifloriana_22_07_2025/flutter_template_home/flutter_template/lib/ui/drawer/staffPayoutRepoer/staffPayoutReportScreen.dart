@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../../wiget/appbar/commen_appbar.dart';
 import '../../../wiget/loading.dart';
 import 'package:flutter_template/utils/colors.dart';
+import '../drawer_screen.dart';
 import 'staffPayoutReoirtController.dart';
 
 class Staffpayoutreportscreen extends StatelessWidget {
@@ -168,6 +169,7 @@ class Staffpayoutreportscreen extends StatelessWidget {
           );
         }),
       ),
+        drawer: DrawerScreen(),
       body: Column(
         children: [
           // Remove the old search TextField since we now have it in AppBar

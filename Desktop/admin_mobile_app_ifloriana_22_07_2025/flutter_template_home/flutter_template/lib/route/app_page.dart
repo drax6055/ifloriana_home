@@ -31,7 +31,13 @@ import '../ui/drawer/branches/getBranchesScreen.dart';
 import '../ui/drawer/dashboard/dashboard_screen.dart';
 import '../ui/drawer/products/allProducts/addProductsScreen.dart';
 import '../ui/drawer/products/variations/variationScreen.dart';
+import '../ui/drawer/reports/customerMembershipReport/customer_membership_report_screen.dart';
 import '../ui/drawer/reports/customerPackageReport/customer_package_report_screen.dart';
+import '../ui/drawer/reports/dailyBooking/dailyBooking_screen.dart';
+import '../ui/drawer/reports/orderReport/order_report_screen.dart';
+import '../ui/drawer/reports/overallBooking/overall_booking_screen.dart';
+import '../ui/drawer/reports/staffServiceReport/staff_service_report_screen.dart';
+import '../ui/drawer/staffPayoutRepoer/staffPayoutReportScreen.dart';
 import '../ui/splash/splash_screen.dart';
 import 'app_route.dart';
 import 'package:flutter_template/ui/drawer/products/product_list/product_list_screen.dart';
@@ -167,15 +173,39 @@ class AppPages {
         name: Routes.managerDashboard,
         page: () => ManagerDashboard(),
         transition: Transition.rightToLeft),
-
-         GetPage(
+    GetPage(
         name: Routes.GetBranchPackagesScreen,
         page: () => GetBranchPackagesScreen(),
         transition: Transition.rightToLeft),
-
-           GetPage(
+    GetPage(
         name: Routes.CustomerPackageReportScreen,
         page: () => CustomerPackageReportScreen(),
+        transition: Transition.rightToLeft),
+    GetPage(
+        name: Routes.CustomerMembershipReportScreen,
+        page: () => CustomerMembershipReportScreen(),
+        transition: Transition.rightToLeft),
+    GetPage(
+        name: Routes.DailybookingScreen,
+        page: () => DailybookingScreen(),
+        transition: Transition.rightToLeft),
+          GetPage(
+        name: Routes.OrderReportScreen,
+        page: () => OrderReportScreen(),
+        transition: Transition.rightToLeft),
+            GetPage(
+        name: Routes.OverallBookingScreen,
+        page: () => OverallBookingScreen(),
+        transition: Transition.rightToLeft),
+
+            GetPage(
+        name: Routes.Staffpayoutreportscreen,
+        page: () => Staffpayoutreportscreen(),
+        transition: Transition.rightToLeft),
+
+            GetPage(
+        name: Routes.StaffServiceReportScreen,
+        page: () => StaffServiceReportScreen(),
         transition: Transition.rightToLeft),
   ];
 }
