@@ -125,6 +125,7 @@ class DashboardScreen extends StatelessWidget {
       ),
       drawer: DrawerScreen(),
       body: RefreshIndicator(
+        color: primaryColor,
         child: SingleChildScrollView(
           child: Container(
             child: Padding(

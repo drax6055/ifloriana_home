@@ -56,7 +56,7 @@ class DioClient {
       T Function(Map<String, dynamic>) fromJson) async {
     try {
       final response = await dio.post(endpoint, data: data);
-      if (response.statusCode == 201) {
+      if (response.statusCode == 201 || response.statusCode == 200) {
         return fromJson(response.data);
       } else {
         throw Exception('POST Error: ${response.statusCode}');

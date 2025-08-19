@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_template/network/model/getAdminDetails.dart';
 import 'package:get/get.dart';
+import '../../../commen_items/requestData.dart';
 import '../../../main.dart';
 import '../../../network/model/login_model.dart';
 import '../../../network/model/managerLogin.dart';
@@ -53,22 +56,30 @@ class LoginController extends GetxController {
   }
 
   Future onLoginPressManager() async {
-    Map<String, dynamic> loginData = {
-      'email': emailController.text,
-      'password': passController.text,
-    };
+    ApiService api = ApiService();
 
     try {
-      ManagerLogin response = await dioClient.postData<ManagerLogin>(
-        '${Apis.baseUrl}/managers/login',
-        loginData,
-        (json) => ManagerLogin.fromJson(json),
+      var response = await api.postRequest(
+        "${Apis.baseUrl}/managers/login",
+        {
+          'email': emailController.text,
+          'password': passController.text,
+        },
       );
-      await prefs.setManagerUser(response);
-      CustomSnackbar.showSuccess('success', 'Manager Login Successfully');
-      Get.offAllNamed(Routes.managerDashboard);
+
+      if (response != null && response['manager'] != null) {
+        final managerUser = ManagerLogin.fromJson(response);
+
+        
+        await prefs.setManagerUser(managerUser);
+
+        CustomSnackbar.showSuccess("Success", "Manager Login Successfully");
+        Get.offAllNamed(Routes.managerDashboard);
+      } else {
+        CustomSnackbar.showError("Error", "Invalid response from server");
+      }
     } catch (e) {
-      CustomSnackbar.showError('Error', e.toString());
+      CustomSnackbar.showError("Error", e.toString());
     }
   }
 

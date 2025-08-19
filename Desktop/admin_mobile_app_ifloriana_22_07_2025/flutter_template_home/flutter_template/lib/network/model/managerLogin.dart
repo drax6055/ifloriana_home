@@ -29,11 +29,12 @@ class Manager {
   String? email;
   String? contactNumber;
   String? gender;
-  String? branchId;
+  BranchId? branchId;
   String? salonId;
   String? createdAt;
   String? updatedAt;
   int? iV;
+  Null? imageUrl;
 
   Manager(
       {this.sId,
@@ -45,7 +46,8 @@ class Manager {
       this.salonId,
       this.createdAt,
       this.updatedAt,
-      this.iV});
+      this.iV,
+      this.imageUrl});
 
   Manager.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];
@@ -53,11 +55,14 @@ class Manager {
     email = json['email'];
     contactNumber = json['contact_number'];
     gender = json['gender'];
-    branchId = json['branch_id'];
+    branchId = json['branch_id'] != null
+        ? new BranchId.fromJson(json['branch_id'])
+        : null;
     salonId = json['salon_id'];
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
     iV = json['__v'];
+    imageUrl = json['image_url'];
   }
 
   Map<String, dynamic> toJson() {
@@ -67,11 +72,33 @@ class Manager {
     data['email'] = this.email;
     data['contact_number'] = this.contactNumber;
     data['gender'] = this.gender;
-    data['branch_id'] = this.branchId;
+    if (this.branchId != null) {
+      data['branch_id'] = this.branchId!.toJson();
+    }
     data['salon_id'] = this.salonId;
     data['createdAt'] = this.createdAt;
     data['updatedAt'] = this.updatedAt;
     data['__v'] = this.iV;
+    data['image_url'] = this.imageUrl;
+    return data;
+  }
+}
+
+class BranchId {
+  String? sId;
+  String? name;
+
+  BranchId({this.sId, this.name});
+
+  BranchId.fromJson(Map<String, dynamic> json) {
+    sId = json['_id'];
+    name = json['name'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['_id'] = this.sId;
+    data['name'] = this.name;
     return data;
   }
 }

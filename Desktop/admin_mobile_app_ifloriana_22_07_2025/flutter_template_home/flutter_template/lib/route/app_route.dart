@@ -63,8 +63,11 @@ abstract class Routes {
   static const VariationGetscreen = "/VariationGetscreen";
   static const InhouseproductScreen = "/InhouseproductScreen";
 
-
   static const Statffearningscreen = "/Statffearningscreen";
 
-    static const CommissionListScreen = "/CommissionListScreen";
+  static const CommissionListScreen = "/CommissionListScreen";
+  static const Adminprofilescreen = "/Adminprofilescreen";
+
+  static const Managerappointmentsscreen = "/Managerappointmentsscreen";
+  static const ManagerDashboardScreen = "/ManagerDashboardScreen";
 }
