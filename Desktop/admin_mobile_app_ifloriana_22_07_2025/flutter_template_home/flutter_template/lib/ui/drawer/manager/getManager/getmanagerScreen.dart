@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_template/network/network_const.dart';
+import 'package:flutter_template/ui/drawer/drawer_screen.dart';
 import 'package:flutter_template/ui/drawer/manager/getManager/getmanagerController.dart';
 import 'package:flutter_template/utils/colors.dart';
 import 'package:flutter_template/wiget/appbar/commen_appbar.dart';
@@ -70,6 +71,7 @@ class Getmanagerscreen extends StatelessWidget {
           ),
         ],
       ),
+      drawer: DrawerScreen(),
       body: Obx(() {
         return getController.isLoading.value
             ? const Center(child: CustomLoadingAvatar())

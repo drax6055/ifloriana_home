@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_template/route/app_route.dart';
+import 'package:flutter_template/ui/drawer/drawer_screen.dart';
 import 'package:flutter_template/utils/colors.dart';
 import 'package:flutter_template/wiget/appbar/commen_appbar.dart';
 import 'package:get/get.dart';
@@ -17,6 +18,7 @@ class CustomersScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: "Customers"),
+      drawer: DrawerScreen(),
       body: Obx(() => customerController.customerList.isEmpty
           ? Center(
               child: Text(

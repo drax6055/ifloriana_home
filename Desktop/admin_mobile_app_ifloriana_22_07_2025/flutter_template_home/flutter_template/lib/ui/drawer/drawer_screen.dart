@@ -156,24 +156,24 @@ class DrawerScreen extends StatelessWidget {
           route: '',
           subItems: [
             DrawerItem(
-                title: 'Staff Earning',
+                title: 'Manager',
                 icon: Icons.account_box,
-                route: Routes.Statffearningscreen),
+                route: Routes.getManager),
             DrawerItem(
-                title: 'Commition',
+                title: 'Staff',
                 icon: Icons.account_box,
-                route: Routes.CommissionListScreen),
+                route: Routes.gerStaff),
             DrawerItem(
-                title: 'Coupons',
+                title: 'Customer',
                 icon: Icons.account_box,
-                route: Routes.getCoupons),
-          ])
-      // DrawerItem(
-      //   title: 'Logout',
-      //   icon: Icons.logout,
-      //   route: '',
-      //   isLogout: true,
-      // ),
+                route: Routes.customersScreen),
+          ]),
+      DrawerItem(
+        title: 'Logout',
+        icon: Icons.logout,
+        route: '',
+        isLogout: true,
+      ),
     ];
 
     return Drawer(
