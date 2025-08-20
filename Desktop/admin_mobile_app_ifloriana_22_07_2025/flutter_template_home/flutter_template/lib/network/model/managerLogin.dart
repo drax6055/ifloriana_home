@@ -34,7 +34,7 @@ class Manager {
   String? createdAt;
   String? updatedAt;
   int? iV;
-  Null? imageUrl;
+  String? imageUrl;
 
   Manager(
       {this.sId,

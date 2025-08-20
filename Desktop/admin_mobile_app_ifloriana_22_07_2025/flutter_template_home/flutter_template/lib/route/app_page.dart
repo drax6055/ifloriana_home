@@ -23,6 +23,7 @@ import 'package:flutter_template/ui/drawer/staff/staffDetailsScreen.dart'
 import 'package:flutter_template/ui/tax/addNewTaxScreen.dart';
 import 'package:get/get.dart';
 import '../manager_ui/dashboard/dashboardScreen.dart';
+import '../manager_ui/manager_appointment_screen/getappointmentManagerScreen.dart';
 import '../manager_ui/manager_appointment_screen/managerAppointmentSScreen.dart';
 import '../ui/auth/forgot/forgot_screen.dart';
 import '../ui/buy_product/buy_product_screen.dart';
@@ -280,18 +281,14 @@ class AppPages {
         page: () => Adminprofilescreen(),
         transition: Transition.rightToLeft),
 
-
-
-
-
-
-
-
-
-
           GetPage(
         name: Routes.Managerappointmentsscreen,
         page: () => Managerappointmentsscreen(),
+        transition: Transition.rightToLeft),
+
+              GetPage(
+        name: Routes.Getappointmentmanagerscreen,
+        page: () => Getappointmentmanagerscreen(),
         transition: Transition.rightToLeft),
 
 

@@ -161,10 +161,19 @@ class DashboardScreen extends StatelessWidget {
     // Use root-level fields from the API response
     final List<Map<String, dynamic>> items = [
       {'label': 'Appointments', 'value': dashboard.appointmentCount ?? 0},
-      {'label': 'Total Commission', 'value': dashboard.totalCommission ?? 0},
+      {
+        'label': 'Total Commission',
+        'value': dashboard.totalCommission?.toStringAsFixed(2) ?? 0
+      },
       {'label': 'New Customers', 'value': dashboard.customerCount ?? 0},
-      {'label': 'Orders', 'value': dashboard.orderCount ?? 0},
-      {'label': 'Products', 'value': dashboard.productSales ?? 0},
+      {
+        'label': 'Orders',
+        'value': dashboard.orderCount?.toStringAsFixed(2) ?? 0
+      },
+      {
+        'label': 'Products',
+        'value': dashboard.productSales?.toStringAsFixed(2) ?? 0
+      },
     ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
