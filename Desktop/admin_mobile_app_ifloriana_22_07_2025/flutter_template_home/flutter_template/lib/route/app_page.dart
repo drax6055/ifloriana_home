@@ -25,6 +25,7 @@ import 'package:get/get.dart';
 import '../manager_ui/dashboard/dashboardScreen.dart';
 import '../manager_ui/manager_appointment_screen/getappointmentManagerScreen.dart';
 import '../manager_ui/manager_appointment_screen/managerAppointmentSScreen.dart';
+import '../manager_ui/manager_packages/manager_packageScreen.dart';
 import '../manager_ui/services_manager/manager_serviceScreen.dart';
 import '../ui/auth/forgot/forgot_screen.dart';
 import '../ui/buy_product/buy_product_screen.dart';
@@ -301,6 +302,11 @@ class AppPages {
     GetPage(
         name: Routes.ManagerServicescreen,
         page: () => ManagerServicescreen(),
+        transition: Transition.rightToLeft),
+
+    GetPage(
+        name: Routes.ManagerPackagescreen,
+        page: () => ManagerPackagescreen(),
         transition: Transition.rightToLeft),
 
 

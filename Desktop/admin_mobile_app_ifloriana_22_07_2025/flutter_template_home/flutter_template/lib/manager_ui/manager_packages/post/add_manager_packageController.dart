@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import '../../../main.dart';
 import '../../../network/network_const.dart';
 import '../../../wiget/custome_snackbar.dart';
-import 'getBranchPackagesController.dart';
+import '../manager_packageController.dart';
 
 class Service {
   String? id;
@@ -21,20 +21,6 @@ class Service {
   }
 }
 
-class Branch {
-  final String? id;
-  final String? name;
-
-  Branch({this.id, this.name});
-
-  factory Branch.fromJson(Map<String, dynamic> json) {
-    return Branch(
-      id: json['_id'],
-      name: json['name'],
-    );
-  }
-}
-
 class ContainerData {
   Rxn<Service> selectedService = Rxn<Service>();
   TextEditingController discountedPriceController = TextEditingController();
@@ -42,12 +28,10 @@ class ContainerData {
   RxInt total = 0.obs;
 }
 
-class DynamicInputController extends GetxController {
+class AddManagerPackagecontroller extends GetxController {
   var containerList = <ContainerData>[].obs;
   RxList<Service> serviceList = <Service>[].obs;
   RxInt grandTotal = 0.obs;
-  var branchList = <Branch>[].obs;
-  var selectedBranch = Rx<Branch?>(null);
   var StarttimeController = TextEditingController();
   var EndtimeController = TextEditingController();
   var isActive = true.obs;
@@ -65,7 +49,6 @@ class DynamicInputController extends GetxController {
 
   Future<void> _initData() async {
     await getServices();
-    await getBranches();
     if (packageToEdit != null) {
       loadPackageForEdit(packageToEdit!);
     }
@@ -79,13 +62,7 @@ class DynamicInputController extends GetxController {
     EndtimeController.text = package.endDate.toIso8601String().split('T').first;
     isActive.value = package.status == 1;
 
-    if (package.branchId.isNotEmpty) {
-      final branch = branchList.firstWhere(
-        (b) => b.id == package.branchId.first.id,
-        orElse: () => branchList.first,
-      );
-      selectedBranch.value = branch;
-    }
+
 
     containerList.clear();
     for (var detail in package.packageDetails) {
@@ -167,21 +144,6 @@ class DynamicInputController extends GetxController {
     }
   }
 
-  Future<void> getBranches() async {
-    final loginUser = await prefs.getManagerUser();
-    try {
-      final response = await dioClient.getData(
-        '${Apis.baseUrl}${Endpoints.getBranchName}${loginUser?.manager?.salonId}',
-        (json) => json,
-      );
-
-      final data = response['data'] as List;
-      branchList.value = data.map((e) => Branch.fromJson(e)).toList();
-    } catch (e) {
-      CustomSnackbar.showError('Error', 'Failed to get data: $e');
-    }
-  }
-
   Future<void> submitPackage() async {
     try {
       final packageDetails = containerList.map((container) {
@@ -195,16 +157,16 @@ class DynamicInputController extends GetxController {
           'quantity': int.parse(container.quantityController.text),
         };
       }).toList();
-      final loginUser = await prefs.getUser();
+      final loginUser = await prefs.getManagerUser();
       final requestBody = {
-        'branch_id': [selectedBranch.value!.id],
+        'branch_id': loginUser?.manager?.branchId?.sId,
         'package_name': nameController.text,
         'description': discriptionController.text,
         'start_date': StarttimeController.text,
         'end_date': EndtimeController.text,
         'status': isActive.value ? 1 : 0,
         'package_details': packageDetails,
-        'salon_id': loginUser!.salonId,
+        'salon_id': loginUser!.manager?.salonId,
       };
 
       if (packageToEdit != null) {
@@ -215,7 +177,7 @@ class DynamicInputController extends GetxController {
         );
         // Refresh package list on previous screen
         final getBranchPackagesController =
-            Get.find<GetBranchPackagesController>();
+            Get.find<ManagerPackagecontroller>();
         await getBranchPackagesController.getBranchPackages();
 
         Get.back();
@@ -229,7 +191,7 @@ class DynamicInputController extends GetxController {
         // Refresh package list on previous screen
 
         final getBranchPackagesController =
-            Get.find<GetBranchPackagesController>();
+            Get.find<ManagerPackagecontroller>();
         await getBranchPackagesController.getBranchPackages();
 
         Get.back();
@@ -250,9 +212,7 @@ class DynamicInputController extends GetxController {
     discriptionController.clear();
     StarttimeController.clear();
     EndtimeController.clear();
-    selectedBranch.value = null;
     isActive.value = true;
     grandTotal.value = 0;
   }
 }
-  

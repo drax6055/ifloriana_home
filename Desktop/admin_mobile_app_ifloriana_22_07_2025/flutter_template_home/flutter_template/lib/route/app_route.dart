@@ -72,4 +72,5 @@ abstract class Routes {
   static const ManagerDashboardScreen = "/ManagerDashboardScreen";
   static const Getappointmentmanagerscreen = "/Getappointmentmanagerscreen";
     static const ManagerServicescreen = "/ManagerServicescreen";
+    static const ManagerPackagescreen = "/ManagerPackagescreen";
 }

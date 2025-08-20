@@ -28,7 +28,7 @@ class ManagerDrawerScreen extends StatelessWidget {
       ),
       DrawerItem(
         title: 'packages',
-        route: 'DSDADSA', // parent doesn’t navigate
+        route: Routes.ManagerPackagescreen,// parent doesn’t navigate
         icon: Icons.room_service_outlined,
       ),
       DrawerItem(
