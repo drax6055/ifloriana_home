@@ -70,6 +70,14 @@ class ManagerServicescreen extends StatelessWidget {
                     _showCategoryFilterDialog(context);
                   } else if (value == 'clear_filters') {
                     getController.clearFilters();
+                  } else if (value == 'sort_asc') {
+                    getController.setSortOrder('asc');
+                  } else if (value == 'sort_desc') {
+                    getController.setSortOrder('desc');
+                  } else if (value == 'export_excel') {
+                    await getController.exportToExcel();
+                  } else if (value == 'export_pdf') {
+                    await getController.exportToPdf();
                   }
                 },
                 itemBuilder: (context) => [
@@ -79,8 +87,26 @@ class ManagerServicescreen extends StatelessWidget {
                   ),
                   const PopupMenuDivider(),
                   const PopupMenuItem<String>(
+                    value: 'sort_asc',
+                    child: Text('Sort A → Z'),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'sort_desc',
+                    child: Text('Sort Z → A'),
+                  ),
+                  const PopupMenuDivider(),
+                  const PopupMenuItem<String>(
                     value: 'clear_filters',
                     child: Text('Clear Filters'),
+                  ),
+                  const PopupMenuDivider(),
+                  const PopupMenuItem<String>(
+                    value: 'export_excel',
+                    child: Text('Export Excel'),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'export_pdf',
+                    child: Text('Export PDF'),
                   ),
                 ],
               ),
