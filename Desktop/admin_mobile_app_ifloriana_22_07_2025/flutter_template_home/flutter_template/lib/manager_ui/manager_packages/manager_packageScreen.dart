@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_template/manager_ui/drawer/drawerscreen.dart';
 import 'package:flutter_template/manager_ui/manager_packages/manager_packageController.dart';
 import 'package:flutter_template/ui/drawer/drawer_screen.dart';
 import 'package:get/get.dart';
@@ -10,8 +11,7 @@ import '../../../wiget/loading.dart';
 import 'post/add_manager_packageScreen.dart';
 
 class ManagerPackagescreen extends StatelessWidget {
-  final controller =
-      Get.put(ManagerPackagecontroller());
+  final controller = Get.put(ManagerPackagecontroller());
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class ManagerPackagescreen extends StatelessWidget {
       appBar: CustomAppBar(
         title: 'Branch Packages',
       ),
-      drawer: DrawerScreen(),
+      drawer: ManagerDrawerScreen(),
       body: RefreshIndicator(
         color: primaryColor,
         child: Obx(() {
@@ -80,7 +80,6 @@ class ManagerPackagescreen extends StatelessWidget {
                           ),
                         ],
                       ),
-
                       Row(
                         spacing: 5.w,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -101,7 +100,6 @@ class ManagerPackagescreen extends StatelessWidget {
                           ),
                         ],
                       ),
-
                       Text(
                         'Valid from ${_formatDate(package.startDate)} to ${_formatDate(package.endDate)}',
                         style: CustomTextStyles.textFontRegular(

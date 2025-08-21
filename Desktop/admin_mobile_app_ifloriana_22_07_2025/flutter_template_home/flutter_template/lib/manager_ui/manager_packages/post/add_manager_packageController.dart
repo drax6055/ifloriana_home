@@ -3,6 +3,7 @@ import 'package:flutter_template/network/model/branch_package_model.dart';
 import 'package:get/get.dart';
 
 import '../../../main.dart';
+import '../../../network/model/manager_branch_package_model.dart';
 import '../../../network/network_const.dart';
 import '../../../wiget/custome_snackbar.dart';
 import '../manager_packageController.dart';
@@ -10,7 +11,7 @@ import '../manager_packageController.dart';
 class Service {
   String? id;
   String? name;
-  int? regularPrice;
+  num? regularPrice;
 
   Service({this.id, this.name, this.regularPrice});
 
@@ -38,7 +39,7 @@ class AddManagerPackagecontroller extends GetxController {
   var discriptionController = TextEditingController();
   var nameController = TextEditingController();
 
-  final BranchPackageModel? packageToEdit = Get.arguments;
+  final ManagerBranchPackageModel? packageToEdit = Get.arguments;
 
   @override
   void onInit() {
@@ -54,15 +55,13 @@ class AddManagerPackagecontroller extends GetxController {
     }
   }
 
-  void loadPackageForEdit(BranchPackageModel package) {
+  void loadPackageForEdit(ManagerBranchPackageModel package) {
     nameController.text = package.packageName;
     discriptionController.text = package.description;
     StarttimeController.text =
         package.startDate.toIso8601String().split('T').first;
     EndtimeController.text = package.endDate.toIso8601String().split('T').first;
     isActive.value = package.status == 1;
-
-
 
     containerList.clear();
     for (var detail in package.packageDetails) {
@@ -159,7 +158,7 @@ class AddManagerPackagecontroller extends GetxController {
       }).toList();
       final loginUser = await prefs.getManagerUser();
       final requestBody = {
-        'branch_id': loginUser?.manager?.branchId?.sId,
+        'branch_id': [loginUser?.manager?.branchId?.sId],
         'package_name': nameController.text,
         'description': discriptionController.text,
         'start_date': StarttimeController.text,
@@ -175,12 +174,12 @@ class AddManagerPackagecontroller extends GetxController {
           requestBody,
           (json) => json,
         );
+
+        Get.back();
         // Refresh package list on previous screen
         final getBranchPackagesController =
             Get.find<ManagerPackagecontroller>();
         await getBranchPackagesController.getBranchPackages();
-
-        Get.back();
         CustomSnackbar.showSuccess('Success', 'Package updated successfully');
       } else {
         final response = await dioClient.postData(
@@ -190,11 +189,11 @@ class AddManagerPackagecontroller extends GetxController {
         );
         // Refresh package list on previous screen
 
+        Get.back();
         final getBranchPackagesController =
             Get.find<ManagerPackagecontroller>();
         await getBranchPackagesController.getBranchPackages();
 
-        Get.back();
         CustomSnackbar.showSuccess('Success', 'Package created successfully');
       }
 

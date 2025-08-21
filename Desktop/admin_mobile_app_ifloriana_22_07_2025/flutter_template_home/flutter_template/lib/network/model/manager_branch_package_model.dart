@@ -5,9 +5,9 @@ class ManagerBranchPackageModel {
   final String description;
   final DateTime startDate;
   final DateTime endDate;
-  final int status;
+  final num status;
   final List<ManagerPackageDetail> packageDetails;
-  final int packagePrice;
+  final num packagePrice;
   final String salonId;
   final List<dynamic> usedServices;
   final DateTime createdAt;
@@ -42,16 +42,16 @@ class ManagerBranchPackageModel {
           DateTime.now(),
       endDate: DateTime.tryParse((json['end_date'] ?? '').toString()) ??
           DateTime.now(),
-      status: json['status'] is int
-          ? json['status'] as int
-          : int.tryParse('${json['status'] ?? 0}') ?? 0,
+      status: json['status'] is num
+          ? json['status'] as num
+          : num.tryParse('${json['status'] ?? 0}') ?? 0,
       packageDetails: ((json['package_details'] as List?) ?? [])
           .map((d) =>
               ManagerPackageDetail.fromJson((d as Map).cast<String, dynamic>()))
           .toList(),
-      packagePrice: json['package_price'] is int
-          ? json['package_price'] as int
-          : int.tryParse('${json['package_price'] ?? 0}') ?? 0,
+      packagePrice: json['package_price'] is num
+          ? json['package_price'] as num
+          : num.tryParse('${json['package_price'] ?? 0}') ?? 0,
       salonId: (json['salon_id'] ?? '').toString(),
       usedServices: (json['used_services'] as List?) ?? const [],
       createdAt: DateTime.tryParse((json['createdAt'] ?? '').toString()) ??
@@ -81,8 +81,8 @@ class ManagerBranchInfo {
 
 class ManagerPackageDetail {
   final ManagerServiceMini serviceId;
-  final int discountedPrice;
-  final int quantity;
+  final num discountedPrice;
+  final num quantity;
   final String id;
 
   ManagerPackageDetail({
@@ -96,12 +96,12 @@ class ManagerPackageDetail {
     return ManagerPackageDetail(
       serviceId: ManagerServiceMini.fromJson(
           (json['service_id'] ?? const {}) as Map<String, dynamic>),
-      discountedPrice: json['discounted_price'] is int
-          ? json['discounted_price'] as int
-          : int.tryParse('${json['discounted_price'] ?? 0}') ?? 0,
-      quantity: json['quantity'] is int
-          ? json['quantity'] as int
-          : int.tryParse('${json['quantity'] ?? 0}') ?? 0,
+      discountedPrice: json['discounted_price'] is num
+          ? json['discounted_price'] as num
+          : num.tryParse('${json['discounted_price'] ?? 0}') ?? 0,
+      quantity: json['quantity'] is num
+          ? json['quantity'] as num
+          : num.tryParse('${json['quantity'] ?? 0}') ?? 0,
       id: (json['_id'] ?? '').toString(),
     );
   }
@@ -110,7 +110,7 @@ class ManagerPackageDetail {
 class ManagerServiceMini {
   final String id;
   final String name;
-  final int regularPrice;
+  final num regularPrice;
 
   ManagerServiceMini({
     required this.id,
@@ -122,9 +122,9 @@ class ManagerServiceMini {
     return ManagerServiceMini(
       id: (json['_id'] ?? '').toString(),
       name: (json['name'] ?? '').toString(),
-      regularPrice: json['regular_price'] is int
-          ? json['regular_price'] as int
-          : int.tryParse('${json['regular_price'] ?? 0}') ?? 0,
+      regularPrice: json['regular_price'] is num
+          ? json['regular_price'] as num
+          : num.tryParse('${json['regular_price'] ?? 0}') ?? 0,
     );
   }
 }
