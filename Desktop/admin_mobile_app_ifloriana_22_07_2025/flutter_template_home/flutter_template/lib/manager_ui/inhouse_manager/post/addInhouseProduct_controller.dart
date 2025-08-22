@@ -99,14 +99,17 @@ class AddinhouseproductController extends GetxController {
 
       print("User data for staff: ${loginUser.toJson()}");
       print("Salon ID for staff: ${loginUser.manager?.salonId}");
+      print("Branch ID for staff: ${loginUser.manager?.branchId?.sId}");
 
-      if (loginUser.manager?.salonId == null ) {
-        print("Error: Salon ID is null or empty for staff");
+      if (loginUser.manager?.salonId == null ||
+          loginUser.manager?.branchId?.sId == null) {
+        print("Error: Salon ID or Branch ID is null or empty for staff");
         return;
       }
 
+      // Use the same endpoint as ManagerStaffController to get staff by branch
       final endpoint =
-          '${Apis.baseUrl}${Endpoints.getStaffDetails}${loginUser.manager?.salonId}';
+          '${Apis.baseUrl}/staffs/by-branch?salon_id=${loginUser.manager?.salonId}&branch_id=${loginUser.manager?.branchId?.sId}';
       print("Fetching staff from: $endpoint");
 
       final data = await dioClient.getData<Map<String, dynamic>>(
@@ -117,7 +120,8 @@ class AddinhouseproductController extends GetxController {
       if (data != null && data['data'] != null) {
         staff.value = data['data'];
         _allStaff = data['data'];
-        print("Staff loaded: ${staff.length}");
+        print(
+            "Staff loaded for branch ${loginUser.manager?.branchId?.sId}: ${staff.length}");
         // Keep selected staff reference in sync with new list
         _syncSelectedById(selectedStaff, staff);
       } else {
@@ -195,38 +199,12 @@ class AddinhouseproductController extends GetxController {
     }
   }
 
-  // Method to filter staff by branch
-  void filterStaffByBranch() async{
-      final loginUser = await prefs.getManagerUser();
-    if (loginUser?.manager?.branchId?.sId == null) {
-      staff.value = _allStaff; // Show all staff if no branch selected
-      // Ensure selection remains valid after list change
-      _syncSelectedById(selectedStaff, staff);
-      return;
-    }
-
-    final selectedBranchId = loginUser?.manager?.branchId?.sId;
-    final filteredStaff = _allStaff.where((staffMember) {
-      // Check if staff member has branch_id and it matches selected branch
-      if (staffMember['branch_id'] != null) {
-        // Handle both cases: branch_id as string or as object with _id
-        if (staffMember['branch_id'] is String) {
-          return staffMember['branch_id'] == selectedBranchId;
-        } else if (staffMember['branch_id'] is Map) {
-          return staffMember['branch_id']['_id'] == selectedBranchId;
-        }
-      }
-      return false;
-    }).toList();
-
-    staff.value = filteredStaff;
-    // Clear selected staff if it's not in the filtered list
-    _syncSelectedById(selectedStaff, staff);
-  }
+  // Method to filter staff by branch (no longer needed since we fetch by branch directly)
+  // void filterStaffByBranch() - REMOVED
 
   // Add to cart method
-  void addToCart() async{
-      final loginUser = await prefs.getManagerUser();
+  void addToCart() async {
+    final loginUser = await prefs.getManagerUser();
     if (selectedProduct.value == null) {
       CustomSnackbar.showError('Error', 'Please select a product');
       return;
@@ -342,7 +320,7 @@ class AddinhouseproductController extends GetxController {
     // Clear cart
     clearCart();
 
-    // Reset staff list to show all staff (in case it was filtered)
+    // Reset staff list to show current branch staff
     staff.value = _allStaff;
   }
 
@@ -432,7 +410,8 @@ class AddinhouseproductController extends GetxController {
         clearAllControllers();
 
         // Refresh the InhouseproductController data before navigating back
-        final inhouseController = Get.find<ManagerGetInHouseProductController>();
+        final inhouseController =
+            Get.find<ManagerGetInHouseProductController>();
         inhouseController.getInhouseProductUseageData();
 
         return true;
