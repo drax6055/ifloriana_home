@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import '../../route/app_route.dart';
 import '../../wiget/custome_snackbar.dart';
 import '../drawer/customers/customersScreen.dart';
-import '../drawer/reports/customerMembershipReport/customer_membership_report_screen.dart';
+import '../../manager_ui/report/customer_membership/manager_customer_membership_report_screen.dart';
 
 class SplashController extends GetxController {
   @override

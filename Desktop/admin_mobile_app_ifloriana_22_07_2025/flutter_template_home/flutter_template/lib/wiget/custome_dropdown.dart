@@ -14,6 +14,8 @@ class CustomDropdown<T> extends StatelessWidget {
   final Function(T?) onChanged;
   final FormFieldValidator<T>? validator;
   final String Function(T)? itemToString;
+  final String Function(T)?
+      getId; // optional identifier extractor to normalize value
   final TextStyle labelStyle = CustomTextStyles.textFontMedium(size: 14.sp);
 
   CustomDropdown({
@@ -26,12 +28,14 @@ class CustomDropdown<T> extends StatelessWidget {
     this.prefixIcon,
     this.validator,
     this.itemToString,
+    this.getId,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final T? normalizedValue = _normalizeValue(value, items);
     return DropdownButtonFormField<T>(
-      value: value,
+      value: normalizedValue,
       validator: validator,
       decoration: InputDecoration(
         hintText: items.isEmpty ? 'No items available' : hintText,
@@ -71,5 +75,24 @@ class CustomDropdown<T> extends StatelessWidget {
       }).toList(),
       onChanged: onChanged,
     );
+  }
+
+  T? _normalizeValue(T? current, List<T> list) {
+    if (current == null) return null;
+    // If the current instance already exists in list, use it
+    for (final item in list) {
+      if (identical(item, current)) return item;
+    }
+    // Try to match by identifier if provided
+    if (getId != null) {
+      try {
+        final String currentId = getId!(current);
+        for (final item in list) {
+          if (getId!(item) == currentId) return item;
+        }
+      } catch (_) {}
+    }
+    // Fallback: if list contains current by equality
+    return list.contains(current) ? current : null;
   }
 }

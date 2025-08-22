@@ -22,11 +22,20 @@ import 'package:flutter_template/ui/drawer/staff/staffDetailsScreen.dart'
     show Staffdetailsscreen;
 import 'package:flutter_template/ui/tax/addNewTaxScreen.dart';
 import 'package:get/get.dart';
+import '../manager_ui/coupons/manager_coupons_screen.dart';
+import '../manager_ui/customer/edit/manager_edit_customer.dart';
+import '../manager_ui/customer/add/manager_post_customer_screen.dart';
+import '../manager_ui/customer/manager_get_customer_screen.dart';
 import '../manager_ui/dashboard/dashboardScreen.dart';
+import '../manager_ui/inhouse_manager/get/inhouseProduct_screen.dart';
 import '../manager_ui/manager_appointment_screen/getappointmentManagerScreen.dart';
 import '../manager_ui/manager_appointment_screen/managerAppointmentSScreen.dart';
 import '../manager_ui/manager_packages/manager_packageScreen.dart';
+import '../manager_ui/report/customer_membership/manager_customer_membership_report_screen.dart';
+import '../manager_ui/report/customer_packages/manager_customer_package_report_screen.dart';
 import '../manager_ui/services_manager/manager_serviceScreen.dart';
+import '../manager_ui/staff/manager_staff_screen.dart';
+import '../manager_ui/taxes/manager_taxes_screen.dart';
 import '../ui/auth/forgot/forgot_screen.dart';
 import '../ui/buy_product/buy_product_screen.dart';
 import '../ui/drawer/appointment/appointmentScreen.dart';
@@ -42,7 +51,6 @@ import '../ui/drawer/products/subcategory/subcategoryScreen.dart';
 import '../ui/drawer/products/units/unitsScreen.dart';
 import '../ui/drawer/products/variations/get/variationGetScreen.dart';
 import '../ui/drawer/products/variations/variationScreen.dart';
-import '../ui/drawer/reports/customerMembershipReport/customer_membership_report_screen.dart';
 import '../ui/drawer/reports/customerPackageReport/customer_package_report_screen.dart';
 import '../ui/drawer/reports/dailyBooking/dailyBooking_screen.dart';
 import '../ui/drawer/reports/orderReport/order_report_screen.dart';
@@ -196,7 +204,7 @@ class AppPages {
         transition: Transition.rightToLeft),
     GetPage(
         name: Routes.CustomerMembershipReportScreen,
-        page: () => CustomerMembershipReportScreen(),
+        page: () => ManagerCustomerMembershipReportScreen(),
         transition: Transition.rightToLeft),
     GetPage(
         name: Routes.DailybookingScreen,
@@ -307,6 +315,39 @@ class AppPages {
     GetPage(
         name: Routes.ManagerPackagescreen,
         page: () => ManagerPackagescreen(),
+        transition: Transition.rightToLeft),
+    GetPage(
+        name: Routes.MenagerStaffScreen,
+        page: () => ManagerStaffScreen(),
+        transition: Transition.rightToLeft),
+          GetPage(
+        name: Routes.ManagerCouponsScreen,
+        page: () => ManagerCouponsScreen(),
+        transition: Transition.rightToLeft),
+          GetPage(
+        name: Routes.ManagerTaxesScreen,
+        page: () => ManagerTaxesScreen(),
+        transition: Transition.rightToLeft),
+    GetPage(
+        name: Routes.ManagerGetStaffScreen,
+        page: () => ManagerGetStaffScreen(),
+        transition: Transition.rightToLeft),
+           GetPage(
+        name: Routes.ManagerPostCustomerScreen,
+        page: () => ManagerPostCustomerScreen(),
+        transition: Transition.rightToLeft),
+
+            GetPage(
+        name: Routes.ManagerEditCustomer,
+        page: () => ManagerEditCustomer(),
+        transition: Transition.rightToLeft),
+    GetPage(
+        name: Routes.ManagerCustomerPackageReportScreen,
+        page: () => ManagerCustomerPackageReportScreen(),
+        transition: Transition.rightToLeft),
+    GetPage(
+        name: Routes.ManagerINhouseScreen,
+        page: () => ManagerINhouseScreen(),
         transition: Transition.rightToLeft),
 
 

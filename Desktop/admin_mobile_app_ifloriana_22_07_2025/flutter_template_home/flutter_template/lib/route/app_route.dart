@@ -71,6 +71,17 @@ abstract class Routes {
   static const Managerappointmentsscreen = "/Managerappointmentsscreen";
   static const ManagerDashboardScreen = "/ManagerDashboardScreen";
   static const Getappointmentmanagerscreen = "/Getappointmentmanagerscreen";
-    static const ManagerServicescreen = "/ManagerServicescreen";
-    static const ManagerPackagescreen = "/ManagerPackagescreen";
+  static const ManagerServicescreen = "/ManagerServicescreen";
+  static const ManagerPackagescreen = "/ManagerPackagescreen";
+  static const MenagerStaffScreen = "/MenagerStaffScreen";
+  static const ManagerCouponsScreen = "/ManagerCouponsScreen";
+  static const ManagerTaxesScreen = "/ManagerTaxesScreen";
+  static const ManagerGetStaffScreen = "/ManagerGetStaffScreen";
+  static const ManagerPostCustomerScreen = "/ManagerPostCustomerScreen";
+
+  static const ManagerEditCustomer = "/ManagerEditCustomer";
+  static const ManagerCustomerPackageReportScreen =
+      "/ManagerCustomerPackageReportScreen";
+
+  static const ManagerINhouseScreen = "/ManagerINhouseScreen";
 }

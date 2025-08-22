@@ -13,10 +13,11 @@ class ManagerDrawerScreen extends StatelessWidget {
   final getController = Get.put(managerDrawerController());
   @override
   Widget build(BuildContext context) {
-
     final List<DrawerItem> drawerItems = [
       DrawerItem(
-          title: 'Dashboard', icon: FontAwesomeIcons.gauge, route: Routes.ManagerDashboardScreen),
+          title: 'Dashboard',
+          icon: FontAwesomeIcons.gauge,
+          route: Routes.ManagerDashboardScreen),
       DrawerItem(
           title: 'Booking',
           icon: FontAwesomeIcons.calendarDays,
@@ -28,7 +29,7 @@ class ManagerDrawerScreen extends StatelessWidget {
       ),
       DrawerItem(
         title: 'packages',
-        route: Routes.ManagerPackagescreen,// parent doesn’t navigate
+        route: Routes.ManagerPackagescreen, // parent doesn’t navigate
         icon: Icons.room_service_outlined,
       ),
       DrawerItem(
@@ -39,11 +40,11 @@ class ManagerDrawerScreen extends StatelessWidget {
             DrawerItem(
                 title: 'Staff',
                 icon: Icons.manage_accounts_outlined,
-                route: Routes.getManager),
+                route: Routes.MenagerStaffScreen),
             DrawerItem(
                 title: 'Customer',
                 icon: Icons.person_search_outlined,
-                route: Routes.gerStaff),
+                route: Routes.ManagerGetStaffScreen),
           ]),
       DrawerItem(
           title: 'Reports',
@@ -53,11 +54,11 @@ class ManagerDrawerScreen extends StatelessWidget {
             DrawerItem(
                 title: 'Customer Membership',
                 icon: Icons.edit_document,
-                route: "dsadasda"),
+                route: Routes.ManagerCustomerPackageReportScreen),
             DrawerItem(
                 title: 'Customer Package',
                 icon: Icons.stacked_line_chart_outlined,
-                route: "dsadasda")
+                route: Routes.CustomerMembershipReportScreen)
           ]),
       DrawerItem(
           title: 'Finance',
@@ -67,11 +68,11 @@ class ManagerDrawerScreen extends StatelessWidget {
             DrawerItem(
                 title: 'Tax',
                 icon: Icons.format_textdirection_l_to_r_outlined,
-                route: Routes.addtex),
+                route: Routes.ManagerTaxesScreen),
             DrawerItem(
                 title: 'Coupons',
                 icon: Icons.paid_outlined,
-                route: Routes.Statffearningscreen),
+                route: Routes.ManagerCouponsScreen),
           ]),
       DrawerItem(
           title: 'Products',
@@ -116,7 +117,7 @@ class ManagerDrawerScreen extends StatelessWidget {
       DrawerItem(
           title: 'Product Cunsumption',
           icon: Icons.edit_document,
-          route: "dsadasda"),
+          route: Routes.ManagerINhouseScreen),
       DrawerItem(
         title: 'Logout',
         icon: Icons.logout,

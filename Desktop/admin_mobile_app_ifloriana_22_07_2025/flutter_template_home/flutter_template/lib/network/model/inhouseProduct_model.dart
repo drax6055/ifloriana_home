@@ -130,11 +130,11 @@ class Staff {
       serviceId: json['service_id'] != null
           ? List<String>.from(json['service_id'])
           : null,
-      status: json['status'],
-      image: json['image'],
+      status: _parseNumericField(json['status']),
+      image: _parseImageField(json['image']),
       specialization: json['specialization'],
       assignedCommissionId: json['assigned_commission_id'],
-      showInCalendar: json['show_in_calendar'],
+      showInCalendar: _parseBooleanField(json['show_in_calendar']),
       assignTime: json['assign_time'] != null
           ? ShiftTime.fromJson(json['assign_time'])
           : null,
@@ -146,6 +146,43 @@ class Staff {
       updatedAt:
           json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
     );
+  }
+
+  // Helper method to safely parse boolean fields
+  static bool? _parseBooleanField(dynamic value) {
+    if (value == null) return null;
+    if (value is bool) return value;
+    if (value is int) return value == 1;
+    if (value is String) {
+      return value == '1' || value.toLowerCase() == 'true';
+    }
+    return false;
+  }
+
+  // Helper method to safely parse image field
+  static String? _parseImageField(dynamic imageData) {
+    if (imageData == null) return null;
+    if (imageData is String) return imageData;
+    if (imageData is Map) {
+      // If it's a map, try to extract a string value
+      // You can customize this based on your API response structure
+      return imageData.toString();
+    }
+    // For any other type, convert to string
+    return imageData.toString();
+  }
+
+  // Helper method to safely parse numeric fields
+  static int? _parseNumericField(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is String) {
+      return int.tryParse(value);
+    }
+    if (value is double) {
+      return value.toInt();
+    }
+    return null;
   }
 }
 
@@ -171,9 +208,22 @@ class LunchTime {
 
   factory LunchTime.fromJson(Map<String, dynamic> json) {
     return LunchTime(
-      duration: json['duration'],
+      duration: _parseNumericField(json['duration']),
       timing: json['timing'],
     );
+  }
+
+  // Helper method to safely parse numeric fields
+  static int? _parseNumericField(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is String) {
+      return int.tryParse(value);
+    }
+    if (value is double) {
+      return value.toInt();
+    }
+    return null;
   }
 }
 
@@ -196,10 +246,23 @@ class ProductItem {
           ? Product.fromJson(json['product_id'])
           : null,
       variantId: json['variant_id'],
-      quantity: json['quantity'],
+      quantity: _parseNumericField(json['quantity']),
       variant:
           json['variant'] != null ? Variant.fromJson(json['variant']) : null,
     );
+  }
+
+  // Helper method to safely parse numeric fields
+  static int? _parseNumericField(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is String) {
+      return int.tryParse(value);
+    }
+    if (value is double) {
+      return value.toInt();
+    }
+    return null;
   }
 }
 
@@ -256,21 +319,58 @@ class Product {
       categoryId: json['category_id'],
       tagId: json['tag_id'],
       unitId: json['unit_id'],
-      status: json['status'],
-      hasVariations: json['has_variations'] == 1,
+      status: _parseNumericField(json['status']),
+      hasVariations: _parseHasVariations(json['has_variations']),
       variants: json['variants'] != null
           ? List<Variant>.from(json['variants'].map((x) => Variant.fromJson(x)))
           : null,
       sku: json['sku'] ?? '',
-      image: json['image'],
+      image: _parseImageField(json['image']),
       code: json['code'],
       salonId: json['salon_id'],
-      price: json['price'],
-      stock: json['stock'],
+      price: _parseNumericField(json['price']),
+      stock: _parseNumericField(json['stock']),
       productDiscount: json['product_discount'] != null
           ? ProductDiscount.fromJson(json['product_discount'])
           : null,
     );
+  }
+
+  // Helper method to safely parse image field
+  static String? _parseImageField(dynamic imageData) {
+    if (imageData == null) return null;
+    if (imageData is String) return imageData;
+    if (imageData is Map) {
+      // If it's a map, try to extract a string value
+      // You can customize this based on your API response structure
+      return imageData.toString();
+    }
+    // For any other type, convert to string
+    return imageData.toString();
+  }
+
+  // Helper method to safely parse numeric fields
+  static int? _parseNumericField(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is String) {
+      return int.tryParse(value);
+    }
+    if (value is double) {
+      return value.toInt();
+    }
+    return null;
+  }
+
+  // Helper method to safely parse has_variations field
+  static bool? _parseHasVariations(dynamic value) {
+    if (value == null) return null;
+    if (value is bool) return value;
+    if (value is int) return value == 1;
+    if (value is String) {
+      return value == '1' || value.toLowerCase() == 'true';
+    }
+    return false;
   }
 }
 
@@ -294,8 +394,8 @@ class Variant {
   factory Variant.fromJson(Map<String, dynamic> json) {
     return Variant(
       id: json['_id'] ?? '',
-      price: json['price'],
-      stock: json['stock'],
+      price: _parseNumericField(json['price']),
+      stock: _parseNumericField(json['stock']),
       sku: json['sku'],
       code: json['code'],
       combination: json['combination'] != null
@@ -304,6 +404,19 @@ class Variant {
             )
           : null,
     );
+  }
+
+  // Helper method to safely parse numeric fields
+  static int? _parseNumericField(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is String) {
+      return int.tryParse(value);
+    }
+    if (value is double) {
+      return value.toInt();
+    }
+    return null;
   }
 }
 
@@ -348,7 +461,20 @@ class ProductDiscount {
           : null,
       endDate:
           json['end_date'] != null ? DateTime.parse(json['end_date']) : null,
-      discountAmount: json['discount_amount'],
+      discountAmount: _parseDiscountAmount(json['discount_amount']),
     );
+  }
+
+  // Helper method to safely parse discount amount
+  static int? _parseDiscountAmount(dynamic amount) {
+    if (amount == null) return null;
+    if (amount is int) return amount;
+    if (amount is String) {
+      return int.tryParse(amount);
+    }
+    if (amount is double) {
+      return amount.toInt();
+    }
+    return null;
   }
 }

@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_template/manager_ui/drawer/drawerscreen.dart';
 import 'package:flutter_template/ui/drawer/drawer_screen.dart';
-import 'package:flutter_template/ui/drawer/reports/customerMembershipReport/customer_membership_report_controller.dart';
+import 'package:flutter_template/manager_ui/report/customer_membership/manager_customer_membership_report_controller.dart';
 import 'package:get/get.dart';
 
-import '../../../../wiget/appbar/commen_appbar.dart';
-import '../../../../wiget/loading.dart';
+import '../../../wiget/appbar/commen_appbar.dart';
+import '../../../wiget/loading.dart';
 
-class CustomerMembershipReportScreen extends StatefulWidget {
+class ManagerCustomerMembershipReportScreen extends StatefulWidget {
   @override
-  _CustomerMembershipReportScreenState createState() =>
-      _CustomerMembershipReportScreenState();
+  _ManagerCustomerMembershipReportScreen createState() =>
+      _ManagerCustomerMembershipReportScreen();
 }
 
-class _CustomerMembershipReportScreenState
-    extends State<CustomerMembershipReportScreen> {
-  final controller = Get.put(CustomerMembershipReportController());
+class _ManagerCustomerMembershipReportScreen
+    extends State<ManagerCustomerMembershipReportScreen> {
+  final controller = Get.put(ManagerCustomerMembershipReportController());
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -36,7 +37,7 @@ class _CustomerMembershipReportScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: "Customers  Membership"),
-      drawer: DrawerScreen(),
+      drawer: ManagerDrawerScreen(),
       body: Obx(() {
         if (controller.customers.isEmpty && controller.isLoading.value) {
           return Center(child: CustomLoadingAvatar());

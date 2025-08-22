@@ -6,10 +6,10 @@ import '../../../main.dart';
 import '../../../network/dio.dart';
 import '../../../network/network_const.dart';
 import '../../../wiget/custome_snackbar.dart';
-import '../../../wiget/custome_dropdown.dart';
+
 import '../get/inhouseProduct_controller.dart';
 
-class AddinhouseproductController extends GetxController {
+class ManagerPostInhouseController extends GetxController {
   final DioClient dioClient = DioClient();
 
   RxList branches = [].obs;
@@ -28,45 +28,33 @@ class AddinhouseproductController extends GetxController {
   RxList cart = <Map<String, dynamic>>[].obs;
   RxDouble totalAmount = 0.0.obs;
   RxBool isSubmitting = false.obs;
-  RxBool isLoading = false.obs;
 
   @override
   void onInit() {
     super.onInit();
-    _initLoad();
+    fetchBranches();
+    fetchStaff();
+    fetchProducts();
   }
 
-  Future<void> _initLoad() async {
+  void fetchBranches() async {
     try {
-      isLoading.value = true;
-      await Future.wait([
-        fetchBranches(),
-        fetchStaff(),
-        fetchProducts(),
-      ]);
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  Future<void> fetchBranches() async {
-    try {
-      final loginUser = await prefs.getUser();
+      final loginUser = await prefs.getManagerUser();
       if (loginUser == null) {
         print("Error: No user found");
         return;
       }
 
       print("User data: ${loginUser.toJson()}");
-      print("Salon ID: ${loginUser.salonId}");
+      print("Salon ID: ${loginUser.manager?.salonId}");
 
-      if (loginUser.salonId == null || loginUser.salonId!.isEmpty) {
+      if (loginUser.manager?.salonId == null) {
         print("Error: Salon ID is null or empty");
         return;
       }
 
       final endpoint =
-          '${Apis.baseUrl}${Endpoints.getBranchName}${loginUser.salonId}';
+          '${Apis.baseUrl}${Endpoints.getBranchName}${loginUser.manager?.salonId}';
       print("Fetching branches from: $endpoint");
 
       final data = await dioClient.getData<Map<String, dynamic>>(
@@ -77,8 +65,6 @@ class AddinhouseproductController extends GetxController {
       if (data != null && data['data'] != null) {
         branches.value = data['data'];
         print("Branches loaded: ${branches.length}");
-        // Keep selected branch reference in sync with new list
-        _syncSelectedById(selectedBranch, branches);
       } else {
         print("No branches data found in response");
         branches.value = [];
@@ -89,24 +75,24 @@ class AddinhouseproductController extends GetxController {
     }
   }
 
-  Future<void> fetchStaff() async {
+  void fetchStaff() async {
     try {
-      final loginUser = await prefs.getUser();
+      final loginUser = await prefs.getManagerUser();
       if (loginUser == null) {
         print("Error: No user found");
         return;
       }
 
       print("User data for staff: ${loginUser.toJson()}");
-      print("Salon ID for staff: ${loginUser.salonId}");
+      print("Salon ID for staff: ${loginUser.manager?.salonId}");
 
-      if (loginUser.salonId == null || loginUser.salonId!.isEmpty) {
+      if (loginUser.manager?.salonId == null ) {
         print("Error: Salon ID is null or empty for staff");
         return;
       }
 
       final endpoint =
-          '${Apis.baseUrl}${Endpoints.getStaffDetails}${loginUser.salonId}';
+          '${Apis.baseUrl}${Endpoints.getStaffDetails}${loginUser.manager?.salonId}';
       print("Fetching staff from: $endpoint");
 
       final data = await dioClient.getData<Map<String, dynamic>>(
@@ -118,8 +104,6 @@ class AddinhouseproductController extends GetxController {
         staff.value = data['data'];
         _allStaff = data['data'];
         print("Staff loaded: ${staff.length}");
-        // Keep selected staff reference in sync with new list
-        _syncSelectedById(selectedStaff, staff);
       } else {
         print("No staff data found in response");
         staff.value = [];
@@ -132,62 +116,40 @@ class AddinhouseproductController extends GetxController {
     }
   }
 
-  Future<void> fetchProducts() async {
+  void fetchProducts() async {
     try {
-      final loginUser = await prefs.getUser();
+      final loginUser = await prefs.getManagerUser();
       if (loginUser == null) {
         print("Error: No user found");
         return;
       }
 
       print("User data for products: ${loginUser.toJson()}");
-      print("Salon ID for products: ${loginUser.salonId}");
+      print("Salon ID for products: ${loginUser.manager?.salonId}");
 
-      if (loginUser.salonId == null || loginUser.salonId!.isEmpty) {
+      if (loginUser.manager?.salonId == null ) {
         print("Error: Salon ID is null or empty for products");
         return;
       }
 
       final endpoint =
-          '${Apis.baseUrl}${Endpoints.getProductsName}${loginUser.salonId}';
+          '${Apis.baseUrl}${Endpoints.getProductsName}${loginUser.manager?.salonId}';
       print("Fetching products from: $endpoint");
 
-      final response =
-          await dioClient.getData<dynamic>(endpoint, (json) => json);
+      final data = await dioClient.getData<List<dynamic>>(
+          endpoint, (json) => json as List<dynamic>);
 
-      print("Products response: $response");
+      print("Products response: $data");
 
-      List<dynamic> parsedProducts = [];
-
-      if (response is List) {
-        parsedProducts = response;
-      } else if (response is Map<String, dynamic>) {
-        // Common backend shape: { message, data: [...] }
-        final dynamic inner = response['data'];
-        if (inner is List) {
-          parsedProducts = inner;
-        } else if (inner is Map<String, dynamic>) {
-          // Edge case: data is a map that contains list under a known key
-          // Try a few likely keys safely
-          final candidates = [
-            inner['items'],
-            inner['results'],
-            inner['list'],
-          ];
-          final firstList =
-              candidates.firstWhere((e) => e is List, orElse: () => null);
-          if (firstList is List) {
-            parsedProducts = firstList;
-          }
-        }
+      if (data != null) {
+        products.value = data;
+        _allProducts = data;
+        print("Products loaded: ${products.length}");
+      } else {
+        print("No products data found in response");
+        products.value = [];
+        _allProducts = [];
       }
-
-      products.value = parsedProducts;
-      _allProducts = parsedProducts;
-      print("Products loaded: ${products.length}");
-      // Keep selected product reference in sync with new list
-      _syncSelectedById(selectedProduct, products);
-      print("==>    Fetching products from: $endpoint");
     } catch (e) {
       print("Error fetching products: $e");
       products.value = [];
@@ -199,8 +161,6 @@ class AddinhouseproductController extends GetxController {
   void filterStaffByBranch() {
     if (selectedBranch.value == null) {
       staff.value = _allStaff; // Show all staff if no branch selected
-      // Ensure selection remains valid after list change
-      _syncSelectedById(selectedStaff, staff);
       return;
     }
 
@@ -220,7 +180,13 @@ class AddinhouseproductController extends GetxController {
 
     staff.value = filteredStaff;
     // Clear selected staff if it's not in the filtered list
-    _syncSelectedById(selectedStaff, staff);
+    if (selectedStaff.value != null) {
+      final isStillValid =
+          filteredStaff.any((s) => s['_id'] == selectedStaff.value['_id']);
+      if (!isStillValid) {
+        selectedStaff.value = null;
+      }
+    }
   }
 
   // Add to cart method
@@ -351,40 +317,11 @@ class AddinhouseproductController extends GetxController {
     staff.value = _allStaff;
   }
 
-  // Ensure selected Rxn holds the same instance from the provided list by matching _id
-  void _syncSelectedById(Rxn selected, List list) {
-    final current = selected.value;
-    if (current == null) return;
-    try {
-      final currentId = (current is Map && current.containsKey('_id'))
-          ? current['_id']
-          : null;
-      if (currentId == null) {
-        selected.value = null;
-        return;
-      }
-      Map<String, dynamic>? match;
-      for (final item in list) {
-        if (item is Map && item['_id'] == currentId) {
-          match = item.cast<String, dynamic>();
-          break;
-        }
-      }
-      if (match != null) {
-        selected.value = match;
-      } else {
-        selected.value = null;
-      }
-    } catch (_) {
-      selected.value = null;
-    }
-  }
-
   // Submit cart to API
   Future<bool> submitCart() async {
     try {
       isSubmitting.value = true;
-      final loginUser = await prefs.getUser();
+      final loginUser = await prefs.getManagerUser();
 
       if (loginUser == null) {
         CustomSnackbar.showError('Error', 'User not logged in');
@@ -416,8 +353,8 @@ class AddinhouseproductController extends GetxController {
 
       // Prepare request data
       Map<String, dynamic> requestData = {
-        'salon_id': loginUser.salonId,
-        'branch_id': firstItem['branch_id'],
+        'salon_id': loginUser.manager?.salonId,
+        'branch_id': loginUser.manager?.branchId?.sId,
         'staff_id': firstItem['staff_id'],
         'product': productArray,
       };
@@ -437,7 +374,7 @@ class AddinhouseproductController extends GetxController {
         clearAllControllers();
 
         // Refresh the InhouseproductController data before navigating back
-        final inhouseController = Get.find<InhouseproductController>();
+        final inhouseController = Get.find<ManagerInHouseCOntroller>();
         inhouseController.getInhouseProductUseageData();
 
         return true;

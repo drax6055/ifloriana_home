@@ -11,22 +11,31 @@ import '../../../wiget/custome_snackbar.dart';
 import '../../../wiget/Custome_button.dart';
 import 'addInhouseProduct_controller.dart';
 
-class AddInhouseproductScreen extends StatelessWidget {
-  AddInhouseproductScreen({super.key});
-  final AddinhouseproductController controller =
-      Get.put(AddinhouseproductController());
+class ManagetPostInhouseScreen extends StatelessWidget {
+  ManagetPostInhouseScreen({super.key});
+  final controller =
+      Get.put(ManagerPostInhouseController());
 
   @override
   Widget build(BuildContext context) {
-    // Controller already fetches in onInit; avoid duplicate fetches
+    // Manually trigger data fetching when screen loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.fetchBranches();
+      controller.fetchStaff();
+      controller.fetchProducts();
+    });
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomAppBarWithDrawer(title: "Product Utilization Entry"),
       body: Obx(() {
-        if (controller.isLoading.value) {
-          return const Center(child: CustomLoadingAvatar());
+        // Show loading until all data is loaded
+        if (controller.branches.isEmpty ||
+            controller.staff.isEmpty ||
+            controller.products.isEmpty) {
+          return Center(child: CustomLoadingAvatar());
         }
+
         return Padding(
           padding: const EdgeInsets.all(16.0),
           child: ListView(
@@ -34,18 +43,17 @@ class AddInhouseproductScreen extends StatelessWidget {
               SizedBox(height: 20.h),
 
               // Branch Selection
-              CustomDropdown<dynamic>(
-                value: controller.selectedBranch.value,
-                items: controller.branches,
-                labelText: "Select Branch *",
-                onChanged: (v) {
-                  controller.selectedBranch.value = v;
-                  controller.filterStaffByBranch();
-                },
-                itemToString: (b) => b['name'],
-                getId: (b) => (b as Map<String, dynamic>)['_id'] ?? '',
-              ),
-              SizedBox(height: 20.h),
+              // CustomDropdown<dynamic>(
+              //   value: controller.selectedBranch.value,
+              //   items: controller.branches,
+              //   labelText: "Select Branch *",
+              //   onChanged: (v) {
+              //     controller.selectedBranch.value = v;
+              //     controller.filterStaffByBranch();
+              //   },
+              //   itemToString: (b) => b['name'],
+              // ),
+              // SizedBox(height: 20.h),
 
               // Staff Selection
               CustomDropdown<dynamic>(
@@ -54,7 +62,6 @@ class AddInhouseproductScreen extends StatelessWidget {
                 labelText: "Select Staff",
                 onChanged: (v) => controller.selectedStaff.value = v,
                 itemToString: (s) => s['full_name'],
-                getId: (s) => (s as Map<String, dynamic>)['_id'] ?? '',
               ),
               SizedBox(height: 20.h),
 
@@ -133,7 +140,7 @@ class AddInhouseproductScreen extends StatelessWidget {
     );
   }
 
-  Widget _productDropdown(AddinhouseproductController controller) {
+  Widget _productDropdown(ManagerPostInhouseController controller) {
     return Obx(() {
       final product = controller.selectedProduct.value;
       final hasVariations = product != null && product['has_variations'] == 1;
@@ -395,7 +402,8 @@ class AddInhouseproductScreen extends StatelessWidget {
               ? SizedBox(
                   width: 20,
                   height: 20,
-                  child: CustomLoadingAvatar(),
+                  child: CustomLoadingAvatar(
+                  ),
                 )
               : Icon(Icons.send, color: Colors.white),
         ));
