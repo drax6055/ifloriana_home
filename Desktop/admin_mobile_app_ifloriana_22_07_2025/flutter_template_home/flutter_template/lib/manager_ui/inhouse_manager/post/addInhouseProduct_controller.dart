@@ -6,10 +6,10 @@ import '../../../main.dart';
 import '../../../network/dio.dart';
 import '../../../network/network_const.dart';
 import '../../../wiget/custome_snackbar.dart';
-
+import '../../../wiget/custome_dropdown.dart';
 import '../get/inhouseProduct_controller.dart';
 
-class ManagerPostInhouseController extends GetxController {
+class AddinhouseproductController extends GetxController {
   final DioClient dioClient = DioClient();
 
   RxList branches = [].obs;
@@ -18,7 +18,7 @@ class ManagerPostInhouseController extends GetxController {
   List<dynamic> _allStaff = []; // Store all staff for filtering
   List<dynamic> _allProducts = []; // Store all products for filtering
 
-  Rxn selectedBranch = Rxn();
+  // Rxn selectedBranch = Rxn();
   Rxn selectedStaff = Rxn();
   Rxn selectedProduct = Rxn();
   Rxn selectedVariant = Rxn();
@@ -28,16 +28,28 @@ class ManagerPostInhouseController extends GetxController {
   RxList cart = <Map<String, dynamic>>[].obs;
   RxDouble totalAmount = 0.0.obs;
   RxBool isSubmitting = false.obs;
+  RxBool isLoading = false.obs;
 
   @override
   void onInit() {
     super.onInit();
-    fetchBranches();
-    fetchStaff();
-    fetchProducts();
+    _initLoad();
   }
 
-  void fetchBranches() async {
+  Future<void> _initLoad() async {
+    try {
+      isLoading.value = true;
+      await Future.wait([
+        fetchBranches(),
+        fetchStaff(),
+        fetchProducts(),
+      ]);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> fetchBranches() async {
     try {
       final loginUser = await prefs.getManagerUser();
       if (loginUser == null) {
@@ -65,6 +77,8 @@ class ManagerPostInhouseController extends GetxController {
       if (data != null && data['data'] != null) {
         branches.value = data['data'];
         print("Branches loaded: ${branches.length}");
+        // Keep selected branch reference in sync with new list
+        _syncSelectedById(loginUser.manager?.branchId!.sId as Rxn, branches);
       } else {
         print("No branches data found in response");
         branches.value = [];
@@ -75,7 +89,7 @@ class ManagerPostInhouseController extends GetxController {
     }
   }
 
-  void fetchStaff() async {
+  Future<void> fetchStaff() async {
     try {
       final loginUser = await prefs.getManagerUser();
       if (loginUser == null) {
@@ -104,6 +118,8 @@ class ManagerPostInhouseController extends GetxController {
         staff.value = data['data'];
         _allStaff = data['data'];
         print("Staff loaded: ${staff.length}");
+        // Keep selected staff reference in sync with new list
+        _syncSelectedById(selectedStaff, staff);
       } else {
         print("No staff data found in response");
         staff.value = [];
@@ -116,7 +132,7 @@ class ManagerPostInhouseController extends GetxController {
     }
   }
 
-  void fetchProducts() async {
+  Future<void> fetchProducts() async {
     try {
       final loginUser = await prefs.getManagerUser();
       if (loginUser == null) {
@@ -127,7 +143,7 @@ class ManagerPostInhouseController extends GetxController {
       print("User data for products: ${loginUser.toJson()}");
       print("Salon ID for products: ${loginUser.manager?.salonId}");
 
-      if (loginUser.manager?.salonId == null ) {
+      if (loginUser.manager?.salonId == null) {
         print("Error: Salon ID is null or empty for products");
         return;
       }
@@ -136,20 +152,42 @@ class ManagerPostInhouseController extends GetxController {
           '${Apis.baseUrl}${Endpoints.getProductsName}${loginUser.manager?.salonId}';
       print("Fetching products from: $endpoint");
 
-      final data = await dioClient.getData<List<dynamic>>(
-          endpoint, (json) => json as List<dynamic>);
+      final response =
+          await dioClient.getData<dynamic>(endpoint, (json) => json);
 
-      print("Products response: $data");
+      print("Products response: $response");
 
-      if (data != null) {
-        products.value = data;
-        _allProducts = data;
-        print("Products loaded: ${products.length}");
-      } else {
-        print("No products data found in response");
-        products.value = [];
-        _allProducts = [];
+      List<dynamic> parsedProducts = [];
+
+      if (response is List) {
+        parsedProducts = response;
+      } else if (response is Map<String, dynamic>) {
+        // Common backend shape: { message, data: [...] }
+        final dynamic inner = response['data'];
+        if (inner is List) {
+          parsedProducts = inner;
+        } else if (inner is Map<String, dynamic>) {
+          // Edge case: data is a map that contains list under a known key
+          // Try a few likely keys safely
+          final candidates = [
+            inner['items'],
+            inner['results'],
+            inner['list'],
+          ];
+          final firstList =
+              candidates.firstWhere((e) => e is List, orElse: () => null);
+          if (firstList is List) {
+            parsedProducts = firstList;
+          }
+        }
       }
+
+      products.value = parsedProducts;
+      _allProducts = parsedProducts;
+      print("Products loaded: ${products.length}");
+      // Keep selected product reference in sync with new list
+      _syncSelectedById(selectedProduct, products);
+      print("==>    Fetching products from: $endpoint");
     } catch (e) {
       print("Error fetching products: $e");
       products.value = [];
@@ -158,13 +196,16 @@ class ManagerPostInhouseController extends GetxController {
   }
 
   // Method to filter staff by branch
-  void filterStaffByBranch() {
-    if (selectedBranch.value == null) {
+  void filterStaffByBranch() async{
+      final loginUser = await prefs.getManagerUser();
+    if (loginUser?.manager?.branchId?.sId == null) {
       staff.value = _allStaff; // Show all staff if no branch selected
+      // Ensure selection remains valid after list change
+      _syncSelectedById(selectedStaff, staff);
       return;
     }
 
-    final selectedBranchId = selectedBranch.value['_id'];
+    final selectedBranchId = loginUser?.manager?.branchId?.sId;
     final filteredStaff = _allStaff.where((staffMember) {
       // Check if staff member has branch_id and it matches selected branch
       if (staffMember['branch_id'] != null) {
@@ -180,24 +221,14 @@ class ManagerPostInhouseController extends GetxController {
 
     staff.value = filteredStaff;
     // Clear selected staff if it's not in the filtered list
-    if (selectedStaff.value != null) {
-      final isStillValid =
-          filteredStaff.any((s) => s['_id'] == selectedStaff.value['_id']);
-      if (!isStillValid) {
-        selectedStaff.value = null;
-      }
-    }
+    _syncSelectedById(selectedStaff, staff);
   }
 
   // Add to cart method
-  void addToCart() {
+  void addToCart() async{
+      final loginUser = await prefs.getManagerUser();
     if (selectedProduct.value == null) {
       CustomSnackbar.showError('Error', 'Please select a product');
-      return;
-    }
-
-    if (selectedBranch.value == null) {
-      CustomSnackbar.showError('Error', 'Please select a branch');
       return;
     }
 
@@ -215,7 +246,7 @@ class ManagerPostInhouseController extends GetxController {
     // Check if cart already has items with different branch or staff
     if (cart.isNotEmpty) {
       final firstItem = cart.first;
-      if (firstItem['branch_id'] != selectedBranch.value['_id']) {
+      if (firstItem['branch_id'] != loginUser?.manager?.branchId?.sId) {
         CustomSnackbar.showError(
             'Error', 'All products must be from the same branch');
         return;
@@ -228,7 +259,7 @@ class ManagerPostInhouseController extends GetxController {
     }
 
     final product = selectedProduct.value as Map<String, dynamic>;
-    final branch = selectedBranch.value as Map<String, dynamic>;
+    // final branch = loginUser?.manager?.branchId?.sId as Map<String, dynamic>;
     final staffMember = selectedStaff.value as Map<String, dynamic>;
 
     // Get product price - handle both main product and variant prices
@@ -252,14 +283,14 @@ class ManagerPostInhouseController extends GetxController {
 
     final cartItem = {
       'name': productName,
-      'branch': branch['name'] ?? 'Unknown Branch',
+      'branch': loginUser?.manager?.branchId?.name,
       'staff': staffMember['full_name'] ?? 'Unknown Staff',
       'quantity': quantity,
       'price': price,
       'total': total,
       'product_id': product['_id'],
       'variant_id': selectedVariant.value?['_id'],
-      'branch_id': branch['_id'],
+      'branch_id': loginUser?.manager?.branchId?.sId,
       'staff_id': staffMember['_id'],
     };
 
@@ -301,8 +332,6 @@ class ManagerPostInhouseController extends GetxController {
 
   // Clear all form controllers
   void clearAllControllers() {
-    // Clear selections
-    selectedBranch.value = null;
     selectedStaff.value = null;
     selectedProduct.value = null;
     selectedVariant.value = null;
@@ -317,11 +346,40 @@ class ManagerPostInhouseController extends GetxController {
     staff.value = _allStaff;
   }
 
+  // Ensure selected Rxn holds the same instance from the provided list by matching _id
+  void _syncSelectedById(Rxn selected, List list) {
+    final current = selected.value;
+    if (current == null) return;
+    try {
+      final currentId = (current is Map && current.containsKey('_id'))
+          ? current['_id']
+          : null;
+      if (currentId == null) {
+        selected.value = null;
+        return;
+      }
+      Map<String, dynamic>? match;
+      for (final item in list) {
+        if (item is Map && item['_id'] == currentId) {
+          match = item.cast<String, dynamic>();
+          break;
+        }
+      }
+      if (match != null) {
+        selected.value = match;
+      } else {
+        selected.value = null;
+      }
+    } catch (_) {
+      selected.value = null;
+    }
+  }
+
   // Submit cart to API
   Future<bool> submitCart() async {
     try {
       isSubmitting.value = true;
-      final loginUser = await prefs.getManagerUser();
+      final loginUser = await prefs.getUser();
 
       if (loginUser == null) {
         CustomSnackbar.showError('Error', 'User not logged in');
@@ -353,8 +411,8 @@ class ManagerPostInhouseController extends GetxController {
 
       // Prepare request data
       Map<String, dynamic> requestData = {
-        'salon_id': loginUser.manager?.salonId,
-        'branch_id': loginUser.manager?.branchId?.sId,
+        'salon_id': loginUser.salonId,
+        'branch_id': firstItem['branch_id'],
         'staff_id': firstItem['staff_id'],
         'product': productArray,
       };
@@ -374,7 +432,7 @@ class ManagerPostInhouseController extends GetxController {
         clearAllControllers();
 
         // Refresh the InhouseproductController data before navigating back
-        final inhouseController = Get.find<ManagerInHouseCOntroller>();
+        final inhouseController = Get.find<ManagerGetInHouseProductController>();
         inhouseController.getInhouseProductUseageData();
 
         return true;

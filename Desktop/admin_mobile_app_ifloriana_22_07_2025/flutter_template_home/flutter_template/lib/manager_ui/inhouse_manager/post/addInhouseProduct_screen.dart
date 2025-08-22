@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_template/manager_ui/drawer/drawerscreen.dart';
 import 'package:flutter_template/utils/colors.dart';
 import 'package:get/get.dart';
 import '../../../utils/custom_text_styles.dart';
@@ -11,31 +12,23 @@ import '../../../wiget/custome_snackbar.dart';
 import '../../../wiget/Custome_button.dart';
 import 'addInhouseProduct_controller.dart';
 
-class ManagetPostInhouseScreen extends StatelessWidget {
-  ManagetPostInhouseScreen({super.key});
-  final controller =
-      Get.put(ManagerPostInhouseController());
+class AddInhouseproductScreen extends StatelessWidget {
+  AddInhouseproductScreen({super.key});
+  final AddinhouseproductController controller =
+      Get.put(AddinhouseproductController());
 
   @override
   Widget build(BuildContext context) {
-    // Manually trigger data fetching when screen loads
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.fetchBranches();
-      controller.fetchStaff();
-      controller.fetchProducts();
-    });
+    // Controller already fetches in onInit; avoid duplicate fetches
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomAppBarWithDrawer(title: "Product Utilization Entry"),
+      drawer: ManagerDrawerScreen(),
       body: Obx(() {
-        // Show loading until all data is loaded
-        if (controller.branches.isEmpty ||
-            controller.staff.isEmpty ||
-            controller.products.isEmpty) {
-          return Center(child: CustomLoadingAvatar());
+        if (controller.isLoading.value) {
+          return const Center(child: CustomLoadingAvatar());
         }
-
         return Padding(
           padding: const EdgeInsets.all(16.0),
           child: ListView(
@@ -52,6 +45,7 @@ class ManagetPostInhouseScreen extends StatelessWidget {
               //     controller.filterStaffByBranch();
               //   },
               //   itemToString: (b) => b['name'],
+              //   getId: (b) => (b as Map<String, dynamic>)['_id'] ?? '',
               // ),
               // SizedBox(height: 20.h),
 
@@ -62,6 +56,7 @@ class ManagetPostInhouseScreen extends StatelessWidget {
                 labelText: "Select Staff",
                 onChanged: (v) => controller.selectedStaff.value = v,
                 itemToString: (s) => s['full_name'],
+                getId: (s) => (s as Map<String, dynamic>)['_id'] ?? '',
               ),
               SizedBox(height: 20.h),
 
@@ -140,7 +135,7 @@ class ManagetPostInhouseScreen extends StatelessWidget {
     );
   }
 
-  Widget _productDropdown(ManagerPostInhouseController controller) {
+  Widget _productDropdown(AddinhouseproductController controller) {
     return Obx(() {
       final product = controller.selectedProduct.value;
       final hasVariations = product != null && product['has_variations'] == 1;
@@ -240,15 +235,14 @@ class ManagetPostInhouseScreen extends StatelessWidget {
       );
     });
   }
-
-  bool _canAddProduct() {
+bool _canAddProduct() {
     final parsedQuantity =
         int.tryParse(controller.quantityController.text) ?? 1;
     return controller.selectedProduct.value != null &&
-        controller.selectedBranch.value != null &&
         controller.selectedStaff.value != null &&
         parsedQuantity > 0;
   }
+
 
   Widget _buildCartSection() {
     return Column(
@@ -402,8 +396,7 @@ class ManagetPostInhouseScreen extends StatelessWidget {
               ? SizedBox(
                   width: 20,
                   height: 20,
-                  child: CustomLoadingAvatar(
-                  ),
+                  child: CustomLoadingAvatar(),
                 )
               : Icon(Icons.send, color: Colors.white),
         ));

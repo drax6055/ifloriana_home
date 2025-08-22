@@ -347,7 +347,7 @@ class AppPages {
         transition: Transition.rightToLeft),
     GetPage(
         name: Routes.ManagerINhouseScreen,
-        page: () => ManagerINhouseScreen(),
+        page: () => ManagerGetInHouseProductScreen(),
         transition: Transition.rightToLeft),
 
 

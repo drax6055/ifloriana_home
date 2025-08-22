@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_template/manager_ui/drawer/drawerscreen.dart';
 import 'package:flutter_template/utils/colors.dart';
 import 'package:get/get.dart';
-import '../../../utils/custom_text_styles.dart';
 import '../../../wiget/appbar/drawer_appbar.dart';
 import '../../../wiget/loading.dart';
-import '../../../wiget/custome_snackbar.dart';
 import '../../../network/model/inhouseProduct_model.dart';
+import '../../drawer/drawerscreen.dart';
 import '../post/addInhouseProduct_screen.dart';
 import 'inhouseProduct_controller.dart';
 
-class ManagerINhouseScreen extends StatelessWidget {
-  ManagerINhouseScreen({super.key});
+class ManagerGetInHouseProductScreen extends StatelessWidget {
+  ManagerGetInHouseProductScreen({super.key});
   final controller =
-      Get.put(ManagerInHouseCOntroller());
+      Get.put(ManagerGetInHouseProductController());
 
   @override
   Widget build(BuildContext context) {
@@ -197,7 +195,7 @@ class ManagerINhouseScreen extends StatelessWidget {
           );
         }),
       ),
-            drawer: ManagerDrawerScreen(),
+      drawer: ManagerDrawerScreen(),
       body: Column(
         children: [
           Expanded(
@@ -424,7 +422,7 @@ class ManagerINhouseScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Get.to(ManagetPostInhouseScreen());
+          Get.to(() => AddInhouseproductScreen());
         },
         child: Icon(
           Icons.add,
@@ -445,7 +443,7 @@ class ManagerINhouseScreen extends StatelessWidget {
   }
 
   void _showExportDialog(
-      BuildContext context, ManagerInHouseCOntroller controller) {
+      BuildContext context, ManagerGetInHouseProductController controller) {
     showDialog(
       context: context,
       builder: (BuildContext context) {

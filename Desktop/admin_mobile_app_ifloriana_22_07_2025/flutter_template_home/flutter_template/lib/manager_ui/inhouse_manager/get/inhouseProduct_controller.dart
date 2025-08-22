@@ -15,7 +15,7 @@ import '../../../network/network_const.dart';
 import '../../../wiget/custome_snackbar.dart';
 import '../../../network/model/inhouseProduct_model.dart';
 
-class ManagerInHouseCOntroller extends GetxController {
+class ManagerGetInHouseProductController extends GetxController {
   RxList<InhouseProductData> inhouseProducts = <InhouseProductData>[].obs;
   RxList<Map<String, dynamic>> filteredProducts = <Map<String, dynamic>>[].obs;
   RxBool isLoading = true.obs;
@@ -45,7 +45,7 @@ class ManagerInHouseCOntroller extends GetxController {
         (json) => json,
       );
       print(
-          '==========> ${Apis.baseUrl}${Endpoints.inHouseProduct}?salon_id=${loginUser.manager?.salonId}');
+          "==============> ${Apis.baseUrl}${Endpoints.inHouseProduct}?salon_id=${loginUser.manager?.salonId}");
       if (response != null && response['data'] != null) {
         final List<dynamic> dataList = response['data'];
         inhouseProducts.value =
