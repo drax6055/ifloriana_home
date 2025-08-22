@@ -30,6 +30,7 @@ import '../manager_ui/dashboard/dashboardScreen.dart';
 import '../manager_ui/inhouse_manager/get/inhouseProduct_screen.dart';
 import '../manager_ui/manager_appointment_screen/getappointmentManagerScreen.dart';
 import '../manager_ui/manager_appointment_screen/managerAppointmentSScreen.dart';
+import '../manager_ui/manager_orders/order_report_screen.dart';
 import '../manager_ui/manager_packages/manager_packageScreen.dart';
 import '../manager_ui/report/customer_membership/manager_customer_membership_report_screen.dart';
 import '../manager_ui/report/customer_packages/manager_customer_package_report_screen.dart';
@@ -350,6 +351,9 @@ class AppPages {
         page: () => ManagerGetInHouseProductScreen(),
         transition: Transition.rightToLeft),
 
-
+    GetPage(
+        name: Routes.ManagerOrderReportScreen,
+        page: () => ManagerOrderReportScreen(),
+        transition: Transition.rightToLeft),
   ];
 }

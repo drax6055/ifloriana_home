@@ -84,4 +84,5 @@ abstract class Routes {
       "/ManagerCustomerPackageReportScreen";
 
   static const ManagerINhouseScreen = "/ManagerINhouseScreen";
+  static const ManagerOrderReportScreen = "/ManagerOrderReportScreen";
 }

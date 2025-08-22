@@ -113,7 +113,7 @@ class ManagerDrawerScreen extends StatelessWidget {
       DrawerItem(
           title: 'orders',
           icon: Icons.paid_outlined,
-          route: Routes.Statffearningscreen),
+          route: Routes.ManagerOrderReportScreen),
       DrawerItem(
           title: 'Product Cunsumption',
           icon: Icons.edit_document,
