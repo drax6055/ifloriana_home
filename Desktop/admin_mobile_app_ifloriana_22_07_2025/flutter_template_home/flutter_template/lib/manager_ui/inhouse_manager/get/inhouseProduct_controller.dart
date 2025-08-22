@@ -40,21 +40,27 @@ class ManagerGetInHouseProductController extends GetxController {
         return;
       }
 
+      // Use the by-branch endpoint to get data for the manager's specific branch
+      final endpoint =
+          '${Apis.baseUrl}/in-house-product/by-branch?salon_id=${loginUser.manager?.salonId}&branch_id=${loginUser.manager?.branchId?.sId}';
+      print("Fetching inhouse products from: $endpoint");
+
       final response = await dioClient.getData<Map<String, dynamic>>(
-        '${Apis.baseUrl}${Endpoints.inHouseProduct}?salon_id=${loginUser.manager?.salonId}',
+        endpoint,
         (json) => json,
       );
-      print(
-          "==============> ${Apis.baseUrl}${Endpoints.inHouseProduct}?salon_id=${loginUser.manager?.salonId}");
+
       if (response != null && response['data'] != null) {
         final List<dynamic> dataList = response['data'];
         inhouseProducts.value =
             dataList.map((json) => InhouseProductData.fromJson(json)).toList();
-        print("Inhouse products loaded: ${inhouseProducts.length}");
+        print(
+            "Inhouse products loaded for branch ${loginUser.manager?.branchId?.sId}: ${inhouseProducts.length}");
         applyFilters();
       } else {
         inhouseProducts.value = [];
-        print("No inhouse products found");
+        print(
+            "No inhouse products found for branch ${loginUser.manager?.branchId?.sId}");
         applyFilters();
       }
     } catch (e) {

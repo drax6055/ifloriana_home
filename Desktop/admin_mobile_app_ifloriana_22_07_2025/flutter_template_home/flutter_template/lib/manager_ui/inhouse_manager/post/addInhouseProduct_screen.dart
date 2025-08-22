@@ -33,7 +33,7 @@ class AddInhouseproductScreen extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: ListView(
             children: [
-              SizedBox(height: 20.h),
+              // SizedBox(height: 10.h),
 
               // Branch Selection
               // CustomDropdown<dynamic>(
@@ -235,14 +235,14 @@ class AddInhouseproductScreen extends StatelessWidget {
       );
     });
   }
-bool _canAddProduct() {
+
+  bool _canAddProduct() {
     final parsedQuantity =
         int.tryParse(controller.quantityController.text) ?? 1;
     return controller.selectedProduct.value != null &&
         controller.selectedStaff.value != null &&
         parsedQuantity > 0;
   }
-
 
   Widget _buildCartSection() {
     return Column(
