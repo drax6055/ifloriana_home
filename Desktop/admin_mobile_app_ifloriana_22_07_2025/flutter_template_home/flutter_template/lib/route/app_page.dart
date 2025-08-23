@@ -1,3 +1,6 @@
+import 'package:flutter_template/manager_ui/ManagerProducts/allProducts/addProductsScreen.dart';
+import 'package:flutter_template/manager_ui/ManagerProducts/product_list/product_list_screen.dart';
+import 'package:flutter_template/manager_ui/ManagerProducts/variations/get/variationGetScreen.dart';
 import 'package:flutter_template/ui/auth/login/login_screen.dart';
 import 'package:flutter_template/ui/auth/profile/adminProfileScreen.dart';
 import 'package:flutter_template/ui/auth/register_packages/register_packages_screen.dart';
@@ -22,6 +25,11 @@ import 'package:flutter_template/ui/drawer/staff/staffDetailsScreen.dart'
     show Staffdetailsscreen;
 import 'package:flutter_template/ui/tax/addNewTaxScreen.dart';
 import 'package:get/get.dart';
+import '../manager_ui/ManagerProducts/Tags/tagsScreen.dart';
+import '../manager_ui/ManagerProducts/brand/getBrandsScreen.dart';
+import '../manager_ui/ManagerProducts/category/CategoryScreen.dart';
+import '../manager_ui/ManagerProducts/subcategory/subcategoryScreen.dart';
+import '../manager_ui/ManagerProducts/units/unitsScreen.dart';
 import '../manager_ui/coupons/manager_coupons_screen.dart';
 import '../manager_ui/customer/edit/manager_edit_customer.dart';
 import '../manager_ui/customer/add/manager_post_customer_screen.dart';
@@ -352,8 +360,38 @@ class AppPages {
         transition: Transition.rightToLeft),
 
     GetPage(
-        name: Routes.ManagerOrderReportScreen,
-        page: () => ManagerOrderReportScreen(),
+        name: Routes.ManagerProductListScreen,
+        page: () => ManagerProductListScreen(),
+        transition: Transition.rightToLeft),
+
+         GetPage(
+        name: Routes.ManagerGetbrandsscreen,
+        page: () => ManagerGetbrandsscreen(),
+        transition: Transition.rightToLeft),
+         GetPage(
+        name: Routes.ManagerCategoryscreen,
+        page: () => ManagerCategoryscreen(),
+        transition: Transition.rightToLeft),
+         GetPage(
+        name: Routes.ManagerSubcategoryscreen,
+        page: () => ManagerSubcategoryscreen(),
+        transition: Transition.rightToLeft),
+         GetPage(
+        name: Routes.ManagerTagsscreen,
+        page: () => ManagerTagsscreen(),
+        transition: Transition.rightToLeft),
+         GetPage(
+        name: Routes.ManagerUnitsscreen,
+        page: () => ManagerUnitsscreen(),
+        transition: Transition.rightToLeft),
+         GetPage(
+        name: Routes.ManagerVariationGetscreen,
+        page: () => ManagerVariationGetscreen(),
+        transition: Transition.rightToLeft),
+
+          GetPage(
+        name: Routes.ManagerAddProductScreen,
+        page: () => ManagerAddProductScreen(),
         transition: Transition.rightToLeft),
   ];
 }

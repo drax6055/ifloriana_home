@@ -82,33 +82,31 @@ class ManagerDrawerScreen extends StatelessWidget {
             DrawerItem(
                 title: 'All Products',
                 icon: Icons.shopping_bag_outlined,
-                route: Routes.ProductListScreen),
+                route: Routes.ManagerProductListScreen),
             DrawerItem(
                 title: 'Brands',
                 icon: Icons.business_outlined,
-                route: Routes.Getbrandsscreen),
+                route: Routes.ManagerGetbrandsscreen),
             DrawerItem(
                 title: 'Category',
                 icon: Icons.list_alt_rounded,
-                route: Routes.Categoryscreen),
+                route: Routes.ManagerCategoryscreen),
             DrawerItem(
                 title: 'Sub Category',
                 icon: Icons.category_outlined,
-                route: Routes.Subcategoryscreen),
+                route: Routes.ManagerSubcategoryscreen),
             DrawerItem(
                 title: 'Units',
                 icon: Icons.ac_unit_outlined,
-                route: Routes.Unitsscreen),
+                route: Routes.ManagerUnitsscreen),
             DrawerItem(
-                title: 'Tags', icon: Icons.list, route: Routes.Tagsscreen),
+                title: 'Tags',
+                icon: Icons.list,
+                route: Routes.ManagerTagsscreen),
             DrawerItem(
                 title: 'Product Variation',
                 icon: Icons.line_style_sharp,
-                route: Routes.VariationGetscreen),
-            DrawerItem(
-                title: 'Product Cunsumption',
-                icon: Icons.update,
-                route: Routes.InhouseproductScreen),
+                route: Routes.ManagerVariationGetscreen),
           ]),
       DrawerItem(
           title: 'orders',
